@@ -1,0 +1,156 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>EchoDNA — Northern Irish Example Report</title>
+
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+<style>
+:root{
+  --bg:#0b0f16;
+  --card:#121825;
+  --text:#ecf2ff;
+  --muted:#9ba7c0;
+  --accent:#b3d4fc;
+}
+
+*{
+  box-sizing:border-box;
+}
+
+body{
+  margin:0;
+  font-family:Inter,system-ui,sans-serif;
+  background:var(--bg);
+  color:var(--text);
+  min-height:100vh;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  overflow:hidden;
+}
+
+.bg{
+  position:fixed;
+  inset:0;
+  background:
+    radial-gradient(circle at top left, rgba(179,212,252,.12), transparent 30%),
+    radial-gradient(circle at bottom right, rgba(179,212,252,.08), transparent 30%);
+}
+
+.card{
+  position:relative;
+  z-index:2;
+  width:min(720px,92vw);
+  background:rgba(18,24,37,.92);
+  border:1px solid rgba(179,212,252,.12);
+  border-radius:28px;
+  padding:42px;
+  backdrop-filter:blur(18px);
+  box-shadow:0 20px 60px rgba(0,0,0,.45);
+}
+
+.logo{
+  font-size:14px;
+  letter-spacing:.18em;
+  text-transform:uppercase;
+  color:var(--accent);
+  font-weight:800;
+  margin-bottom:14px;
+}
+
+h1{
+  margin:0;
+  font-size:44px;
+  line-height:1.05;
+}
+
+p{
+  margin-top:18px;
+  color:var(--muted);
+  font-size:15px;
+  line-height:1.7;
+}
+
+.buttons{
+  margin-top:34px;
+  display:flex;
+  flex-wrap:wrap;
+  gap:14px;
+}
+
+.btn{
+  padding:14px 20px;
+  border-radius:14px;
+  text-decoration:none;
+  font-weight:700;
+  transition:.2s ease;
+}
+
+.btn-primary{
+  background:var(--accent);
+  color:#08111d;
+}
+
+.btn-primary:hover{
+  transform:translateY(-2px);
+}
+
+.btn-secondary{
+  border:1px solid rgba(255,255,255,.08);
+  color:var(--text);
+  background:#171e2b;
+}
+
+.btn-secondary:hover{
+  background:#1d2636;
+}
+
+.footer{
+  margin-top:30px;
+  color:#6f7d96;
+  font-size:12px;
+}
+</style>
+</head>
+
+<body>
+
+<div class="bg"></div>
+
+<div class="card">
+
+<div class="logo">EchoDNA</div>
+
+<h1>Northern Irish<br>Example Report</h1>
+
+<p>
+Explore a full ancient DNA report including ancient sample matches,
+admixture breakdowns, phenotype reconstruction, PCA positioning,
+and physical trait prediction.
+</p>
+
+<div class="buttons">
+  <a class="btn btn-primary" href="pages/top_matches.html">
+    Open Report
+  </a>
+
+  <a class="btn btn-secondary" href="pages/admixture.html">
+    Admixture
+  </a>
+
+  <a class="btn btn-secondary" href="pages/phenotype.html">
+    Phenotype
+  </a>
+</div>
+
+<div class="footer">
+Generated with EchoDNA Ancient Echoes
+</div>
+
+</div>
+
+</body>
+</html>
