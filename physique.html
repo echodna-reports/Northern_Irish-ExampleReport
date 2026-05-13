@@ -1,0 +1,907 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Physique Prediction</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+  <style>
+    body {
+      font-family: Inter, sans-serif;
+      background: #f0f6ff;
+    }
+
+    .glass {
+      background: rgba(255,255,255,0.78);
+      backdrop-filter: blur(18px);
+      border: 1px solid rgba(255,255,255,0.7);
+    }
+
+    .sport-card,
+    .trait-card {
+      transition: transform .22s ease, box-shadow .22s ease;
+    }
+
+    .sport-card:hover,
+    .trait-card:hover {
+      transform: translateY(-4px);
+      box-shadow: 0 20px 40px rgba(15,23,42,.13);
+    }
+
+    .trait-card {
+      max-width: 920px;
+      margin-left: auto;
+      margin-right: auto;
+    }
+  </style>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
+
+<style id="echo-shell-css">
+:root{
+  --echo-bg:#0b0f16;
+  --echo-panel:#101722;
+  --echo-border:rgba(255,255,255,.08);
+  --echo-text:#e8eef8;
+  --echo-muted:#8fa1b8;
+  --ancient:#ffffff;
+  --traits:#00b8c8;
+  --phenotype:#7c8cff;
+  --physique:#ff8757;
+}
+
+body.echo-light-section{
+  --echo-bg:#f5f7fa;
+  --echo-text:#1a222c;
+  --echo-muted:#6b7785;
+  --echo-border:rgba(0,0,0,.08);
+}
+
+.echo-shell-topbar{
+  position:fixed;
+  top:0;
+  left:0;
+  right:0;
+  height:72px;
+  z-index:99990;
+  background:rgba(11,15,22,.85);
+  backdrop-filter:blur(12px);
+  border-bottom:1px solid var(--echo-border);
+  box-sizing:border-box;
+  font-family:Inter,system-ui,sans-serif;
+}
+
+body.echo-light-section .echo-shell-topbar{
+  background:rgba(255,255,255,.85);
+}
+
+.echo-shell-toplinks{
+  max-width:1300px;
+  height:72px;
+  margin:0 auto;
+  display:flex;
+}
+
+.echo-shell-toplinks a{
+  flex:1;
+  display:flex;
+  align-items:center;
+  justify-content:center;
+  gap:10px;
+  color:var(--echo-muted);
+  text-decoration:none;
+  font-size:14px;
+  font-weight:800;
+  position:relative;
+  transition:.25s ease;
+}
+
+.echo-shell-toplinks a:hover,
+.echo-shell-toplinks a.active{
+  color:var(--echo-text);
+}
+
+.echo-shell-toplinks a.active::after{
+  content:"";
+  position:absolute;
+  bottom:0;
+  left:20%;
+  right:20%;
+  height:3px;
+  border-radius:999px;
+}
+
+.echo-shell-toplinks a[data-tab="ancient"].active::after{background:var(--ancient);}
+body.echo-light-section .echo-shell-toplinks a[data-tab="ancient"].active::after{background:#0b0f16;}
+.echo-shell-toplinks a[data-tab="traits"].active::after{background:var(--traits);}
+.echo-shell-toplinks a[data-tab="phenotype"].active::after{background:var(--phenotype);}
+.echo-shell-toplinks a[data-tab="physique"].active::after{background:var(--physique);}
+
+.echo-nav-icon,
+.echo-nav-icon-stroke{
+  width:22px;
+  height:22px;
+  flex:0 0 auto;
+}
+
+.echo-nav-icon{fill:currentColor;}
+.echo-nav-icon-stroke{
+  fill:none;
+  stroke:currentColor;
+  stroke-width:1.8;
+  stroke-linecap:round;
+  stroke-linejoin:round;
+}
+
+.echo-shell-sidebar{
+  display:none;
+  position:fixed;
+  top:72px;
+  left:0;
+  bottom:0;
+  width:248px;
+  z-index:99980;
+  background:linear-gradient(180deg,rgba(16,23,34,.96),rgba(9,13,20,.98));
+  border-right:1px solid var(--echo-border);
+  padding:18px 14px;
+  box-sizing:border-box;
+  font-family:Inter,system-ui,sans-serif;
+}
+
+body.echo-ancient-page .echo-shell-sidebar{
+  display:block;
+}
+
+.echo-shell-mode{
+  padding:15px 14px;
+  border:1px solid var(--echo-border);
+  border-radius:18px;
+  background:rgba(255,255,255,.035);
+  margin-bottom:16px;
+}
+
+.echo-shell-mode .kicker{
+  color:#b3d4fc;
+  font-size:11px;
+  font-weight:900;
+  text-transform:uppercase;
+  letter-spacing:.12em;
+  margin-bottom:7px;
+}
+
+.echo-shell-mode h2{
+  color:#e8eef8;
+  font-size:18px;
+  margin:0 0 8px;
+}
+
+.echo-shell-mode p{
+  color:#8fa1b8;
+  font-size:12px;
+  line-height:1.45;
+  margin:0;
+}
+
+.echo-shell-nav{
+  display:flex;
+  flex-direction:column;
+  gap:8px;
+}
+
+.echo-shell-nav a{
+  color:#8fa1b8;
+  text-decoration:none;
+  display:flex;
+  align-items:center;
+  gap:11px;
+  padding:12px;
+  border-radius:15px;
+  border:1px solid transparent;
+  transition:.18s ease;
+  font-size:13px;
+  font-weight:700;
+}
+
+.echo-shell-nav a .ico{
+  width:30px;
+  height:30px;
+  border-radius:11px;
+  display:grid;
+  place-items:center;
+  background:rgba(179,212,252,.08);
+  color:#b3d4fc;
+}
+
+.echo-shell-nav a:hover,
+.echo-shell-nav a.active{
+  color:#e8eef8;
+  background:rgba(179,212,252,.08);
+  border-color:rgba(179,212,252,.16);
+}
+
+.echo-shell-nav a.active .ico{
+  background:#b3d4fc;
+  color:#08111d;
+}
+
+.echo-shell-footer{
+  margin-top:18px;
+  padding:12px;
+  border-radius:16px;
+  background:rgba(255,255,255,.035);
+  color:#8fa1b8;
+  font-size:11px;
+  line-height:1.45;
+}
+
+#echo-shell-root{
+  margin-left:0;
+  padding-top:72px;
+  min-height:100vh;
+  box-sizing:border-box;
+}
+
+body.echo-ancient-page #echo-shell-root{
+  margin-left:248px;
+}
+
+@media(max-width:900px){
+  .echo-shell-sidebar{width:78px;padding:12px 8px;}
+  .echo-shell-mode{display:none;}
+  .echo-shell-nav a span.label{display:none;}
+  .echo-shell-nav a{justify-content:center;padding:10px;}
+  body.echo-ancient-page #echo-shell-root{margin-left:78px;}
+  .echo-shell-toplinks a{font-size:0;}
+}
+</style>
+
+</head>
+
+<body class="min-h-screen text-slate-900 relative overflow-x-hidden">
+
+<div class="echo-shell-topbar">
+  <nav class="echo-shell-toplinks">
+    <a href="top_matches.html" data-tab="ancient">✦ Ancient Echoes</a>
+    <a href="traits.html" data-tab="traits">DNA Traits</a>
+    <a href="phenotype.html" data-tab="phenotype">Phenotype</a>
+    <a href="physique.html" data-tab="physique">Physique</a>
+  </nav>
+</div>
+
+<aside class="echo-shell-sidebar">
+  <div class="echo-shell-mode">
+    <div class="kicker">Ancient Mode</div>
+    <h2>Ancient Echoes</h2>
+    <p>Explore sample matches, ancestry composition and PCA placement.</p>
+  </div>
+
+  <nav class="echo-shell-nav">
+    <a href="top_matches.html"><span class="ico">✦</span><span class="label">Top Matches</span></a>
+    <a href="admixture.html"><span class="ico">◌</span><span class="label">Admixture</span></a>
+    <a href="pca_plot.html"><span class="ico">⌁</span><span class="label">PCA</span></a>
+    <a href="store.html"><span class="ico">🛒</span><span class="label">Store</span></a>
+  </nav>
+
+  <div class="echo-shell-footer">
+    Ancient Echoes report bundle generated locally into dist/pages.
+  </div>
+</aside>
+
+<script id="echo-shell-js">
+(function(){
+  const file = location.pathname.split('/').pop().toLowerCase();
+
+  const ancientFiles = new Set([
+    'top_matches.html',
+    'admixture.html',
+    'pca_plot.html'
+  ]);
+
+  const lightFiles = new Set([
+    'traits.html',
+    'phenotype.html',
+    'physique.html'
+  ]);
+
+  if(ancientFiles.has(file)){
+    document.body.classList.add('echo-ancient-page');
+  }
+
+  if(lightFiles.has(file)){
+    document.body.classList.add('echo-light-section');
+  }
+
+  document.querySelectorAll('.echo-shell-nav a, .echo-shell-toplinks a').forEach(a=>{
+    const href = (a.getAttribute('href') || '').toLowerCase();
+
+    if(href === file){
+      a.classList.add('active');
+    }
+
+    if(ancientFiles.has(file) && a.dataset && a.dataset.tab === 'ancient'){
+      a.classList.add('active');
+    }
+  });
+})();
+</script>
+
+<div id="echo-shell-root">
+
+
+  
+<div class="absolute inset-0 -z-10 overflow-hidden">
+  <div class="absolute inset-x-0 top-0">
+    <svg class="w-full h-56" xmlns="http://www.w3.org/2000/svg"
+         viewBox="0 0 1440 320" preserveAspectRatio="none">
+      <path fill="#b3d4fc" fill-opacity="1"
+        d="M0,96L30,122.7C60,149,120,203,180,208C240,213,300,171,360,165.3C420,160,480,192,540,181.3C600,171,660,117,720,117.3C780,117,840,171,900,181.3C960,192,1020,160,1080,144C1140,128,1200,128,1260,133.3C1320,139,1380,149,1410,154.7L1440,160L1440,0L0,0Z" />
+    </svg>
+  </div>
+  <div id="bg-shapes"></div>
+</div>
+
+
+  <main class="max-w-7xl mx-auto px-6 pt-20 pb-16">
+
+    <section class="grid grid-cols-1 lg:grid-cols-2 gap-8 mb-16">
+      
+      <div class="glass rounded-[2rem] shadow-xl p-8 min-h-[360px] flex flex-col justify-between">
+        <div>
+          <div class="flex items-start justify-between gap-4">
+            <div>
+              <p class="text-xs text-blue-600 font-extrabold uppercase tracking-wider">
+                Your Predicted Sports Archetype
+              </p>
+              <h2 class="text-4xl font-black mt-3">Power Athlete</h2>
+              <p class="text-sm text-blue-700 font-bold mt-2">Explosive strength dominant</p>
+              <p class="text-slate-500 text-sm mt-3 max-w-xl">
+                Your profile suggests stronger alignment with short-duration power, sprinting, jumping, heavy resistance training, and contact-based sports.
+              </p>
+            </div>
+
+            <div class="w-16 h-16 rounded-3xl bg-blue-100 flex items-center justify-center text-3xl">
+              ⚡
+            </div>
+          </div>
+
+          <div class="grid grid-cols-6 gap-4 mt-8">
+            <div class="col-span-2 bg-white rounded-3xl p-4 shadow-sm">
+              <p class="text-xs text-slate-400 uppercase font-bold">Power</p>
+              <p class="text-2xl font-black text-blue-600 mt-1">9.3</p>
+            </div>
+            <div class="col-span-2 bg-white rounded-3xl p-4 shadow-sm">
+              <p class="text-xs text-slate-400 uppercase font-bold">Endurance</p>
+              <p class="text-2xl font-black text-emerald-600 mt-1">4.5</p>
+            </div>
+            <div class="col-span-2 bg-white rounded-3xl p-4 shadow-sm">
+              <p class="text-xs text-slate-400 uppercase font-bold">Resilience</p>
+              <p class="text-2xl font-black text-rose-600 mt-1">9.0</p>
+            </div>
+            <div class="col-span-3 bg-white rounded-3xl p-4 shadow-sm">
+              <p class="text-xs text-slate-400 uppercase font-bold">Recovery</p>
+              <p class="text-2xl font-black text-violet-600 mt-1">6.0</p>
+            </div>
+            <div class="col-span-3 bg-white rounded-3xl p-4 shadow-sm">
+              <p class="text-xs text-slate-400 uppercase font-bold">Metabolism</p>
+              <p class="text-2xl font-black text-orange-600 mt-1">8.0</p>
+            </div>
+          </div>
+        </div>
+      </div>
+    
+      
+      <div class="glass rounded-[2rem] shadow-xl p-8 min-h-[360px]">
+        <div class="flex items-center justify-between mb-6">
+          <div>
+            <p class="text-xs text-blue-600 font-extrabold uppercase tracking-wider">
+              Recommended Sports
+            </p>
+            <h2 class="text-3xl font-black mt-2">Best Matches</h2>
+          </div>
+
+          <span class="text-xs bg-blue-100 text-blue-700 px-3 py-1 rounded-full font-extrabold">
+            6 matches
+          </span>
+        </div>
+
+        <div class="grid grid-cols-2 md:grid-cols-3 gap-4">
+          
+          <div class="sport-card bg-white rounded-3xl p-4 shadow-sm">
+            <div class="w-12 h-12 rounded-2xl bg-blue-100 flex items-center justify-center mb-3">
+              <img src="../Images/mma.png" alt="MMA" class="w-8 h-8 object-contain">
+            </div>
+            <h3 class="font-black text-sm leading-tight">MMA</h3>
+            <p class="text-xs text-slate-500 mt-1">Recommended for</p>
+            <p class="text-xs font-black text-blue-600 mt-1">Hybrid resilience</p>
+          </div>
+        
+          <div class="sport-card bg-white rounded-3xl p-4 shadow-sm">
+            <div class="w-12 h-12 rounded-2xl bg-violet-100 flex items-center justify-center mb-3">
+              <img src="../Images/wrestling.png" alt="Wrestling" class="w-8 h-8 object-contain">
+            </div>
+            <h3 class="font-black text-sm leading-tight">Wrestling</h3>
+            <p class="text-xs text-slate-500 mt-1">Recommended for</p>
+            <p class="text-xs font-black text-violet-600 mt-1">Strength + resilience</p>
+          </div>
+        
+          <div class="sport-card bg-white rounded-3xl p-4 shadow-sm">
+            <div class="w-12 h-12 rounded-2xl bg-pink-100 flex items-center justify-center mb-3">
+              <img src="../Images/rugby.png" alt="Rugby" class="w-8 h-8 object-contain">
+            </div>
+            <h3 class="font-black text-sm leading-tight">Rugby</h3>
+            <p class="text-xs text-slate-500 mt-1">Recommended for</p>
+            <p class="text-xs font-black text-pink-600 mt-1">Power + durability</p>
+          </div>
+        
+          <div class="sport-card bg-white rounded-3xl p-4 shadow-sm">
+            <div class="w-12 h-12 rounded-2xl bg-emerald-100 flex items-center justify-center mb-3">
+              <img src="../Images/climbing.png" alt="Climbing" class="w-8 h-8 object-contain">
+            </div>
+            <h3 class="font-black text-sm leading-tight">Climbing</h3>
+            <p class="text-xs text-slate-500 mt-1">Recommended for</p>
+            <p class="text-xs font-black text-emerald-600 mt-1">Strength-to-weight</p>
+          </div>
+        
+          <div class="sport-card bg-white rounded-3xl p-4 shadow-sm">
+            <div class="w-12 h-12 rounded-2xl bg-orange-100 flex items-center justify-center mb-3">
+              <img src="../Images/powerlifting.png" alt="Powerlifting" class="w-8 h-8 object-contain">
+            </div>
+            <h3 class="font-black text-sm leading-tight">Powerlifting</h3>
+            <p class="text-xs text-slate-500 mt-1">Recommended for</p>
+            <p class="text-xs font-black text-orange-600 mt-1">Max strength</p>
+          </div>
+        
+          <div class="sport-card bg-white rounded-3xl p-4 shadow-sm">
+            <div class="w-12 h-12 rounded-2xl bg-cyan-100 flex items-center justify-center mb-3">
+              <img src="../Images/shotput.png" alt="Shot Put" class="w-8 h-8 object-contain">
+            </div>
+            <h3 class="font-black text-sm leading-tight">Shot Put</h3>
+            <p class="text-xs text-slate-500 mt-1">Recommended for</p>
+            <p class="text-xs font-black text-cyan-600 mt-1">Force output</p>
+          </div>
+        
+        </div>
+      </div>
+    
+    </section>
+
+    <div class="flex justify-center mb-12">
+      <div class="w-24 h-1 rounded-full bg-blue-400 opacity-60"></div>
+    </div>
+
+    <section class="grid grid-cols-1 gap-8">
+      
+<div class="bg-white rounded-2xl shadow-xl hover:shadow-xl transition overflow-hidden trait-card">
+
+  <div class="bg-blue-600 text-white flex items-center justify-between px-6 py-3">
+    <div class="flex items-center gap-3">
+      <img src="../Images/power.png" alt="Power icon" class="w-8 h-8 object-contain" />
+      <h2 class="text-lg font-bold">Power</h2>
+    </div>
+    <div class="flex gap-2 flex-wrap justify-end">
+      <span class="bg-blue-100 text-blue-700 text-xs font-semibold px-3 py-1 rounded-full">Fast-twitch advantage</span>
+      <span class="bg-blue-800 text-white text-xs font-semibold px-3 py-1 rounded-full">Genotype: <span style="color:#60a5fa; font-weight:700;">CC</span></span>
+    </div>
+  </div>
+
+  <div class="p-6 grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
+    <div class="pr-6 md:border-r border-gray-200">
+      <div class="text-sm font-medium text-gray-700 mb-3">Key SNP: rs1815739 &nbsp;&nbsp; Gene: ACTN3</div>
+      <p class="text-sm text-gray-400 leading-relaxed">Research into the ACTN3 gene shows that this profile is commonly associated with functional α-actinin-3 expression, supporting fast-twitch muscle activity and explosive strength performance.</p>
+    </div>
+
+    <div class="pl-0 md:pl-6 flex flex-col items-center relative">
+      <div class="flex items-center gap-2 text-xs font-semibold text-gray-600 mb-3">
+        <span>Key SNP Distribution</span>
+      </div>
+      <canvas id="chart_rs1815739" height="180" class="w-full"></canvas>
+    </div>
+  </div>
+</div>
+
+
+<div class="bg-white rounded-2xl shadow-xl hover:shadow-xl transition overflow-hidden trait-card">
+
+  <div class="bg-green-600 text-white flex items-center justify-between px-6 py-3">
+    <div class="flex items-center gap-3">
+      <img src="../Images/aerobic.png" alt="Aerobic Capacity icon" class="w-8 h-8 object-contain" />
+      <h2 class="text-lg font-bold">Aerobic Capacity</h2>
+    </div>
+    <div class="flex gap-2 flex-wrap justify-end">
+      <span class="bg-red-100 text-red-700 text-xs font-semibold px-3 py-1 rounded-full">Lower aerobic potential</span>
+      <span class="bg-green-800 text-white text-xs font-semibold px-3 py-1 rounded-full">Genotype: <span style="color:#f87171; font-weight:700;">TT</span></span>
+    </div>
+  </div>
+
+  <div class="p-6 grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
+    <div class="pr-6 md:border-r border-gray-200">
+      <div class="text-sm font-medium text-gray-700 mb-3">Key SNP: rs8192678 &nbsp;&nbsp; Gene: PPARGC1A</div>
+      <p class="text-sm text-gray-400 leading-relaxed">Your PPARGC1A profile suggests less natural bias toward high aerobic efficiency, although training can still produce strong adaptations.</p>
+    </div>
+
+    <div class="pl-0 md:pl-6 flex flex-col items-center relative">
+      <div class="flex items-center gap-2 text-xs font-semibold text-gray-600 mb-3">
+        <span>Key SNP Distribution</span>
+      </div>
+      <canvas id="chart_rs8192678" height="180" class="w-full"></canvas>
+    </div>
+  </div>
+</div>
+
+
+<div class="bg-white rounded-2xl shadow-xl hover:shadow-xl transition overflow-hidden trait-card">
+
+  <div class="bg-purple-600 text-white flex items-center justify-between px-6 py-3">
+    <div class="flex items-center gap-3">
+      <img src="../Images/anabolic.png" alt="Anabolic Response icon" class="w-8 h-8 object-contain" />
+      <h2 class="text-lg font-bold">Anabolic Response</h2>
+    </div>
+    <div class="flex gap-2 flex-wrap justify-end">
+      <span class="bg-purple-100 text-purple-700 text-xs font-semibold px-3 py-1 rounded-full">Intermediate anabolic response</span>
+      <span class="bg-purple-800 text-white text-xs font-semibold px-3 py-1 rounded-full">Genotype: <span style="color:#a78bfa; font-weight:700;">AG</span></span>
+    </div>
+  </div>
+
+  <div class="p-6 grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
+    <div class="pr-6 md:border-r border-gray-200">
+      <div class="text-sm font-medium text-gray-700 mb-3">Key SNP: rs35767 &nbsp;&nbsp; Gene: IGF1</div>
+      <p class="text-sm text-gray-400 leading-relaxed">Your IGF1 profile suggests a balanced anabolic response to resistance training.</p>
+    </div>
+
+    <div class="pl-0 md:pl-6 flex flex-col items-center relative">
+      <div class="flex items-center gap-2 text-xs font-semibold text-gray-600 mb-3">
+        <span>Key SNP Distribution</span>
+      </div>
+      <canvas id="chart_rs35767" height="180" class="w-full"></canvas>
+    </div>
+  </div>
+</div>
+
+
+<div class="bg-white rounded-2xl shadow-xl hover:shadow-xl transition overflow-hidden trait-card">
+
+  <div class="bg-red-600 text-white flex items-center justify-between px-6 py-3">
+    <div class="flex items-center gap-3">
+      <img src="../Images/PainTol.png" alt="Pain Tolerance icon" class="w-8 h-8 object-contain" />
+      <h2 class="text-lg font-bold">Pain Tolerance</h2>
+    </div>
+    <div class="flex gap-2 flex-wrap justify-end">
+      <span class="bg-orange-100 text-orange-700 text-xs font-semibold px-3 py-1 rounded-full">Strong pain tolerance</span>
+      <span class="bg-red-800 text-white text-xs font-semibold px-3 py-1 rounded-full">Genotype: <span style="color:#fb923c; font-weight:700;">GG</span></span>
+    </div>
+  </div>
+
+  <div class="p-6 grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
+    <div class="pr-6 md:border-r border-gray-200">
+      <div class="text-sm font-medium text-gray-700 mb-3">Key SNP: rs6746030 &nbsp;&nbsp; Gene: SCN9A</div>
+      <p class="text-sm text-gray-400 leading-relaxed">Your genetic profile shows fewer pain-sensitivity alleles across the checked pain-related pathways.</p>
+    </div>
+
+    <div class="pl-0 md:pl-6 flex flex-col items-center relative">
+      <div class="flex items-center gap-2 text-xs font-semibold text-gray-600 mb-3">
+        <span>Key SNP Distribution</span>
+      </div>
+      <canvas id="chart_rs6746030" height="180" class="w-full"></canvas>
+    </div>
+  </div>
+</div>
+
+
+<div class="bg-white rounded-2xl shadow-xl hover:shadow-xl transition overflow-hidden trait-card">
+
+  <div class="bg-yellow-600 text-white flex items-center justify-between px-6 py-3">
+    <div class="flex items-center gap-3">
+      <img src="../Images/BoneDensity.png" alt="Bone Density icon" class="w-8 h-8 object-contain" />
+      <h2 class="text-lg font-bold">Bone Density</h2>
+    </div>
+    <div class="flex gap-2 flex-wrap justify-end">
+      <span class="bg-green-100 text-green-700 text-xs font-semibold px-3 py-1 rounded-full">Intermediate bone density</span>
+      <span class="bg-yellow-800 text-white text-xs font-semibold px-3 py-1 rounded-full">Genotype: <span style="color:#34d399; font-weight:700;">CT</span></span>
+    </div>
+  </div>
+
+  <div class="p-6 grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
+    <div class="pr-6 md:border-r border-gray-200">
+      <div class="text-sm font-medium text-gray-700 mb-3">Key SNP: rs3736228 &nbsp;&nbsp; Gene: LRP5</div>
+      <p class="text-sm text-gray-400 leading-relaxed">Your LRP5 profile suggests an intermediate skeletal density pattern.</p>
+    </div>
+
+    <div class="pl-0 md:pl-6 flex flex-col items-center relative">
+      <div class="flex items-center gap-2 text-xs font-semibold text-gray-600 mb-3">
+        <span>Key SNP Distribution</span>
+      </div>
+      <canvas id="chart_rs3736228" height="180" class="w-full"></canvas>
+    </div>
+  </div>
+</div>
+
+
+<div class="bg-white rounded-2xl shadow-xl hover:shadow-xl transition overflow-hidden trait-card">
+
+  <div class="bg-pink-600 text-white flex items-center justify-between px-6 py-3">
+    <div class="flex items-center gap-3">
+      <img src="../Images/MuscleInjury.png" alt="Muscular Injury Susceptibility icon" class="w-8 h-8 object-contain" />
+      <h2 class="text-lg font-bold">Muscular Injury Susceptibility</h2>
+    </div>
+    <div class="flex gap-2 flex-wrap justify-end">
+      <span class="bg-red-100 text-red-700 text-xs font-semibold px-3 py-1 rounded-full">Lower injury susceptibility</span>
+      <span class="bg-pink-800 text-white text-xs font-semibold px-3 py-1 rounded-full">Genotype: <span style="color:#f87171; font-weight:700;">TT</span></span>
+    </div>
+  </div>
+
+  <div class="p-6 grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
+    <div class="pr-6 md:border-r border-gray-200">
+      <div class="text-sm font-medium text-gray-700 mb-3">Key SNP: rs1049434 &nbsp;&nbsp; Gene: MCT1</div>
+      <p class="text-sm text-gray-400 leading-relaxed">Your MCT1 profile is associated with lower muscular injury susceptibility.</p>
+    </div>
+
+    <div class="pl-0 md:pl-6 flex flex-col items-center relative">
+      <div class="flex items-center gap-2 text-xs font-semibold text-gray-600 mb-3">
+        <span>Key SNP Distribution</span>
+      </div>
+      <canvas id="chart_rs1049434" height="180" class="w-full"></canvas>
+    </div>
+  </div>
+</div>
+
+
+<div class="bg-white rounded-2xl shadow-xl hover:shadow-xl transition overflow-hidden trait-card">
+
+  <div class="bg-green-600 text-white flex items-center justify-between px-6 py-3">
+    <div class="flex items-center gap-3">
+      <img src="../Images/Appetite.png" alt="Appetite Regulation icon" class="w-8 h-8 object-contain" />
+      <h2 class="text-lg font-bold">Appetite Regulation</h2>
+    </div>
+    <div class="flex gap-2 flex-wrap justify-end">
+      <span class="bg-teal-100 text-teal-700 text-xs font-semibold px-3 py-1 rounded-full">Moderate appetite</span>
+      <span class="bg-green-800 text-white text-xs font-semibold px-3 py-1 rounded-full">Genotype: <span style="color:#2dd4bf; font-weight:700;">AT</span></span>
+    </div>
+  </div>
+
+  <div class="p-6 grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
+    <div class="pr-6 md:border-r border-gray-200">
+      <div class="text-sm font-medium text-gray-700 mb-3">Key SNP: rs9939609 &nbsp;&nbsp; Gene: FTO</div>
+      <p class="text-sm text-gray-400 leading-relaxed">Your FTO profile suggests an intermediate appetite tendency.</p>
+    </div>
+
+    <div class="pl-0 md:pl-6 flex flex-col items-center relative">
+      <div class="flex items-center gap-2 text-xs font-semibold text-gray-600 mb-3">
+        <span>Key SNP Distribution</span>
+      </div>
+      <canvas id="chart_rs9939609" height="180" class="w-full"></canvas>
+    </div>
+  </div>
+</div>
+
+
+<div class="bg-white rounded-2xl shadow-xl hover:shadow-xl transition overflow-hidden trait-card">
+
+  <div class="bg-indigo-600 text-white flex items-center justify-between px-6 py-3">
+    <div class="flex items-center gap-3">
+      <img src="../Images/Fat.png" alt="Fat Storage Susceptibility icon" class="w-8 h-8 object-contain" />
+      <h2 class="text-lg font-bold">Fat Storage Susceptibility</h2>
+    </div>
+    <div class="flex gap-2 flex-wrap justify-end">
+      <span class="bg-teal-100 text-teal-700 text-xs font-semibold px-3 py-1 rounded-full">Moderate fat storage tendency</span>
+      <span class="bg-indigo-800 text-white text-xs font-semibold px-3 py-1 rounded-full">Genotype: <span style="color:#2dd4bf; font-weight:700;">AT</span></span>
+    </div>
+  </div>
+
+  <div class="p-6 grid grid-cols-1 md:grid-cols-2 gap-6 items-start">
+    <div class="pr-6 md:border-r border-gray-200">
+      <div class="text-sm font-medium text-gray-700 mb-3">Key SNP: rs1558902 &nbsp;&nbsp; Gene: FTO</div>
+      <p class="text-sm text-gray-400 leading-relaxed">Your FTO-region profile suggests an intermediate tendency toward fat storage.</p>
+    </div>
+
+    <div class="pl-0 md:pl-6 flex flex-col items-center relative">
+      <div class="flex items-center gap-2 text-xs font-semibold text-gray-600 mb-3">
+        <span>Key SNP Distribution</span>
+      </div>
+      <canvas id="chart_rs1558902" height="180" class="w-full"></canvas>
+    </div>
+  </div>
+</div>
+
+    </section>
+
+  </main>
+
+  <script>
+        (() => {
+          const canvas = document.getElementById("chart_rs1815739");
+          if (!canvas) return;
+          new Chart(canvas, {
+            type: 'bar',
+            data: {
+              labels: ["African", "American", "East Asian", "European", "South Asian"],
+              datasets: [{"label": "CC", "data": [77.5, 16.1, 30.8, 31.0, 15.7], "backgroundColor": "#60a5fa"}, {"label": "CT", "data": [22.1, 53.3, 49.8, 51.1, 51.1], "backgroundColor": "#34d399"}, {"label": "TT", "data": [0.5, 30.5, 19.4, 17.9, 33.1], "backgroundColor": "#f87171"}]
+            },
+            options: {
+              indexAxis: 'y',
+              responsive: true,
+              plugins: {
+                legend: { display: false }
+              },
+              scales: {
+                x: { stacked: true, max: 100 },
+                y: { stacked: true }
+              }
+            }
+          });
+        })();
+        
+
+        (() => {
+          const canvas = document.getElementById("chart_rs8192678");
+          if (!canvas) return;
+          new Chart(canvas, {
+            type: 'bar',
+            data: {
+              labels: ["European", "African", "East Asian", "South Asian", "American"],
+              datasets: [{"label": "CC", "data": [45.1, 90.4, 34.6, 52.5, 67.2], "backgroundColor": "#60a5fa"}, {"label": "CT", "data": [39.8, 8.9, 47.1, 36.6, 25.9], "backgroundColor": "#34d399"}, {"label": "TT", "data": [15.1, 0.7, 18.3, 10.9, 6.9], "backgroundColor": "#f87171"}]
+            },
+            options: {
+              indexAxis: 'y',
+              responsive: true,
+              plugins: {
+                legend: { display: false }
+              },
+              scales: {
+                x: { stacked: true, max: 100 },
+                y: { stacked: true }
+              }
+            }
+          });
+        })();
+        
+
+        (() => {
+          const canvas = document.getElementById("chart_rs35767");
+          if (!canvas) return;
+          new Chart(canvas, {
+            type: 'bar',
+            data: {
+              labels: ["African", "American", "East Asian", "European", "South Asian"],
+              datasets: [{"label": "AA", "data": [21.6, 6.1, 14.1, 2.6, 5.5], "backgroundColor": "#facc15"}, {"label": "AG", "data": [45.7, 34.3, 44.8, 26.8, 38.7], "backgroundColor": "#a78bfa"}, {"label": "GG", "data": [32.7, 59.7, 41.1, 70.6, 55.8], "backgroundColor": "#fb923c"}]
+            },
+            options: {
+              indexAxis: 'y',
+              responsive: true,
+              plugins: {
+                legend: { display: false }
+              },
+              scales: {
+                x: { stacked: true, max: 100 },
+                y: { stacked: true }
+              }
+            }
+          });
+        })();
+        
+
+        (() => {
+          const canvas = document.getElementById("chart_rs6746030");
+          if (!canvas) return;
+          new Chart(canvas, {
+            type: 'bar',
+            data: {
+              labels: ["European", "African", "East Asian", "South Asian", "American"],
+              datasets: [{"label": "GG", "data": [77.0, 73.3, 89.1, 67.3, 84.5], "backgroundColor": "#fb923c"}, {"label": "AG", "data": [22.1, 25.3, 10.9, 28.7, 15.5], "backgroundColor": "#a78bfa"}, {"label": "AA", "data": [0.9, 1.4, 0.0, 4.0, 0.0], "backgroundColor": "#facc15"}]
+            },
+            options: {
+              indexAxis: 'y',
+              responsive: true,
+              plugins: {
+                legend: { display: false }
+              },
+              scales: {
+                x: { stacked: true, max: 100 },
+                y: { stacked: true }
+              }
+            }
+          });
+        })();
+        
+
+        (() => {
+          const canvas = document.getElementById("chart_rs3736228");
+          if (!canvas) return;
+          new Chart(canvas, {
+            type: 'bar',
+            data: {
+              labels: ["African", "American", "East Asian", "European", "South Asian"],
+              datasets: [{"label": "CC", "data": [95.8, 73.2, 63.5, 75.7, 80.0], "backgroundColor": "#60a5fa"}, {"label": "CT", "data": [4.1, 22.8, 32.3, 21.7, 18.6], "backgroundColor": "#34d399"}, {"label": "TT", "data": [0.2, 4.0, 4.2, 2.6, 1.4], "backgroundColor": "#f87171"}]
+            },
+            options: {
+              indexAxis: 'y',
+              responsive: true,
+              plugins: {
+                legend: { display: false }
+              },
+              scales: {
+                x: { stacked: true, max: 100 },
+                y: { stacked: true }
+              }
+            }
+          });
+        })();
+        
+
+        (() => {
+          const canvas = document.getElementById("chart_rs1049434");
+          if (!canvas) return;
+          new Chart(canvas, {
+            type: 'bar',
+            data: {
+              labels: ["African", "American", "East Asian", "European", "South Asian"],
+              datasets: [{"label": "AA", "data": [84.7, 16.0, 40.1, 35.7, 34.7], "backgroundColor": "#facc15"}, {"label": "AT", "data": [13.9, 66.1, 44.5, 48.2, 45.5], "backgroundColor": "#2dd4bf"}, {"label": "TT", "data": [1.4, 17.9, 15.4, 16.1, 19.8], "backgroundColor": "#f87171"}]
+            },
+            options: {
+              indexAxis: 'y',
+              responsive: true,
+              plugins: {
+                legend: { display: false }
+              },
+              scales: {
+                x: { stacked: true, max: 100 },
+                y: { stacked: true }
+              }
+            }
+          });
+        })();
+        
+
+        (() => {
+          const canvas = document.getElementById("chart_rs9939609");
+          if (!canvas) return;
+          new Chart(canvas, {
+            type: 'bar',
+            data: {
+              labels: ["African", "American", "East Asian", "European", "South Asian"],
+              datasets: [{"label": "TT", "data": [25.6, 54.8, 70.0, 37.2, 50.1], "backgroundColor": "#f87171"}, {"label": "AT", "data": [50.1, 38.0, 26.2, 42.9, 42.1], "backgroundColor": "#2dd4bf"}, {"label": "AA", "data": [24.4, 7.2, 3.8, 19.9, 7.8], "backgroundColor": "#facc15"}]
+            },
+            options: {
+              indexAxis: 'y',
+              responsive: true,
+              plugins: {
+                legend: { display: false }
+              },
+              scales: {
+                x: { stacked: true, max: 100 },
+                y: { stacked: true }
+              }
+            }
+          });
+        })();
+        
+
+        (() => {
+          const canvas = document.getElementById("chart_rs1558902");
+          if (!canvas) return;
+          new Chart(canvas, {
+            type: 'bar',
+            data: {
+              labels: ["African", "American", "East Asian", "European", "South Asian"],
+              datasets: [{"label": "TT", "data": [88.8, 57.9, 70.6, 36.0, 47.6], "backgroundColor": "#f87171"}, {"label": "AT", "data": [11.2, 36.3, 25.6, 41.6, 43.4], "backgroundColor": "#2dd4bf"}, {"label": "AA", "data": [0.0, 5.8, 3.8, 22.5, 9.0], "backgroundColor": "#facc15"}]
+            },
+            options: {
+              indexAxis: 'y',
+              responsive: true,
+              plugins: {
+                legend: { display: false }
+              },
+              scales: {
+                x: { stacked: true, max: 100 },
+                y: { stacked: true }
+              }
+            }
+          });
+        })();
+        </script>
+
+
+</div>
+</body>
+</html>
