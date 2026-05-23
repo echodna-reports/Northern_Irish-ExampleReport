@@ -22,113 +22,136 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 
 <style id="echo-shell-css">
+
 :root{
   --echo-bg:#0b0f16;
   --echo-panel:#101722;
-  --echo-border:rgba(255,255,255,.08);
+  --echo-border:rgba(255,255,255,.10);
   --echo-text:#e8eef8;
   --echo-muted:#8fa1b8;
-  --ancient:#ffffff;
-  --traits:#00b8c8;
-  --phenotype:#7c8cff;
-  --physique:#ff8757;
+  --accent:#b3d4fc;
 }
 
-body.echo-light-section{
-  --echo-bg:#f5f7fa;
-  --echo-text:#1a222c;
-  --echo-muted:#6b7785;
-  --echo-border:rgba(0,0,0,.08);
+*{
+  box-sizing:border-box;
 }
+
+html,body{
+  margin:0;
+  padding:0;
+  max-width:100%;
+  overflow-x:hidden;
+}
+
+/* =========================================================
+   TOPBAR
+========================================================= */
 
 .echo-shell-topbar{
   position:fixed;
   top:0;
   left:0;
   right:0;
-  height:72px;
+  height:68px;
   z-index:99990;
-  background:rgba(11,15,22,.85);
-  backdrop-filter:blur(12px);
+  background:rgba(11,15,22,.88);
+  backdrop-filter:blur(14px);
   border-bottom:1px solid var(--echo-border);
-  box-sizing:border-box;
   font-family:Inter,system-ui,sans-serif;
 }
 
-body.echo-light-section .echo-shell-topbar{
-  background:rgba(255,255,255,.85);
-}
-
 .echo-shell-toplinks{
+  height:68px;
   max-width:1300px;
-  height:72px;
   margin:0 auto;
   display:flex;
+  align-items:center;
+  justify-content:center;
 }
 
 .echo-shell-toplinks a{
   flex:1;
+  height:100%;
   display:flex;
   align-items:center;
   justify-content:center;
-  gap:10px;
+  gap:8px;
   color:var(--echo-muted);
   text-decoration:none;
-  font-size:14px;
+  font-size:13px;
   font-weight:800;
-  position:relative;
-  transition:.25s ease;
+  white-space:nowrap;
+  transition:.2s ease;
 }
 
-.echo-shell-toplinks a:hover,
-.echo-shell-toplinks a.active{
+.echo-shell-toplinks a.active,
+.echo-shell-toplinks a:hover{
   color:var(--echo-text);
 }
 
-.echo-shell-toplinks a.active::after{
-  content:"";
-  position:absolute;
-  bottom:0;
-  left:20%;
-  right:20%;
-  height:3px;
-  border-radius:999px;
+/* =========================================================
+   LIGHT MODE TOPBAR
+========================================================= */
+
+body.echo-light-section .echo-shell-topbar{
+  background:rgba(255,255,255,.95);
+  border-bottom:1px solid rgba(0,0,0,.08);
 }
 
-.echo-shell-toplinks a[data-tab="ancient"].active::after{background:var(--ancient);}
-body.echo-light-section .echo-shell-toplinks a[data-tab="ancient"].active::after{background:#0b0f16;}
-.echo-shell-toplinks a[data-tab="traits"].active::after{background:var(--traits);}
-.echo-shell-toplinks a[data-tab="phenotype"].active::after{background:var(--phenotype);}
-.echo-shell-toplinks a[data-tab="physique"].active::after{background:var(--physique);}
-
-.echo-nav-icon,
-.echo-nav-icon-stroke{
-  width:22px;
-  height:22px;
-  flex:0 0 auto;
+body.echo-light-section .echo-shell-toplinks a{
+  color:#6b7280;
 }
 
-.echo-nav-icon{fill:currentColor;}
-.echo-nav-icon-stroke{
-  fill:none;
-  stroke:currentColor;
-  stroke-width:1.8;
-  stroke-linecap:round;
-  stroke-linejoin:round;
+body.echo-light-section .echo-shell-toplinks a.active,
+body.echo-light-section .echo-shell-toplinks a:hover{
+  color:#111827;
 }
+
+/* =========================================================
+   MOBILE MENU BUTTON
+========================================================= */
+
+.echo-mobile-menu-btn{
+  display:none;
+  position:fixed;
+  top:14px;
+  left:14px;
+  z-index:100000;
+  width:42px;
+  height:42px;
+  border-radius:14px;
+  border:1px solid rgba(179,212,252,.25);
+  background:rgba(16,23,34,.96);
+  color:#e8eef8;
+  font-size:22px;
+  cursor:pointer;
+}
+
+body.echo-light-section .echo-mobile-menu-btn{
+  background:rgba(255,255,255,.96);
+  color:#111827;
+  border:1px solid rgba(0,0,0,.10);
+}
+
+/* =========================================================
+   ANCIENT SIDEBAR ONLY
+========================================================= */
 
 .echo-shell-sidebar{
   display:none;
   position:fixed;
-  top:72px;
+  top:68px;
   left:0;
   bottom:0;
   width:248px;
   z-index:99980;
-  background:linear-gradient(180deg,rgba(16,23,34,.96),rgba(9,13,20,.98));
+  background:linear-gradient(
+    180deg,
+    rgba(16,23,34,.98),
+    rgba(9,13,20,.99)
+  );
   border-right:1px solid var(--echo-border);
   padding:18px 14px;
-  box-sizing:border-box;
   font-family:Inter,system-ui,sans-serif;
 }
 
@@ -140,12 +163,12 @@ body.echo-ancient-page .echo-shell-sidebar{
   padding:15px 14px;
   border:1px solid var(--echo-border);
   border-radius:18px;
-  background:rgba(255,255,255,.035);
+  background:rgba(255,255,255,.04);
   margin-bottom:16px;
 }
 
 .echo-shell-mode .kicker{
-  color:#b3d4fc;
+  color:var(--accent);
   font-size:11px;
   font-weight:900;
   text-transform:uppercase;
@@ -183,7 +206,7 @@ body.echo-ancient-page .echo-shell-sidebar{
   border:1px solid transparent;
   transition:.18s ease;
   font-size:13px;
-  font-weight:700;
+  font-weight:800;
 }
 
 .echo-shell-nav a .ico{
@@ -192,19 +215,19 @@ body.echo-ancient-page .echo-shell-sidebar{
   border-radius:11px;
   display:grid;
   place-items:center;
-  background:rgba(179,212,252,.08);
-  color:#b3d4fc;
+  background:rgba(179,212,252,.10);
+  color:var(--accent);
 }
 
 .echo-shell-nav a:hover,
 .echo-shell-nav a.active{
   color:#e8eef8;
-  background:rgba(179,212,252,.08);
-  border-color:rgba(179,212,252,.16);
+  background:rgba(179,212,252,.10);
+  border-color:rgba(179,212,252,.20);
 }
 
 .echo-shell-nav a.active .ico{
-  background:#b3d4fc;
+  background:var(--accent);
   color:#08111d;
 }
 
@@ -212,35 +235,195 @@ body.echo-ancient-page .echo-shell-sidebar{
   margin-top:18px;
   padding:12px;
   border-radius:16px;
-  background:rgba(255,255,255,.035);
+  background:rgba(255,255,255,.04);
   color:#8fa1b8;
   font-size:11px;
   line-height:1.45;
 }
 
+/* =========================================================
+   MAIN CONTENT
+========================================================= */
+
 #echo-shell-root{
-  margin-left:0;
-  padding-top:72px;
+  padding-top:68px;
   min-height:100vh;
-  box-sizing:border-box;
 }
 
 body.echo-ancient-page #echo-shell-root{
   margin-left:248px;
 }
 
-@media(max-width:900px){
-  .echo-shell-sidebar{width:78px;padding:12px 8px;}
-  .echo-shell-mode{display:none;}
-  .echo-shell-nav a span.label{display:none;}
-  .echo-shell-nav a{justify-content:center;padding:10px;}
-  body.echo-ancient-page #echo-shell-root{margin-left:78px;}
-  .echo-shell-toplinks a{font-size:0;}
+/* remove sidebar from traits/phenotype/physique */
+body.echo-no-shell-sidebar .echo-shell-sidebar{
+  display:none !important;
 }
+
+body.echo-no-shell-sidebar #echo-shell-root{
+  margin-left:0 !important;
+}
+
+body.echo-no-shell-sidebar .echo-mobile-menu-btn,
+body.echo-no-shell-sidebar .echo-shell-backdrop{
+  display:none !important;
+}
+
+.echo-shell-backdrop{
+  display:none;
+}
+
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media(max-width:900px){
+
+  .echo-mobile-menu-btn{
+    display:block;
+  }
+
+  /* =====================================================
+     DEFAULT MOBILE TOPBAR
+     (ancient pages with sidebar button)
+  ===================================================== */
+
+  .echo-shell-toplinks{
+    padding-left:62px;
+    overflow-x:auto;
+    justify-content:flex-start;
+    -webkit-overflow-scrolling:touch;
+    scrollbar-width:none;
+  }
+
+  .echo-shell-toplinks::-webkit-scrollbar{
+    display:none;
+  }
+
+  .echo-shell-toplinks a{
+    flex:0 0 auto;
+    padding:0 14px;
+    font-size:12px !important;
+    white-space:nowrap;
+  }
+
+  /* =====================================================
+     LIGHT PAGES
+     traits / phenotype / physique
+  ===================================================== */
+
+  body.echo-no-shell-sidebar .echo-shell-toplinks{
+    padding-left:0 !important;
+    justify-content:flex-start !important;
+    overflow-x:auto !important;
+    width:100% !important;
+    scrollbar-width:none;
+  }
+
+  body.echo-no-shell-sidebar .echo-shell-toplinks::-webkit-scrollbar{
+    display:none;
+  }
+
+  body.echo-no-shell-sidebar .echo-shell-toplinks a{
+    flex:0 0 auto !important;
+    min-width:auto !important;
+    padding:0 18px !important;
+    font-size:12px !important;
+    text-align:center !important;
+    white-space:nowrap !important;
+  }
+
+  /* =====================================================
+     SIDEBAR
+  ===================================================== */
+
+  .echo-shell-sidebar{
+    width:280px;
+    max-width:82vw;
+    transform:translateX(-105%);
+    transition:transform .25s ease;
+    box-shadow:18px 0 45px rgba(0,0,0,.35);
+  }
+
+  body.echo-sidebar-open .echo-shell-sidebar{
+    transform:translateX(0);
+  }
+
+  body.echo-ancient-page #echo-shell-root{
+    margin-left:0;
+  }
+
+  .echo-shell-backdrop{
+    display:block;
+    position:fixed;
+    inset:0;
+    z-index:99970;
+    background:rgba(0,0,0,.48);
+    opacity:0;
+    pointer-events:none;
+    transition:.2s ease;
+  }
+
+  body.echo-sidebar-open .echo-shell-backdrop{
+    opacity:1;
+    pointer-events:auto;
+  }
+
+  /* =====================================================
+     GENERIC MEDIA SAFETY
+  ===================================================== */
+
+  img,
+  video,
+  iframe{
+    max-width:100% !important;
+    height:auto !important;
+  }
+
+  /* Do NOT globally force all SVG/canvas sizing.
+   It breaks phenotype icons, summary cards, charts, etc. */
+  svg,
+  canvas{
+    max-width:100%;
+    height:auto;
+
+  }
+
+  table{
+    display:block;
+    max-width:100%;
+    overflow-x:auto;
+    white-space:nowrap;
+  }
+
+  #plot{
+    width:100% !important;
+    height:70vh !important;
+  }
+
+  #map{
+    width:100% !important;
+  }
+
+  .echo-page,
+  .echo-pca-page,
+  .wrap,
+  main,
+  section{
+    padding-left:14px !important;
+    padding-right:14px !important;
+    max-width:100% !important;
+  }
+}
+
 </style>
 
 </head>
 <body class="min-h-screen bg-[#f0f6ff]">
+
+<button class="echo-mobile-menu-btn" id="echoSidebarToggle" aria-label="Open menu">☰</button>
+
+<div class="echo-shell-backdrop" id="echoSidebarBackdrop"></div>
 
 <div class="echo-shell-topbar">
   <nav class="echo-shell-toplinks">
@@ -252,26 +435,44 @@ body.echo-ancient-page #echo-shell-root{
 </div>
 
 <aside class="echo-shell-sidebar">
+
   <div class="echo-shell-mode">
     <div class="kicker">Ancient Mode</div>
     <h2>Ancient Echoes</h2>
-    <p>Explore sample matches, ancestry composition and PCA placement.</p>
+    <p>Explore sample matches, admixture and PCA placement.</p>
   </div>
 
   <nav class="echo-shell-nav">
-    <a href="top_matches.html"><span class="ico">✦</span><span class="label">Top Matches</span></a>
-    <a href="admixture.html"><span class="ico">◌</span><span class="label">Admixture</span></a>
-    <a href="pca_plot.html"><span class="ico">⌁</span><span class="label">PCA</span></a>
-    <a href="store.html"><span class="ico">🛒</span><span class="label">Store</span></a>
+    <a href="top_matches.html">
+      <span class="ico">✦</span>
+      <span class="label">Top Matches</span>
+    </a>
+
+    <a href="admixture.html">
+      <span class="ico">◌</span>
+      <span class="label">Admixture</span>
+    </a>
+
+    <a href="pca_plot.html">
+      <span class="ico">⌁</span>
+      <span class="label">PCA</span>
+    </a>
+
+    <a href="store.html">
+      <span class="ico">🛒</span>
+      <span class="label">Store</span>
+    </a>
   </nav>
 
   <div class="echo-shell-footer">
     Ancient Echoes report bundle generated locally into dist/pages.
   </div>
+
 </aside>
 
 <script id="echo-shell-js">
 (function(){
+
   const file = location.pathname.split('/').pop().toLowerCase();
 
   const ancientFiles = new Set([
@@ -292,19 +493,51 @@ body.echo-ancient-page #echo-shell-root{
 
   if(lightFiles.has(file)){
     document.body.classList.add('echo-light-section');
+    document.body.classList.add('echo-no-shell-sidebar');
   }
 
-  document.querySelectorAll('.echo-shell-nav a, .echo-shell-toplinks a').forEach(a=>{
-    const href = (a.getAttribute('href') || '').toLowerCase();
+  document.querySelectorAll(
+    '.echo-shell-nav a, .echo-shell-toplinks a'
+  ).forEach(a=>{
+
+    const href = (
+      a.getAttribute('href') || ''
+    ).toLowerCase();
 
     if(href === file){
       a.classList.add('active');
     }
 
-    if(ancientFiles.has(file) && a.dataset && a.dataset.tab === 'ancient'){
+    if(
+      ancientFiles.has(file) &&
+      a.dataset &&
+      a.dataset.tab === 'ancient'
+    ){
       a.classList.add('active');
     }
   });
+
+  const toggle = document.getElementById('echoSidebarToggle');
+  const backdrop = document.getElementById('echoSidebarBackdrop');
+
+  function closeSidebar(){
+    document.body.classList.remove('echo-sidebar-open');
+  }
+
+  if(toggle){
+    toggle.addEventListener('click',()=>{
+      document.body.classList.toggle('echo-sidebar-open');
+    });
+  }
+
+  if(backdrop){
+    backdrop.addEventListener('click', closeSidebar);
+  }
+
+  document.querySelectorAll('.echo-shell-nav a').forEach(a=>{
+    a.addEventListener('click', closeSidebar);
+  });
+
 })();
 </script>
 

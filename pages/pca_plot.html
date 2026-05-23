@@ -1,133 +1,303 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
+
 <meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+
 <title>EchoDNA — PCA Plot</title>
+
 <script src="https://cdn.plot.ly/plotly-2.29.1.min.js"></script>
+
 <style>
-body{background:#0b0f16;margin:0;font-family:Inter,system-ui,sans-serif;color:#ecf2ff;}
-.echo-pca-page{padding:38px 34px 70px;}
-h1{font-size:34px;margin:0 0 8px;}
-.lead{color:#9ba7c0;margin:0 0 22px;font-size:14px;}
-#top-bar{display:flex;flex-wrap:wrap;gap:12px;align-items:center;margin-bottom:12px;}
-button{background:#1a2333;color:#ecf2ff;padding:8px 16px;border:none;border-radius:10px;cursor:pointer;font-size:14px;}
-button:hover{background:#222f43;}
-label.toggle{font-size:13px;display:inline-flex;align-items:center;gap:4px;}
-input[type="checkbox"]{accent-color:#b3d4fc;}
-#status{font-size:13px;color:#9ba7c0;}
-#plot{width:calc(100vw - 330px);height:78vh;margin-top:8px;border-radius:18px;border:1px solid rgba(179,212,252,.16);overflow:hidden;}
-@media(max-width:900px){#plot{width:calc(100vw - 130px);}}
+
+body{
+  background:#0b0f16;
+  margin:0;
+  font-family:Inter,system-ui,sans-serif;
+  color:#ecf2ff;
+  overflow-x:hidden;
+}
+
+.echo-pca-page{
+  padding:38px 34px 70px;
+}
+
+h1{
+  font-size:34px;
+  margin:0 0 8px;
+}
+
+.lead{
+  color:#9ba7c0;
+  margin:0 0 22px;
+  font-size:14px;
+}
+
+/* =====================================================
+   TOP BAR
+===================================================== */
+
+#top-bar{
+  display:flex;
+  flex-wrap:wrap;
+  gap:12px;
+  align-items:center;
+  margin-bottom:12px;
+}
+
+button{
+  background:#1a2333;
+  color:#ecf2ff;
+  padding:8px 16px;
+  border:none;
+  border-radius:10px;
+  cursor:pointer;
+  font-size:14px;
+}
+
+button:hover{
+  background:#222f43;
+}
+
+/* =====================================================
+   TOGGLES
+===================================================== */
+
+label.toggle{
+  font-size:13px;
+  display:inline-flex;
+  align-items:center;
+  gap:6px;
+
+  background:#111827;
+  border:1px solid rgba(179,212,252,.14);
+
+  padding:8px 12px;
+  border-radius:999px;
+
+  color:#dbe7ff;
+}
+
+input[type="checkbox"]{
+  accent-color:#b3d4fc;
+}
+
+#status{
+  font-size:13px;
+  color:#9ba7c0;
+}
+
+/* =====================================================
+   PLOT
+===================================================== */
+
+#plot{
+  width:100%;
+  height:78vh;
+
+  margin-top:8px;
+
+  border-radius:18px;
+  border:1px solid rgba(179,212,252,.16);
+
+  overflow:hidden;
+}
+
+/* =====================================================
+   MOBILE
+===================================================== */
+
+@media(max-width:900px){
+
+  .echo-pca-page{
+    padding:24px 14px 50px;
+  }
+
+  h1{
+    font-size:28px;
+  }
+
+  .lead{
+    font-size:13px;
+    line-height:1.5;
+  }
+
+  #top-bar{
+    gap:8px;
+    overflow-x:auto;
+    flex-wrap:nowrap;
+
+    padding-bottom:8px;
+
+    scrollbar-width:none;
+    -webkit-overflow-scrolling:touch;
+  }
+
+  #top-bar::-webkit-scrollbar{
+    display:none;
+  }
+
+  label.toggle{
+    flex:0 0 auto;
+
+    background:#111827;
+    border:1px solid rgba(179,212,252,.14);
+
+    border-radius:999px;
+
+    padding:8px 10px;
+
+    font-size:12px;
+
+    white-space:nowrap;
+  }
+
+  #status{
+    flex:0 0 auto;
+    white-space:nowrap;
+  }
+
+  #plot{
+    width:100% !important;
+    height:70vh !important;
+  }
+}
+
 </style>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 
 <style id="echo-shell-css">
+
 :root{
   --echo-bg:#0b0f16;
   --echo-panel:#101722;
-  --echo-border:rgba(255,255,255,.08);
+  --echo-border:rgba(255,255,255,.10);
   --echo-text:#e8eef8;
   --echo-muted:#8fa1b8;
-  --ancient:#ffffff;
-  --traits:#00b8c8;
-  --phenotype:#7c8cff;
-  --physique:#ff8757;
+  --accent:#b3d4fc;
 }
 
-body.echo-light-section{
-  --echo-bg:#f5f7fa;
-  --echo-text:#1a222c;
-  --echo-muted:#6b7785;
-  --echo-border:rgba(0,0,0,.08);
+*{
+  box-sizing:border-box;
 }
+
+html,body{
+  margin:0;
+  padding:0;
+  max-width:100%;
+  overflow-x:hidden;
+}
+
+/* =========================================================
+   TOPBAR
+========================================================= */
 
 .echo-shell-topbar{
   position:fixed;
   top:0;
   left:0;
   right:0;
-  height:72px;
+  height:68px;
   z-index:99990;
-  background:rgba(11,15,22,.85);
-  backdrop-filter:blur(12px);
+  background:rgba(11,15,22,.88);
+  backdrop-filter:blur(14px);
   border-bottom:1px solid var(--echo-border);
-  box-sizing:border-box;
   font-family:Inter,system-ui,sans-serif;
 }
 
-body.echo-light-section .echo-shell-topbar{
-  background:rgba(255,255,255,.85);
-}
-
 .echo-shell-toplinks{
+  height:68px;
   max-width:1300px;
-  height:72px;
   margin:0 auto;
   display:flex;
+  align-items:center;
+  justify-content:center;
 }
 
 .echo-shell-toplinks a{
   flex:1;
+  height:100%;
   display:flex;
   align-items:center;
   justify-content:center;
-  gap:10px;
+  gap:8px;
   color:var(--echo-muted);
   text-decoration:none;
-  font-size:14px;
+  font-size:13px;
   font-weight:800;
-  position:relative;
-  transition:.25s ease;
+  white-space:nowrap;
+  transition:.2s ease;
 }
 
-.echo-shell-toplinks a:hover,
-.echo-shell-toplinks a.active{
+.echo-shell-toplinks a.active,
+.echo-shell-toplinks a:hover{
   color:var(--echo-text);
 }
 
-.echo-shell-toplinks a.active::after{
-  content:"";
-  position:absolute;
-  bottom:0;
-  left:20%;
-  right:20%;
-  height:3px;
-  border-radius:999px;
+/* =========================================================
+   LIGHT MODE TOPBAR
+========================================================= */
+
+body.echo-light-section .echo-shell-topbar{
+  background:rgba(255,255,255,.95);
+  border-bottom:1px solid rgba(0,0,0,.08);
 }
 
-.echo-shell-toplinks a[data-tab="ancient"].active::after{background:var(--ancient);}
-body.echo-light-section .echo-shell-toplinks a[data-tab="ancient"].active::after{background:#0b0f16;}
-.echo-shell-toplinks a[data-tab="traits"].active::after{background:var(--traits);}
-.echo-shell-toplinks a[data-tab="phenotype"].active::after{background:var(--phenotype);}
-.echo-shell-toplinks a[data-tab="physique"].active::after{background:var(--physique);}
-
-.echo-nav-icon,
-.echo-nav-icon-stroke{
-  width:22px;
-  height:22px;
-  flex:0 0 auto;
+body.echo-light-section .echo-shell-toplinks a{
+  color:#6b7280;
 }
 
-.echo-nav-icon{fill:currentColor;}
-.echo-nav-icon-stroke{
-  fill:none;
-  stroke:currentColor;
-  stroke-width:1.8;
-  stroke-linecap:round;
-  stroke-linejoin:round;
+body.echo-light-section .echo-shell-toplinks a.active,
+body.echo-light-section .echo-shell-toplinks a:hover{
+  color:#111827;
 }
+
+/* =========================================================
+   MOBILE MENU BUTTON
+========================================================= */
+
+.echo-mobile-menu-btn{
+  display:none;
+  position:fixed;
+  top:14px;
+  left:14px;
+  z-index:100000;
+  width:42px;
+  height:42px;
+  border-radius:14px;
+  border:1px solid rgba(179,212,252,.25);
+  background:rgba(16,23,34,.96);
+  color:#e8eef8;
+  font-size:22px;
+  cursor:pointer;
+}
+
+body.echo-light-section .echo-mobile-menu-btn{
+  background:rgba(255,255,255,.96);
+  color:#111827;
+  border:1px solid rgba(0,0,0,.10);
+}
+
+/* =========================================================
+   ANCIENT SIDEBAR ONLY
+========================================================= */
 
 .echo-shell-sidebar{
   display:none;
   position:fixed;
-  top:72px;
+  top:68px;
   left:0;
   bottom:0;
   width:248px;
   z-index:99980;
-  background:linear-gradient(180deg,rgba(16,23,34,.96),rgba(9,13,20,.98));
+  background:linear-gradient(
+    180deg,
+    rgba(16,23,34,.98),
+    rgba(9,13,20,.99)
+  );
   border-right:1px solid var(--echo-border);
   padding:18px 14px;
-  box-sizing:border-box;
   font-family:Inter,system-ui,sans-serif;
 }
 
@@ -139,12 +309,12 @@ body.echo-ancient-page .echo-shell-sidebar{
   padding:15px 14px;
   border:1px solid var(--echo-border);
   border-radius:18px;
-  background:rgba(255,255,255,.035);
+  background:rgba(255,255,255,.04);
   margin-bottom:16px;
 }
 
 .echo-shell-mode .kicker{
-  color:#b3d4fc;
+  color:var(--accent);
   font-size:11px;
   font-weight:900;
   text-transform:uppercase;
@@ -182,7 +352,7 @@ body.echo-ancient-page .echo-shell-sidebar{
   border:1px solid transparent;
   transition:.18s ease;
   font-size:13px;
-  font-weight:700;
+  font-weight:800;
 }
 
 .echo-shell-nav a .ico{
@@ -191,19 +361,19 @@ body.echo-ancient-page .echo-shell-sidebar{
   border-radius:11px;
   display:grid;
   place-items:center;
-  background:rgba(179,212,252,.08);
-  color:#b3d4fc;
+  background:rgba(179,212,252,.10);
+  color:var(--accent);
 }
 
 .echo-shell-nav a:hover,
 .echo-shell-nav a.active{
   color:#e8eef8;
-  background:rgba(179,212,252,.08);
-  border-color:rgba(179,212,252,.16);
+  background:rgba(179,212,252,.10);
+  border-color:rgba(179,212,252,.20);
 }
 
 .echo-shell-nav a.active .ico{
-  background:#b3d4fc;
+  background:var(--accent);
   color:#08111d;
 }
 
@@ -211,35 +381,196 @@ body.echo-ancient-page .echo-shell-sidebar{
   margin-top:18px;
   padding:12px;
   border-radius:16px;
-  background:rgba(255,255,255,.035);
+  background:rgba(255,255,255,.04);
   color:#8fa1b8;
   font-size:11px;
   line-height:1.45;
 }
 
+/* =========================================================
+   MAIN CONTENT
+========================================================= */
+
 #echo-shell-root{
-  margin-left:0;
-  padding-top:72px;
+  padding-top:68px;
   min-height:100vh;
-  box-sizing:border-box;
 }
 
 body.echo-ancient-page #echo-shell-root{
   margin-left:248px;
 }
 
-@media(max-width:900px){
-  .echo-shell-sidebar{width:78px;padding:12px 8px;}
-  .echo-shell-mode{display:none;}
-  .echo-shell-nav a span.label{display:none;}
-  .echo-shell-nav a{justify-content:center;padding:10px;}
-  body.echo-ancient-page #echo-shell-root{margin-left:78px;}
-  .echo-shell-toplinks a{font-size:0;}
+/* remove sidebar from traits/phenotype/physique */
+body.echo-no-shell-sidebar .echo-shell-sidebar{
+  display:none !important;
 }
+
+body.echo-no-shell-sidebar #echo-shell-root{
+  margin-left:0 !important;
+}
+
+body.echo-no-shell-sidebar .echo-mobile-menu-btn,
+body.echo-no-shell-sidebar .echo-shell-backdrop{
+  display:none !important;
+}
+
+.echo-shell-backdrop{
+  display:none;
+}
+
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media(max-width:900px){
+
+  .echo-mobile-menu-btn{
+    display:block;
+  }
+
+  /* =====================================================
+     DEFAULT MOBILE TOPBAR
+     (ancient pages with sidebar button)
+  ===================================================== */
+
+  .echo-shell-toplinks{
+    padding-left:62px;
+    overflow-x:auto;
+    justify-content:flex-start;
+    -webkit-overflow-scrolling:touch;
+    scrollbar-width:none;
+  }
+
+  .echo-shell-toplinks::-webkit-scrollbar{
+    display:none;
+  }
+
+  .echo-shell-toplinks a{
+    flex:0 0 auto;
+    padding:0 14px;
+    font-size:12px !important;
+    white-space:nowrap;
+  }
+
+  /* =====================================================
+     LIGHT PAGES
+     traits / phenotype / physique
+  ===================================================== */
+
+  body.echo-no-shell-sidebar .echo-shell-toplinks{
+    padding-left:0 !important;
+    justify-content:flex-start !important;
+    overflow-x:auto !important;
+    width:100% !important;
+    scrollbar-width:none;
+  }
+
+  body.echo-no-shell-sidebar .echo-shell-toplinks::-webkit-scrollbar{
+    display:none;
+  }
+
+  body.echo-no-shell-sidebar .echo-shell-toplinks a{
+    flex:0 0 auto !important;
+    min-width:auto !important;
+    padding:0 18px !important;
+    font-size:12px !important;
+    text-align:center !important;
+    white-space:nowrap !important;
+  }
+
+  /* =====================================================
+     SIDEBAR
+  ===================================================== */
+
+  .echo-shell-sidebar{
+    width:280px;
+    max-width:82vw;
+    transform:translateX(-105%);
+    transition:transform .25s ease;
+    box-shadow:18px 0 45px rgba(0,0,0,.35);
+  }
+
+  body.echo-sidebar-open .echo-shell-sidebar{
+    transform:translateX(0);
+  }
+
+  body.echo-ancient-page #echo-shell-root{
+    margin-left:0;
+  }
+
+  .echo-shell-backdrop{
+    display:block;
+    position:fixed;
+    inset:0;
+    z-index:99970;
+    background:rgba(0,0,0,.48);
+    opacity:0;
+    pointer-events:none;
+    transition:.2s ease;
+  }
+
+  body.echo-sidebar-open .echo-shell-backdrop{
+    opacity:1;
+    pointer-events:auto;
+  }
+
+  /* =====================================================
+     GENERIC MEDIA SAFETY
+  ===================================================== */
+
+  img,
+  video,
+  iframe{
+    max-width:100% !important;
+    height:auto !important;
+  }
+
+  /* Do NOT globally force all SVG/canvas sizing.
+   It breaks phenotype icons, summary cards, charts, etc. */
+  svg,
+  canvas{
+    max-width:100%;
+    height:auto;
+
+  }
+
+  table{
+    display:block;
+    max-width:100%;
+    overflow-x:auto;
+    white-space:nowrap;
+  }
+
+  #plot{
+    width:100% !important;
+    height:70vh !important;
+  }
+
+  #map{
+    width:100% !important;
+  }
+
+  .echo-page,
+  .echo-pca-page,
+  .wrap,
+  main,
+  section{
+    padding-left:14px !important;
+    padding-right:14px !important;
+    max-width:100% !important;
+  }
+}
+
 </style>
 
 </head>
+
 <body>
+
+<button class="echo-mobile-menu-btn" id="echoSidebarToggle" aria-label="Open menu">☰</button>
+
+<div class="echo-shell-backdrop" id="echoSidebarBackdrop"></div>
 
 <div class="echo-shell-topbar">
   <nav class="echo-shell-toplinks">
@@ -251,26 +582,44 @@ body.echo-ancient-page #echo-shell-root{
 </div>
 
 <aside class="echo-shell-sidebar">
+
   <div class="echo-shell-mode">
     <div class="kicker">Ancient Mode</div>
     <h2>Ancient Echoes</h2>
-    <p>Explore sample matches, ancestry composition and PCA placement.</p>
+    <p>Explore sample matches, admixture and PCA placement.</p>
   </div>
 
   <nav class="echo-shell-nav">
-    <a href="top_matches.html"><span class="ico">✦</span><span class="label">Top Matches</span></a>
-    <a href="admixture.html"><span class="ico">◌</span><span class="label">Admixture</span></a>
-    <a href="pca_plot.html"><span class="ico">⌁</span><span class="label">PCA</span></a>
-    <a href="store.html"><span class="ico">🛒</span><span class="label">Store</span></a>
+    <a href="top_matches.html">
+      <span class="ico">✦</span>
+      <span class="label">Top Matches</span>
+    </a>
+
+    <a href="admixture.html">
+      <span class="ico">◌</span>
+      <span class="label">Admixture</span>
+    </a>
+
+    <a href="pca_plot.html">
+      <span class="ico">⌁</span>
+      <span class="label">PCA</span>
+    </a>
+
+    <a href="store.html">
+      <span class="ico">🛒</span>
+      <span class="label">Store</span>
+    </a>
   </nav>
 
   <div class="echo-shell-footer">
     Ancient Echoes report bundle generated locally into dist/pages.
   </div>
+
 </aside>
 
 <script id="echo-shell-js">
 (function(){
+
   const file = location.pathname.split('/').pop().toLowerCase();
 
   const ancientFiles = new Set([
@@ -291,63 +640,161 @@ body.echo-ancient-page #echo-shell-root{
 
   if(lightFiles.has(file)){
     document.body.classList.add('echo-light-section');
+    document.body.classList.add('echo-no-shell-sidebar');
   }
 
-  document.querySelectorAll('.echo-shell-nav a, .echo-shell-toplinks a').forEach(a=>{
-    const href = (a.getAttribute('href') || '').toLowerCase();
+  document.querySelectorAll(
+    '.echo-shell-nav a, .echo-shell-toplinks a'
+  ).forEach(a=>{
+
+    const href = (
+      a.getAttribute('href') || ''
+    ).toLowerCase();
 
     if(href === file){
       a.classList.add('active');
     }
 
-    if(ancientFiles.has(file) && a.dataset && a.dataset.tab === 'ancient'){
+    if(
+      ancientFiles.has(file) &&
+      a.dataset &&
+      a.dataset.tab === 'ancient'
+    ){
       a.classList.add('active');
     }
   });
+
+  const toggle = document.getElementById('echoSidebarToggle');
+  const backdrop = document.getElementById('echoSidebarBackdrop');
+
+  function closeSidebar(){
+    document.body.classList.remove('echo-sidebar-open');
+  }
+
+  if(toggle){
+    toggle.addEventListener('click',()=>{
+      document.body.classList.toggle('echo-sidebar-open');
+    });
+  }
+
+  if(backdrop){
+    backdrop.addEventListener('click', closeSidebar);
+  }
+
+  document.querySelectorAll('.echo-shell-nav a').forEach(a=>{
+    a.addEventListener('click', closeSidebar);
+  });
+
 })();
 </script>
 
 <div id="echo-shell-root">
 
+
 <div class="echo-pca-page">
+
 <h1>PCA Plot</h1>
-<p class="lead">Vahaduo-style principal component plot with group hulls, centroids and your point.</p>
+
+<p class="lead">
+Vahaduo-style principal component plot with group hulls,
+centroids and your point.
+</p>
 
 <div id="top-bar">
-<label class="toggle"><input type="checkbox" id="chkIndividuals" checked> Individuals</label>
-<label class="toggle"><input type="checkbox" id="chkCentroids" checked> Centroids</label>
-<label class="toggle"><input type="checkbox" id="chkHulls" checked> Hulls</label>
-<label class="toggle"><input type="checkbox" id="chkRegression" checked> Regression</label>
+
+
+
+<label class="toggle">
+  <input type="checkbox" id="chkIndividuals" checked>
+  Individuals
+</label>
+
+<label class="toggle">
+  <input type="checkbox" id="chkCentroids" checked>
+  Centroids
+</label>
+
+<label class="toggle">
+  <input type="checkbox" id="chkHulls" checked>
+  Hulls
+</label>
+
+<label class="toggle">
+  <input type="checkbox" id="chkRegression" checked>
+  Regression
+</label>
+
+<label class="toggle">
+  <input type="checkbox" id="chkLegend">
+  Legend
+</label>
+
+
 <span id="status">Loading data…</span>
+
 </div>
 
 <div id="plot"></div>
+
 </div>
 
 <script>
+
 const SAMPLES = [{"group": "Viking", "sample": "VK553___AD_750___Coverage_71.31%", "PC1": 0.127482, "PC2": 0.131003}, {"group": "Viking", "sample": "VK549___AD_750___Coverage_80.56%", "PC1": 0.127482, "PC2": 0.138112}, {"group": "Viking", "sample": "VK552___AD_750___Coverage_74.18%", "PC1": 0.126344, "PC2": 0.133034}, {"group": "Viking", "sample": "VK141___AD_950___Coverage_67.82%", "PC1": 0.126344, "PC2": 0.131003}, {"group": "Viking", "sample": "VK279___AD_950___Coverage_89.78%", "PC1": 0.132035, "PC2": 0.135065}, {"group": "Viking", "sample": "VK295___AD_950___Coverage_42.76%", "PC1": 0.12862, "PC2": 0.137096}, {"group": "Viking", "sample": "VK316___AD_950___Coverage_75.25%", "PC1": 0.12862, "PC2": 0.128972}, {"group": "Viking", "sample": "VK281___AD_950___Coverage_85.78%", "PC1": 0.134311, "PC2": 0.127957}, {"group": "Viking", "sample": "VK284___AD_950___Coverage_64.88%", "PC1": 0.133173, "PC2": 0.135065}, {"group": "Viking", "sample": "VK445___AD_950___Coverage_73.61%", "PC1": 0.127482, "PC2": 0.131003}, {"group": "Viking", "sample": "VK151___AD_940___Coverage_66.26%", "PC1": 0.124067, "PC2": 0.116786}, {"group": "Viking", "sample": "VK165___AD_940___Coverage_65.08%", "PC1": 0.124067, "PC2": 0.117801}, {"group": "Viking", "sample": "VK167___AD_940___Coverage_57.70%", "PC1": 0.125205, "PC2": 0.127957}, {"group": "Viking", "sample": "VK176___AD_940___Coverage_89.08%", "PC1": 0.120652, "PC2": 0.128972}, {"group": "Viking", "sample": "VK388___AD_1150___Coverage_62.22%", "PC1": 0.125205, "PC2": 0.122879}, {"group": "Viking", "sample": "VK529___AD_800___Coverage_82.03%", "PC1": 0.129758, "PC2": 0.125926}, {"group": "Viking", "sample": "VK547___AD_900___Coverage_98.60%", "PC1": 0.12862, "PC2": 0.117801}, {"group": "Viking", "sample": "VK520___AD_950___Coverage_81.07%", "PC1": 0.136588, "PC2": 0.119832}, {"group": "Viking", "sample": "VK524___AD_950___Coverage_77.74%", "PC1": 0.129758, "PC2": 0.114755}, {"group": "Viking", "sample": "VK392___AD_850___Coverage_63.45%", "PC1": 0.127482, "PC2": 0.133034}, {"group": "Viking", "sample": "VK393___AD_950___Coverage_68.38%", "PC1": 0.132035, "PC2": 0.129988}, {"group": "Viking", "sample": "VK414___AD_1000___Coverage_70.31%", "PC1": 0.119514, "PC2": 0.114755}, {"group": "Viking", "sample": "VK415___AD_900___Coverage_69.25%", "PC1": 0.125205, "PC2": 0.123895}, {"group": "Insular*Celt", "sample": "6DT3__AD_200__Coverage_73.36%", "PC1": 0.132035, "PC2": 0.13405}, {"group": "Insular*Celt", "sample": "6DT18__AD_200__Coverage_57.86%", "PC1": 0.125205, "PC2": 0.142174}, {"group": "Insular*Celt", "sample": "6DT23__AD_200__Coverage_40.58%", "PC1": 0.126344, "PC2": 0.141159}, {"group": "Insular*Celt", "sample": "S14491__AD_226__Coverage_73.29%", "PC1": 0.130897, "PC2": 0.132019}, {"group": "Insular*Celt", "sample": "I12927__AD_125__Coverage_70.87%", "PC1": 0.126344, "PC2": 0.132019}, {"group": "Insular*Celt", "sample": "I12932__AD_125__Coverage_71.89%", "PC1": 0.134311, "PC2": 0.133034}, {"group": "Insular*Celt", "sample": "I14550__AD_100__Coverage_68.50%", "PC1": 0.134311, "PC2": 0.138112}, {"group": "Insular*Celt", "sample": "I22062__AD_20__Coverage_68.41%", "PC1": 0.134311, "PC2": 0.135065}, {"group": "Insular*Celt", "sample": "VK201__AD_490__Coverage_59.10%", "PC1": 0.126344, "PC2": 0.138112}, {"group": "Insular*Celt", "sample": "VK202__AD_950__Coverage_52.83%", "PC1": 0.121791, "PC2": 0.132019}, {"group": "Insular*Celt", "sample": "VK203__AD_361__Coverage_56.71%", "PC1": 0.124067, "PC2": 0.138112}, {"group": "Insular*Celt", "sample": "VK207__AD_1020__Coverage_38.54%", "PC1": 0.12862, "PC2": 0.135065}, {"group": "Insular*Celt", "sample": "I16504__AD_34__Coverage_57.37%", "PC1": 0.125205, "PC2": 0.139128}, {"group": "Insular*Celt", "sample": "I3568__AD_38__Coverage_68.53%", "PC1": 0.134311, "PC2": 0.133034}, {"group": "Insular*Celt", "sample": "I16413__AD_30__Coverage_15.75%", "PC1": 0.114961, "PC2": 0.137096}, {"group": "Insular*Celt", "sample": "I27384__AD_5__Coverage_59.84%", "PC1": 0.119514, "PC2": 0.131003}, {"group": "Insular*Celt", "sample": "I27385__AD_34__Coverage_72.43%", "PC1": 0.12862, "PC2": 0.139128}, {"group": "Insular*Celt", "sample": "KD001__AD_541__Coverage_57.65%", "PC1": 0.134311, "PC2": 0.126941}, {"group": "Gallic", "sample": "R2055__AD_492__Coverage_57.41%", "PC1": 0.120652, "PC2": 0.142174}, {"group": "Gallic", "sample": "R2058__AD_470__Coverage_44.61%", "PC1": 0.132035, "PC2": 0.138112}, {"group": "Gallic", "sample": "R2066__AD_1346__Coverage_51.16%", "PC1": 0.125205, "PC2": 0.145221}, {"group": "Gallic", "sample": "R11552__AD_272__Coverage_59.63%", "PC1": 0.122929, "PC2": 0.139128}, {"group": "Gallic", "sample": "R11553__AD_272__Coverage_64.02%", "PC1": 0.119514, "PC2": 0.148267}, {"group": "Gallic", "sample": "R11554__AD_272__Coverage_63.24%", "PC1": 0.133173, "PC2": 0.151314}, {"group": "Gallic", "sample": "R11555__AD_272__Coverage_48.51%", "PC1": 0.127482, "PC2": 0.146236}, {"group": "Gallic", "sample": "R11557__AD_337__Coverage_71.66%", "PC1": 0.133173, "PC2": 0.14319}, {"group": "Gallic", "sample": "R11561__AD_272__Coverage_64.87%", "PC1": 0.126344, "PC2": 0.151314}, {"group": "Gallic", "sample": "R1294__AD_950__Coverage_46.33%", "PC1": 0.125205, "PC2": 0.146236}, {"group": "Gallic", "sample": "R1223__AD_1485__Coverage_48.30%", "PC1": 0.127482, "PC2": 0.133034}, {"group": "Slavic", "sample": "Av2", "PC1": 0.135449, "PC2": 0.128972}, {"group": "Slavic", "sample": "KRA001", "PC1": 0.129758, "PC2": 0.122879}, {"group": "Slavic", "sample": "KRA006", "PC1": 0.129758, "PC2": 0.120848}, {"group": "Slavic", "sample": "KRA007", "PC1": 0.125205, "PC2": 0.131003}, {"group": "Slavic", "sample": "KRA011", "PC1": 0.130897, "PC2": 0.132019}, {"group": "Slavic", "sample": "Sunghir6", "PC1": 0.129758, "PC2": 0.116786}, {"group": "Slavic", "sample": "VK212", "PC1": 0.124067, "PC2": 0.135065}, {"group": "Viking*Age*Baltic", "sample": "VK432", "PC1": 0.129758, "PC2": 0.127957}, {"group": "Viking*Age*Baltic", "sample": "VK458", "PC1": 0.130897, "PC2": 0.120848}, {"group": "Viking*Age*Baltic", "sample": "VK463", "PC1": 0.130897, "PC2": 0.132019}, {"group": "Viking*Age*Baltic", "sample": "VK475", "PC1": 0.129758, "PC2": 0.123895}, {"group": "Viking*Age*Baltic", "sample": "VK478", "PC1": 0.134311, "PC2": 0.135065}, {"group": "Alan", "sample": "BOL001", "PC1": 0.112685, "PC2": 0.026404}, {"group": "Alan", "sample": "BOL002", "PC1": 0.112685, "PC2": 0.014217}, {"group": "Alan", "sample": "BOL004", "PC1": 0.10927, "PC2": 0.00914}, {"group": "Alan", "sample": "BOL005", "PC1": 0.120652, "PC2": 0.036559}, {"group": "Alan", "sample": "BOL007", "PC1": 0.113823, "PC2": 0.032497}, {"group": "Alan", "sample": "BOL008", "PC1": 0.113823, "PC2": 0.019295}, {"group": "Alan", "sample": "BOL009", "PC1": 0.117238, "PC2": 0.041637}, {"group": "Saami", "sample": "DA234__AD_550__Coverage_31.42%", "PC1": 0.103579, "PC2": -0.004062}, {"group": "Saami", "sample": "DA238__AD_550__Coverage_1.55%", "PC1": 0.099026, "PC2": -0.081242}, {"group": "Saami", "sample": "JK1968__AD_550__Coverage_31.42%", "PC1": 0.111547, "PC2": -0.016248}, {"group": "Saami", "sample": "JK1970__AD_550__Coverage_29.08%", "PC1": 0.104717, "PC2": -0.041637}, {"group": "Iberian", "sample": "I7673__AD_797__Coverage_25.85%", "PC1": 0.111547, "PC2": 0.147252}, {"group": "Iberian", "sample": "I10852__AD_1042__Coverage_26.45%", "PC1": 0.1161, "PC2": 0.135065}, {"group": "Iberian", "sample": "I10892__AD_1000__Coverage_47.51%", "PC1": 0.114961, "PC2": 0.147252}, {"group": "Iberian", "sample": "I10895__AD_912__Coverage_53.79%", "PC1": 0.112685, "PC2": 0.144205}, {"group": "Iberian", "sample": "I3585__AD_755__Coverage_62.70%", "PC1": 0.099026, "PC2": 0.146236}, {"group": "Iberian", "sample": "I12514__AD_1096__Coverage_43.70%", "PC1": 0.09675, "PC2": 0.142174}, {"group": "Iberian", "sample": "I12515__AD_1200__Coverage_50.03%", "PC1": 0.101303, "PC2": 0.146236}, {"group": "Iberian", "sample": "R10487__AD_337__Coverage_66.13%", "PC1": 0.117238, "PC2": 0.142174}, {"group": "Iberian", "sample": "R10488__AD_337__Coverage_57.83%", "PC1": 0.108132, "PC2": 0.152329}, {"group": "Iberian", "sample": "R10500__AD_426__Coverage_53.65%", "PC1": 0.104717, "PC2": 0.147252}, {"group": "Iberian", "sample": "R10501__AD_426__Coverage_64.40%", "PC1": 0.101303, "PC2": 0.13405}, {"group": "Iberian", "sample": "R10502__AD_426__Coverage_71.97%", "PC1": 0.101303, "PC2": 0.140143}, {"group": "Iberian", "sample": "R10507__AD_426__Coverage_50.92%", "PC1": 0.101303, "PC2": 0.145221}, {"group": "Iberian", "sample": "R10508__AD_337__Coverage_66.89%", "PC1": 0.105855, "PC2": 0.147252}, {"group": "Iberian", "sample": "I8339__AD_173__Coverage_23.45%", "PC1": 0.129758, "PC2": 0.140143}, {"group": "Sardinian", "sample": "COR001", "PC1": 0.122929, "PC2": 0.167562}, {"group": "Sardinian", "sample": "COR002", "PC1": 0.121791, "PC2": 0.162485}, {"group": "Italian", "sample": "VEN001", "PC1": 0.100164, "PC2": 0.140143}, {"group": "Italian", "sample": "VEN005", "PC1": 0.110408, "PC2": 0.144205}, {"group": "Italian", "sample": "VEN006", "PC1": 0.103579, "PC2": 0.141159}, {"group": "Italian", "sample": "VEN012", "PC1": 0.106994, "PC2": 0.125926}, {"group": "Italian", "sample": "VEN013", "PC1": 0.102441, "PC2": 0.146236}, {"group": "Italian", "sample": "VEN015", "PC1": 0.106994, "PC2": 0.155376}, {"group": "Italian", "sample": "VEN016", "PC1": 0.104717, "PC2": 0.152329}, {"group": "Italian", "sample": "ORD010", "PC1": 0.099026, "PC2": 0.157407}, {"group": "Italian", "sample": "VK534", "PC1": 0.103579, "PC2": 0.140143}, {"group": "Italian", "sample": "VK535", "PC1": 0.100164, "PC2": 0.14319}, {"group": "Italian", "sample": "VK537", "PC1": 0.097888, "PC2": 0.146236}, {"group": "Italian", "sample": "ETR003", "PC1": 0.111547, "PC2": 0.1635}, {"group": "Italian", "sample": "ETR007", "PC1": 0.119514, "PC2": 0.148267}, {"group": "Italian", "sample": "ETR010", "PC1": 0.121791, "PC2": 0.152329}, {"group": "Italian", "sample": "ETR013", "PC1": 0.117238, "PC2": 0.150298}, {"group": "Italian", "sample": "ETR014", "PC1": 0.1161, "PC2": 0.152329}, {"group": "Italian", "sample": "POP001", "PC1": 0.112685, "PC2": 0.148267}, {"group": "Italian", "sample": "TAQ003", "PC1": 0.097888, "PC2": 0.144205}, {"group": "Italian", "sample": "TAQ009", "PC1": 0.108132, "PC2": 0.137096}, {"group": "Italian", "sample": "TAQ011", "PC1": 0.10927, "PC2": 0.157407}, {"group": "Italian", "sample": "TAQ022", "PC1": 0.114961, "PC2": 0.150298}, {"group": "Italian", "sample": "RMPR1283", "PC1": 0.108132, "PC2": 0.152329}, {"group": "Italian", "sample": "RMPR1285", "PC1": 0.112685, "PC2": 0.151314}, {"group": "Italian", "sample": "RMPR1287", "PC1": 0.118376, "PC2": 0.155376}, {"group": "Italian", "sample": "CL23", "PC1": 0.119514, "PC2": 0.146236}, {"group": "Italian", "sample": "CL36", "PC1": 0.1161, "PC2": 0.150298}, {"group": "Italian", "sample": "R1291__AD_950__Coverage_53.55%", "PC1": 0.106994, "PC2": 0.140143}, {"group": "Italian", "sample": "R1292__AD_950__Coverage_44.79%", "PC1": 0.105855, "PC2": 0.149283}, {"group": "Medieval*Balkans", "sample": "R3543__AD_516__Coverage_60.75%", "PC1": 0.114961, "PC2": 0.151314}, {"group": "Medieval*Balkans", "sample": "R3544__AD_575__Coverage_61.45%", "PC1": 0.114961, "PC2": 0.145221}, {"group": "Medieval*Balkans", "sample": "R3547__AD_571__Coverage_57.30%", "PC1": 0.111547, "PC2": 0.148267}, {"group": "Medieval*Balkans", "sample": "R2050__AD_468__Coverage_59.29%", "PC1": 0.112685, "PC2": 0.148267}, {"group": "Medieval*Balkans", "sample": "R2051__AD_468__Coverage_48.92%", "PC1": 0.119514, "PC2": 0.153345}, {"group": "Medieval*Balkans", "sample": "R2053__AD_468__Coverage_65.65%", "PC1": 0.114961, "PC2": 0.152329}, {"group": "Medieval*Balkans", "sample": "R3662__AD_599__Coverage_48.79%", "PC1": 0.118376, "PC2": 0.149283}, {"group": "Medieval*Balkans", "sample": "R3663__AD_781__Coverage_41.88%", "PC1": 0.1161, "PC2": 0.148267}, {"group": "Medieval*Balkans", "sample": "I15462__AD_734__Coverage_75.20%", "PC1": 0.108132, "PC2": 0.140143}, {"group": "Medieval*Balkans", "sample": "I15463__AD_750__Coverage_69.19%", "PC1": 0.1161, "PC2": 0.148267}, {"group": "Medieval*Balkans", "sample": "I15741__AD_854__Coverage_69.92%", "PC1": 0.120652, "PC2": 0.149283}, {"group": "Medieval*Balkans", "sample": "I15743__AD_921__Coverage_71.11%", "PC1": 0.119514, "PC2": 0.149283}, {"group": "Medieval*Balkans", "sample": "I15744__AD_722__Coverage_69.45%", "PC1": 0.114961, "PC2": 0.14319}, {"group": "Medieval*Balkans", "sample": "R3685__AD_500__Coverage_56.14%", "PC1": 0.117238, "PC2": 0.146236}, {"group": "Medieval*Balkans", "sample": "I13834__AD_1419__Coverage_55.26%", "PC1": 0.12862, "PC2": 0.145221}, {"group": "Medieval*Balkans", "sample": "I13839__AD_936__Coverage_70.67%", "PC1": 0.120652, "PC2": 0.151314}, {"group": "Medieval*Balkans", "sample": "I14622__AD_829__Coverage_58.66%", "PC1": 0.111547, "PC2": 0.15436}, {"group": "Medieval*Balkans", "sample": "I7833__AD_340__Coverage_80.92%", "PC1": 0.104717, "PC2": 0.146236}, {"group": "Jewish", "sample": "SB604A", "PC1": 0.08992, "PC2": 0.144205}, {"group": "Jewish", "sample": "SB605", "PC1": 0.087644, "PC2": 0.148267}, {"group": "Jewish", "sample": "SB606", "PC1": 0.095611, "PC2": 0.132019}, {"group": "Jewish", "sample": "SB671", "PC1": 0.091058, "PC2": 0.135065}, {"group": "Jewish", "sample": "SB676", "PC1": 0.086506, "PC2": 0.148267}, {"group": "Jewish", "sample": "SB696", "PC1": 0.079676, "PC2": 0.149283}, {"group": "Jewish", "sample": "I13861", "PC1": 0.103579, "PC2": 0.15436}, {"group": "Jewish", "sample": "I13863", "PC1": 0.093335, "PC2": 0.132019}, {"group": "Jewish", "sample": "I13864", "PC1": 0.094473, "PC2": 0.151314}, {"group": "Jewish", "sample": "I13865", "PC1": 0.092197, "PC2": 0.142174}, {"group": "Jewish", "sample": "I13870", "PC1": 0.094473, "PC2": 0.148267}, {"group": "Jewish", "sample": "I14737", "PC1": 0.08992, "PC2": 0.147252}, {"group": "Jewish", "sample": "I14739", "PC1": 0.08992, "PC2": 0.144205}, {"group": "Jewish", "sample": "I14741", "PC1": 0.101303, "PC2": 0.145221}, {"group": "Jewish", "sample": "I14851", "PC1": 0.097888, "PC2": 0.141159}, {"group": "Jewish", "sample": "I14852", "PC1": 0.103579, "PC2": 0.148267}, {"group": "Jewish", "sample": "I14903", "PC1": 0.103579, "PC2": 0.146236}, {"group": "Jewish", "sample": "I13867", "PC1": 0.093335, "PC2": 0.13405}, {"group": "Jewish", "sample": "I14736", "PC1": 0.092197, "PC2": 0.139128}, {"group": "Jewish", "sample": "I14897", "PC1": 0.09675, "PC2": 0.142174}, {"group": "Byzantine", "sample": "I20259__AD_604__Coverage_74.68%", "PC1": 0.097888, "PC2": 0.148267}, {"group": "Byzantine", "sample": "I20260__AD_604__Coverage_74.22%", "PC1": 0.10927, "PC2": 0.153345}, {"group": "Byzantine", "sample": "I20261__AD_604__Coverage_24.66%", "PC1": 0.100164, "PC2": 0.147252}, {"group": "Byzantine", "sample": "I20264__AD_604__Coverage_72.31%", "PC1": 0.113823, "PC2": 0.151314}, {"group": "Byzantine", "sample": "I20265__AD_604__Coverage_72.37%", "PC1": 0.103579, "PC2": 0.155376}, {"group": "Byzantine", "sample": "I20266__AD_604__Coverage_70.09%", "PC1": 0.106994, "PC2": 0.147252}, {"group": "Byzantine", "sample": "I20320__AD_604__Coverage_23.23%", "PC1": 0.097888, "PC2": 0.152329}, {"group": "Byzantine", "sample": "I19539__AD_975__Coverage_48.21%", "PC1": 0.100164, "PC2": 0.141159}, {"group": "Byzantine", "sample": "I20140__AD_1100__Coverage_58.63%", "PC1": 0.10927, "PC2": 0.145221}, {"group": "Byzantine", "sample": "I20141__AD_1100__Coverage_68.25%", "PC1": 0.103579, "PC2": 0.147252}, {"group": "Byzantine", "sample": "I20142__AD_975__Coverage_45.57%", "PC1": 0.100164, "PC2": 0.145221}, {"group": "Byzantine", "sample": "I20143__AD_975__Coverage_45.43%", "PC1": 0.104717, "PC2": 0.147252}, {"group": "Byzantine", "sample": "I20144__AD_975__Coverage_30.46%", "PC1": 0.105855, "PC2": 0.140143}, {"group": "Byzantine", "sample": "I20145__AD_975__Coverage_71.33%", "PC1": 0.097888, "PC2": 0.150298}, {"group": "Byzantine", "sample": "I20146__AD_975__Coverage_78.15%", "PC1": 0.102441, "PC2": 0.150298}, {"group": "Byzantine", "sample": "I20147__AD_975__Coverage_63.31%", "PC1": 0.092197, "PC2": 0.149283}, {"group": "Byzantine", "sample": "I20187__AD_975__Coverage_73.79%", "PC1": 0.111547, "PC2": 0.148267}, {"group": "Byzantine", "sample": "I20574__AD_975__Coverage_75.27%", "PC1": 0.108132, "PC2": 0.147252}, {"group": "Byzantine", "sample": "I14820__AD_1560__Coverage_70.87%", "PC1": 0.106994, "PC2": 0.146236}, {"group": "Byzantine", "sample": "I14824__AD_494__Coverage_69.25%", "PC1": 0.097888, "PC2": 0.145221}, {"group": "Byzantine", "sample": "I10546__AD_700__Coverage_44.30%", "PC1": 0.117238, "PC2": 0.145221}, {"group": "Byzantine", "sample": "I8366__AD_600__Coverage_71.10%", "PC1": 0.121791, "PC2": 0.155376}, {"group": "Byzantine", "sample": "I8367__AD_600__Coverage_45.31%", "PC1": 0.122929, "PC2": 0.15436}, {"group": "Byzantine", "sample": "I8368__AD_600__Coverage_23.03%", "PC1": 0.110408, "PC2": 0.151314}, {"group": "Byzantine", "sample": "I8370__AD_600__Coverage_47.71%", "PC1": 0.113823, "PC2": 0.160454}, {"group": "Byzantine", "sample": "I8371__AD_600__Coverage_71.98%", "PC1": 0.104717, "PC2": 0.155376}, {"group": "Byzantine", "sample": "I8373__AD_600__Coverage_56.24%", "PC1": 0.111547, "PC2": 0.153345}, {"group": "Byzantine", "sample": "I14799__AD_375__Coverage_52.66%", "PC1": 0.114961, "PC2": 0.142174}, {"group": "Byzantine", "sample": "I14833__AD_550__Coverage_41.44%", "PC1": 0.114961, "PC2": 0.144205}, {"group": "Byzantine", "sample": "I14839__AD_484__Coverage_72.40%", "PC1": 0.100164, "PC2": 0.156392}, {"group": "Byzantine", "sample": "I14842__AD_550__Coverage_66.01%", "PC1": 0.112685, "PC2": 0.153345}, {"group": "Byzantine", "sample": "I14843__AD_550__Coverage_66.66%", "PC1": 0.100164, "PC2": 0.149283}, {"group": "Byzantine", "sample": "654", "PC1": 0.104717, "PC2": 0.142174}, {"group": "Byzantine", "sample": "655", "PC1": 0.118376, "PC2": 0.14319}, {"group": "Byzantine", "sample": "661", "PC1": 0.110408, "PC2": 0.14319}, {"group": "Byzantine", "sample": "662", "PC1": 0.108132, "PC2": 0.138112}, {"group": "Byzantine", "sample": "G2501", "PC1": 0.111547, "PC2": 0.149283}, {"group": "Byzantine", "sample": "G2502", "PC1": 0.110408, "PC2": 0.142174}, {"group": "Byzantine", "sample": "G2503", "PC1": 0.108132, "PC2": 0.141159}, {"group": "Byzantine", "sample": "BOG020__AD_160", "PC1": 0.106994, "PC2": 0.155376}, {"group": "Byzantine", "sample": "BOG024__AD_160", "PC1": 0.105855, "PC2": 0.150298}, {"group": "Kartvelian", "sample": "GEO38_georgian_imer", "PC1": 0.106994, "PC2": 0.126941}, {"group": "Kartvelian", "sample": "GEO51_georgian_imer", "PC1": 0.112685, "PC2": 0.138112}, {"group": "Kartvelian", "sample": "GEO71_georgian_imer", "PC1": 0.10927, "PC2": 0.139128}, {"group": "Kartvelian", "sample": "GEO73_georgian_imer", "PC1": 0.106994, "PC2": 0.131003}, {"group": "Kartvelian", "sample": "GEO75_georgia_imer", "PC1": 0.104717, "PC2": 0.131003}, {"group": "Kartvelian", "sample": "IMR1", "PC1": 0.113823, "PC2": 0.139128}, {"group": "Kartvelian", "sample": "IMR2", "PC1": 0.110408, "PC2": 0.132019}, {"group": "Kartvelian", "sample": "IMR3", "PC1": 0.112685, "PC2": 0.137096}, {"group": "Kartvelian", "sample": "IMR4", "PC1": 0.112685, "PC2": 0.135065}, {"group": "Kartvelian", "sample": "IMR5", "PC1": 0.108132, "PC2": 0.132019}, {"group": "Kartvelian", "sample": "SMG1", "PC1": 0.108132, "PC2": 0.123895}, {"group": "Kartvelian", "sample": "SMG2", "PC1": 0.111547, "PC2": 0.128972}, {"group": "Kartvelian", "sample": "SMG3", "PC1": 0.111547, "PC2": 0.133034}, {"group": "Kartvelian", "sample": "SMG4", "PC1": 0.112685, "PC2": 0.127957}, {"group": "Kartvelian", "sample": "SMG5", "PC1": 0.103579, "PC2": 0.131003}, {"group": "Kartvelian", "sample": "WG1", "PC1": 0.104717, "PC2": 0.137096}, {"group": "Kartvelian", "sample": "WG10", "PC1": 0.114961, "PC2": 0.132019}, {"group": "Kartvelian", "sample": "WG2", "PC1": 0.112685, "PC2": 0.140143}, {"group": "Kartvelian", "sample": "WG3", "PC1": 0.112685, "PC2": 0.131003}, {"group": "Kartvelian", "sample": "WG4", "PC1": 0.114961, "PC2": 0.14319}, {"group": "Kartvelian", "sample": "WG5", "PC1": 0.102441, "PC2": 0.138112}, {"group": "Kartvelian", "sample": "WG6", "PC1": 0.113823, "PC2": 0.136081}, {"group": "Kartvelian", "sample": "WG7", "PC1": 0.114961, "PC2": 0.136081}, {"group": "Kartvelian", "sample": "WG8", "PC1": 0.114961, "PC2": 0.13405}, {"group": "Kartvelian", "sample": "WG9", "PC1": 0.110408, "PC2": 0.132019}, {"group": "Alan", "sample": "DA146__AD_650__Coverage_13.23%", "PC1": 0.106994, "PC2": 0.112724}, {"group": "Alan", "sample": "DA160__AD_650__Coverage_31.84%", "PC1": 0.105855, "PC2": 0.098506}, {"group": "Alan", "sample": "DA162__AD_650__Coverage_80.79%", "PC1": 0.10927, "PC2": 0.107646}, {"group": "Alan", "sample": "DA164__AD_1100__Coverage_57.58%", "PC1": 0.1161, "PC2": 0.102568}, {"group": "Alan", "sample": "DA243__AD_900__Coverage_89.98%", "PC1": 0.111547, "PC2": 0.101553}, {"group": "Alan", "sample": "Anapa9__AD_1116__unknown_coverage", "PC1": 0.106994, "PC2": 0.088351}, {"group": "Alan", "sample": "Anapa10__AD_939__unknown_coverage", "PC1": 0.108132, "PC2": 0.085304}, {"group": "Alan", "sample": "Anapa11__AD_937__unknown_coverage", "PC1": 0.113823, "PC2": 0.079211}, {"group": "Armenian", "sample": "I14645__AD_1200__Coverage_59.24%", "PC1": 0.103579, "PC2": 0.140143}, {"group": "Armenian", "sample": "I14647__AD_1200__Coverage_34.78%", "PC1": 0.102441, "PC2": 0.133034}, {"group": "Armenian", "sample": "I14652__AD_1200__Coverage_18.18%", "PC1": 0.09675, "PC2": 0.145221}, {"group": "Levantine", "sample": "R3473__AD_705__Coverage_54.46%", "PC1": 0.061464, "PC2": 0.147252}, {"group": "Levantine", "sample": "R3476__AD_505__Coverage_62.17%", "PC1": 0.092197, "PC2": 0.145221}, {"group": "Levantine", "sample": "R3477__AD_500__Coverage_49.27%", "PC1": 0.093335, "PC2": 0.147252}, {"group": "Levantine", "sample": "R9823__AD_624__Coverage_67.59%", "PC1": 0.085367, "PC2": 0.148267}, {"group": "Levantine", "sample": "R12229__AD_488__Coverage_78.40%", "PC1": 0.093335, "PC2": 0.145221}, {"group": "Levantine", "sample": "R12233__AD_490__Coverage_33.44%", "PC1": 0.0774, "PC2": 0.156392}, {"group": "Levantine", "sample": "R12245__AD_620__Coverage_34.39%", "PC1": 0.080814, "PC2": 0.147252}, {"group": "Levantine", "sample": "SI-38__AD_1150__Coverage_33.18%", "PC1": 0.094473, "PC2": 0.14319}, {"group": "Levantine", "sample": "SI-42__AD_1225__Coverage_39.04%", "PC1": 0.07057, "PC2": 0.151314}, {"group": "Levantine", "sample": "SI-45__AD_1252__Coverage_93.83%", "PC1": 0.079676, "PC2": 0.151314}, {"group": "Levantine", "sample": "QED-2__AD_340__Coverage_64.31%", "PC1": 0.083091, "PC2": 0.145221}, {"group": "Levantine", "sample": "QED-4__AD_544__Coverage_47.85%", "PC1": 0.092197, "PC2": 0.141159}, {"group": "Levantine", "sample": "QED-7__AD_323__Coverage_68.39%", "PC1": 0.092197, "PC2": 0.145221}, {"group": "Levantine", "sample": "QED-12__AD_425__Coverage_23.05%", "PC1": 0.087644, "PC2": 0.147252}, {"group": "Medieval*Arab", "sample": "R3361__AD_1220__Coverage_65.62%", "PC1": 0.07057, "PC2": 0.140143}, {"group": "Medieval*Arab", "sample": "syr005__AD_717__unknown_coverage", "PC1": 0.055773, "PC2": 0.151314}, {"group": "Medieval*Arab", "sample": "syr013__AD_715__unknown_coverage", "PC1": 0.078538, "PC2": 0.152329}, {"group": "Medieval*Arab", "sample": "HGDP00607", "PC1": 0.028456, "PC2": 0.141159}, {"group": "Medieval*Arab", "sample": "HGDP00608", "PC1": 0.0387, "PC2": 0.14319}, {"group": "Medieval*Arab", "sample": "HGDP00610", "PC1": 0.040976, "PC2": 0.144205}, {"group": "Medieval*Arab", "sample": "HGDP00612", "PC1": 0.042115, "PC2": 0.145221}, {"group": "Medieval*Arab", "sample": "HGDP00616", "PC1": 0.048944, "PC2": 0.142174}, {"group": "Medieval*Arab", "sample": "HGDP00618", "PC1": 0.047806, "PC2": 0.150298}, {"group": "Medieval*Arab", "sample": "HGDP00623", "PC1": 0.037562, "PC2": 0.145221}, {"group": "Medieval*Arab", "sample": "HGDP00624", "PC1": 0.027318, "PC2": 0.147252}, {"group": "Medieval*Arab", "sample": "HGDP00630", "PC1": 0.040976, "PC2": 0.140143}, {"group": "Medieval*Arab", "sample": "HGDP00631", "PC1": 0.043253, "PC2": 0.149283}, {"group": "Medieval*Arab", "sample": "HGDP00636", "PC1": 0.039838, "PC2": 0.144205}, {"group": "Medieval*Arab", "sample": "HGDP00641", "PC1": 0.039838, "PC2": 0.145221}, {"group": "Medieval*Arab", "sample": "HGDP00643", "PC1": 0.052359, "PC2": 0.145221}, {"group": "Medieval*Arab", "sample": "HGDP00648", "PC1": 0.042115, "PC2": 0.138112}, {"group": "Medieval*Arab", "sample": "HGDP00649", "PC1": 0.052359, "PC2": 0.145221}, {"group": "Medieval*Arab", "sample": "HGDP00650", "PC1": 0.048944, "PC2": 0.139128}, {"group": "Medieval*Arab", "sample": "HGDP00651", "PC1": 0.037562, "PC2": 0.144205}, {"group": "Medieval*Arab", "sample": "HGDP00653", "PC1": 0.045529, "PC2": 0.141159}, {"group": "Iranian*Plateau", "sample": "F38__BC_883__Coverage_85.73%", "PC1": 0.09675, "PC2": 0.121864}, {"group": "Iranian*Plateau", "sample": "I4232__BC_874__Coverage_82.58%", "PC1": 0.094473, "PC2": 0.119832}, {"group": "Iranian*Plateau", "sample": "I4269__BC_803__Coverage_84.96%", "PC1": 0.095611, "PC2": 0.1046}, {"group": "Iranian*Plateau", "sample": "I4357__BC_871__Coverage_67.43%", "PC1": 0.09675, "PC2": 0.121864}, {"group": "Iranian*Plateau", "sample": "I6428__BC_1027__Coverage_77.02%", "PC1": 0.092197, "PC2": 0.110693}, {"group": "Iranian*Plateau", "sample": "I6430__BC_900__Coverage_74.99%", "PC1": 0.08992, "PC2": 0.099522}, {"group": "Iranian*Plateau", "sample": "I6431__BC_1072__Coverage_44.79%", "PC1": 0.087644, "PC2": 0.12491}, {"group": "Iranian*Plateau", "sample": "I6432__BC_1178__Coverage_74.75%", "PC1": 0.099026, "PC2": 0.101553}, {"group": "Ancient*Egyptian", "sample": "Egyptian_Copt", "PC1": 0.022396833, "PC2": 0.143179}, {"group": "Ancient*Egyptian", "sample": "Egyptian_Copt_Sudan", "PC1": 0.015417818, "PC2": 0.14457436}, {"group": "Maghrebi", "sample": "R11759", "PC1": -0.072847, "PC2": 0.142174}, {"group": "Maghrebi", "sample": "R10667__AD_171__Coverage_85.35%", "PC1": -0.022765, "PC2": 0.14319}, {"group": "Maghrebi", "sample": "gun002__AD_1099__Coverage_13.08%", "PC1": -0.050082, "PC2": 0.122879}, {"group": "Maghrebi", "sample": "gun005__AD_958__Coverage_25.55%", "PC1": -0.01935, "PC2": 0.125926}, {"group": "Maghrebi", "sample": "gun008__AD_936__Coverage_18.38%", "PC1": -0.027318, "PC2": 0.139128}, {"group": "Maghrebi", "sample": "gun011__AD_813__Coverage_91.59%", "PC1": -0.044391, "PC2": 0.131003}, {"group": "Maghrebi", "sample": "gun012__AD_626__Coverage_27.87%", "PC1": -0.055773, "PC2": 0.138112}, {"group": "Khwarazmian", "sample": "OLN002__AD_875__Coverage_85.76%", "PC1": 0.09675, "PC2": 0.085304}, {"group": "Khwarazmian", "sample": "OLN003__AD_862__Coverage_19.30%", "PC1": 0.09675, "PC2": 0.078196}, {"group": "Khwarazmian", "sample": "L5138", "PC1": 0.08992, "PC2": 0.073118}, {"group": "Khwarazmian", "sample": "L7999", "PC1": 0.100164, "PC2": 0.093429}, {"group": "Khwarazmian", "sample": "L8002", "PC1": 0.091058, "PC2": 0.097491}, {"group": "Khwarazmian", "sample": "L8630", "PC1": 0.105855, "PC2": 0.076165}, {"group": "Khwarazmian", "sample": "L8671", "PC1": 0.101303, "PC2": 0.088351}, {"group": "Khwarazmian", "sample": "L5139", "PC1": 0.101303, "PC2": 0.087336}, {"group": "Khorasan", "sample": "I1805__AD_1568__Coverage_45.61%", "PC1": 0.083091, "PC2": 0.020311}, {"group": "Khorasan", "sample": "I2959__AD_1128__Coverage_53.32%", "PC1": 0.078538, "PC2": 0.032497}, {"group": "Khorasan", "sample": "I7716__AD_1222__Coverage_76.48%", "PC1": 0.079676, "PC2": 0.039606}, {"group": "Turkic", "sample": "DA222__AD_850__Coverage_93.34%", "PC1": 0.064879, "PC2": -0.158423}, {"group": "Turkic", "sample": "DA230__AD_1067__Coverage_63.88%", "PC1": 0.061464, "PC2": -0.145221}, {"group": "Turkic", "sample": "CHK004__AD_821__Coverage_52.73%", "PC1": 0.062603, "PC2": -0.122879}, {"group": "Turkic", "sample": "DA203__AD_950__Coverage_40.67%", "PC1": 0.07057, "PC2": -0.166547}, {"group": "Turkic", "sample": "DA204__AD_933__Coverage_54.81%", "PC1": 0.068294, "PC2": -0.155376}, {"group": "Turkic", "sample": "DA205", "PC1": 0.05805, "PC2": -0.199044}, {"group": "Turkic", "sample": "DA87__AD_691__Coverage_18.23%", "PC1": 0.080814, "PC2": -0.140143}, {"group": "Turkic", "sample": "Western*Turk*(Onoq*Confederation)", "PC1": 0.073985, "PC2": -0.1442053}, {"group": "Turkic", "sample": "Karakaba_KKB001", "PC1": 0.069432, "PC2": -0.166547}, {"group": "Turkic", "sample": "Karakaba_KKB002", "PC1": 0.079676, "PC2": -0.176702}, {"group": "Turkic", "sample": "VolgaOka_SHK001", "PC1": 0.073985, "PC2": -0.182795}, {"group": "Turkic", "sample": "VolgaOka_SHK002", "PC1": 0.066017, "PC2": -0.174671}, {"group": "Turkic", "sample": "DA126", "PC1": 0.071709, "PC2": -0.140143}, {"group": "Magyar", "sample": "TCS2", "PC1": 0.097888, "PC2": -0.113739}, {"group": "Magyar", "sample": "KeF21045", "PC1": 0.085367, "PC2": -0.110693}, {"group": "Magyar", "sample": "KeF110936", "PC1": 0.086506, "PC2": -0.126941}, {"group": "Magyar", "sample": "LB1432", "PC1": 0.08992, "PC2": -0.107646}, {"group": "Magyar", "sample": "MH123", "PC1": 0.08992, "PC2": -0.119832}, {"group": "Magyar", "sample": "SZAK6", "PC1": 0.087644, "PC2": -0.110693}, {"group": "Magyar", "sample": "SZAK4", "PC1": 0.08992, "PC2": -0.123895}, {"group": "Magyar", "sample": "SZAK7", "PC1": 0.093335, "PC2": -0.12491}, {"group": "Mongol", "sample": "BAZ001__AD_1250__Coverage_77.04%", "PC1": 0.052359, "PC2": -0.317861}, {"group": "Mongol", "sample": "BRG002__AD_1250__Coverage_72.23%", "PC1": 0.045529, "PC2": -0.35442}, {"group": "Mongol", "sample": "CHD001__AD_1250__Coverage_80.74%", "PC1": 0.048944, "PC2": -0.384886}, {"group": "Mongol", "sample": "DAS001__AD_1250__Coverage_82.25%", "PC1": 0.045529, "PC2": -0.353404}, {"group": "Mongol", "sample": "ERD001__AD_1250__Coverage_73.46%", "PC1": 0.042115, "PC2": -0.349342}, {"group": "Mongol", "sample": "KHV002__AD_1250__Coverage_33.72%", "PC1": 0.042115, "PC2": -0.37473}, {"group": "Mongol", "sample": "KNU001__AD_1250__Coverage_65.54%", "PC1": 0.042115, "PC2": -0.370668}, {"group": "Mongol", "sample": "KRN001__AD_1250__Coverage_61.35%", "PC1": 0.05122, "PC2": -0.335125}, {"group": "Mongol", "sample": "RAH001__AD_1250__Coverage_63.85%", "PC1": 0.044391, "PC2": -0.381839}, {"group": "Mongol", "sample": "SHR001__AD_1250__Coverage_87.82%", "PC1": 0.042115, "PC2": -0.337156}, {"group": "Mongol", "sample": "TAH002__AD_1250__Coverage_77.87%", "PC1": 0.043253, "PC2": -0.370668}, {"group": "Mongol", "sample": "TAV005__AD_650__Coverage_63.01%", "PC1": 0.037562, "PC2": -0.360513}, {"group": "Mongol", "sample": "TSA003__AD_1250__Coverage_33.71%", "PC1": 0.042115, "PC2": -0.355435}, {"group": "Mongol", "sample": "UGO001__AD_1250__Coverage_21.97%", "PC1": 0.030732, "PC2": -0.34528}, {"group": "Mongol", "sample": "UGU003__AD_400__Coverage_22.79%", "PC1": 0.043253, "PC2": -0.373715}, {"group": "Mongol", "sample": "I13176__AD_936__Coverage_47.51%", "PC1": 0.047806, "PC2": -0.344264}, {"group": "Amur", "sample": "bla001__AD_651__Coverage_28.73%", "PC1": 0.025041, "PC2": -0.451911}, {"group": "Tibetan", "sample": "C1__BC_825__Coverage_98.29%", "PC1": 0.012521, "PC2": -0.410274}, {"group": "Tibetan", "sample": "M63__BC_175__Coverage_50.14%", "PC1": 0.009106, "PC2": -0.416367}, {"group": "Tibetan", "sample": "S10__AD_450__Coverage_79.37%", "PC1": 0.020488, "PC2": -0.404181}, {"group": "Tibetan", "sample": "S35__AD_450__Coverage_88.07%", "PC1": 0.012521, "PC2": -0.407227}, {"group": "Tibetan", "sample": "S41__AD_450__Coverage_70.03%", "PC1": 0.022765, "PC2": -0.372699}, {"group": "Southeast*Asian", "sample": "I0627_all__BC_1999__Coverage_9.31%", "PC1": -0.001138, "PC2": -0.390979}, {"group": "Southeast*Asian", "sample": "I1137_all__BC_1808__Coverage_11.66%", "PC1": 0.001138, "PC2": -0.382855}, {"group": "Southeast*Asian", "sample": "Vt777__BC_321__Coverage_8.50%", "PC1": 0.020488, "PC2": -0.397072}, {"group": "Southeast*Asian", "sample": "Vt778__BC_698__Coverage_10.58%", "PC1": 0.011382, "PC2": -0.388948}, {"group": "Southeast*Asian", "sample": "Vt833__BC_2218__Coverage_14.19%", "PC1": 0.017073, "PC2": -0.376761}, {"group": "Southeast*Asian", "sample": "La364__BC_1037__Coverage_79.96%", "PC1": 0.005691, "PC2": -0.40215}, {"group": "Southeast*Asian", "sample": "I1368_all__BC_920__Coverage_16.08%", "PC1": 0.007968, "PC2": -0.415352}, {"group": "Southeast*Asian", "sample": "I1369_all__BC_935__Coverage_23.53%", "PC1": 0.004553, "PC2": -0.428553}, {"group": "Southeast*Asian", "sample": "I1370_all__BC_995__Coverage_20.61%", "PC1": 0.013659, "PC2": -0.419414}, {"group": "Southeast*Asian", "sample": "I5266__BC_1000__Coverage_11.45%", "PC1": 0.022765, "PC2": -0.433631}, {"group": "Southeast*Asian", "sample": "I5951__BC_870__Coverage_10.29%", "PC1": 0.012521, "PC2": -0.42246}, {"group": "Southeast*Asian", "sample": "I13721__BC_1219__Coverage_60.68%", "PC1": 0.009106, "PC2": -0.455973}, {"group": "Southeast*Asian", "sample": "Ma912__BC_509__Coverage_70.71%", "PC1": 0.0, "PC2": -0.395041}, {"group": "Southeast*Asian", "sample": "La727__BC_378__Coverage_24.23%", "PC1": 0.002276, "PC2": -0.380824}, {"group": "Southeast*Asian", "sample": "I2497_all__AD_0__Coverage_27.17%", "PC1": 0.009106, "PC2": -0.421445}, {"group": "Southeast*Asian", "sample": "Vt779__BC_287__Coverage_7.11%", "PC1": 0.034147, "PC2": -0.391994}, {"group": "Southeast*Asian", "sample": "Vt781__BC_292__Coverage_6.89%", "PC1": 0.043253, "PC2": -0.370668}, {"group": "Southeast*Asian", "sample": "I3611__AD_235__Coverage_63.81%", "PC1": 0.015935, "PC2": -0.435662}, {"group": "Southeast*Asian", "sample": "I3612__AD_150__Coverage_62.23%", "PC1": 0.011382, "PC2": -0.441755}, {"group": "Southeast*Asian", "sample": "I3614__AD_400__Coverage_83.64%", "PC1": 0.018212, "PC2": -0.444802}, {"group": "Southeast*Asian", "sample": "I3615__AD_117__Coverage_79.92%", "PC1": 0.025041, "PC2": -0.434647}, {"group": "Southeast*Asian", "sample": "I3616__AD_309__Coverage_68.74%", "PC1": 0.018212, "PC2": -0.448864}, {"group": "Southeast*Asian", "sample": "I3617__AD_306__Coverage_81.92%", "PC1": 0.010244, "PC2": -0.446833}, {"group": "Southeast*Asian", "sample": "I3618__AD_400__Coverage_79.86%", "PC1": 0.010244, "PC2": -0.435662}, {"group": "Southeast*Asian", "sample": "I3619__AD_477__Coverage_83.80%", "PC1": 0.013659, "PC2": -0.445817}, {"group": "Southeast*Asian", "sample": "I3620__AD_93__Coverage_80.64%", "PC1": 0.006829, "PC2": -0.451911}, {"group": "Southeast*Asian", "sample": "I3621__AD_355__Coverage_83.71%", "PC1": 0.01935, "PC2": -0.441755}, {"group": "Southeast*Asian", "sample": "I3727__AD_400__Coverage_81.67%", "PC1": 0.018212, "PC2": -0.443786}, {"group": "Southeast*Asian", "sample": "I3728__AD_454__Coverage_72.02%", "PC1": 0.014797, "PC2": -0.44988}, {"group": "Southeast*Asian", "sample": "I3731__AD_400__Coverage_81.68%", "PC1": 0.009106, "PC2": -0.444802}, {"group": "Southeast*Asian", "sample": "I3732__AD_715__Coverage_77.21%", "PC1": 0.018212, "PC2": -0.439724}, {"group": "Southeast*Asian", "sample": "I3733__AD_690__Coverage_57.06%", "PC1": 0.005691, "PC2": -0.427538}, {"group": "Southeast*Asian", "sample": "I3734__AD_375__Coverage_79.83%", "PC1": 0.012521, "PC2": -0.441755}, {"group": "Southeast*Asian", "sample": "I3735__AD_418__Coverage_80.03%", "PC1": 0.013659, "PC2": -0.441755}, {"group": "Southeast*Asian", "sample": "I3736__AD_400__Coverage_71.13%", "PC1": 0.011382, "PC2": -0.44074}, {"group": "Southeast*Asian", "sample": "I8074__AD_400__Coverage_9.48%", "PC1": 0.039838, "PC2": -0.437693}, {"group": "Southeast*Asian", "sample": "I8075__AD_491__Coverage_63.82%", "PC1": 0.014797, "PC2": -0.439724}, {"group": "Southeast*Asian", "sample": "I8081__AD_541__Coverage_9.61%", "PC1": 0.018212, "PC2": -0.443786}, {"group": "Southeast*Asian", "sample": "I13692__AD_400__Coverage_49.03%", "PC1": 0.014797, "PC2": -0.447848}, {"group": "Southeast*Asian", "sample": "S15158.Y1.E1.L1__AD_400__Coverage_19.06%", "PC1": 0.017073, "PC2": -0.437693}, {"group": "Southeast*Asian", "sample": "Th519__AD_291__Coverage_17.89%", "PC1": 0.012521, "PC2": -0.395041}, {"group": "Southeast*Asian", "sample": "Th521__AD_284__Coverage_40.78%", "PC1": 0.001138, "PC2": -0.397072}, {"group": "Southeast*Asian", "sample": "Th530__AD_304__Coverage_21.93%", "PC1": 0.007968, "PC2": -0.401134}, {"group": "Southeast*Asian", "sample": "Ma554__AD_1518__Coverage_16.86%", "PC1": 0.005691, "PC2": -0.420429}, {"group": "Southeast*Asian", "sample": "Ma555__AD_1572__Coverage_46.63%", "PC1": 0.009106, "PC2": -0.425507}, {"group": "Southeast*Asian", "sample": "I6940__AD_1751__Coverage_35.78%", "PC1": 0.009106, "PC2": -0.397072}, {"group": "Southeast*Asian", "sample": "BalongKD10__AD_461__Coverage_31.29%", "PC1": 0.022765, "PC2": -0.433631}, {"group": "Southeast*Asian", "sample": "BandaKD11__AD_563__Coverage_48.69%", "PC1": 0.017073, "PC2": -0.441755}, {"group": "Southeast*Asian", "sample": "LadaKH01__AD_563__Coverage_71.28%", "PC1": 0.010244, "PC2": -0.435662}, {"group": "Southeast*Asian", "sample": "ShenxianKP09__AD_636__Coverage_56.42%", "PC1": 0.014797, "PC2": -0.426522}, {"group": "Southeast*Asian", "sample": "YiyangKP17__AD_563__Coverage_24.82%", "PC1": 0.01935, "PC2": -0.4316}, {"group": "Sinitic", "sample": "HJTM115__BC_275__Coverage_72.65%", "PC1": 0.022765, "PC2": -0.441755}, {"group": "Sinitic", "sample": "JXNTM2__BC_1300__Coverage_71.52%", "PC1": 0.01935, "PC2": -0.448864}, {"group": "Sinitic", "sample": "JXNTM23__BC_1382__Coverage_62.75%", "PC1": 0.014797, "PC2": -0.447848}, {"group": "Sinitic", "sample": "LGM41__BC_150__Coverage_64.43%", "PC1": 0.021626, "PC2": -0.443786}, {"group": "Sinitic", "sample": "LGM79__BC_300__Coverage_67.99%", "PC1": 0.018212, "PC2": -0.451911}, {"group": "Sinitic", "sample": "DA43__BC_150__Coverage_69.69%", "PC1": 0.022765, "PC2": -0.435662}, {"group": "Sinitic", "sample": "DA45__BC_96__Coverage_99.53%", "PC1": 0.014797, "PC2": -0.44074}, {"group": "Sinitic", "sample": "DCZ-M21II__AD_187__Coverage_50.72%", "PC1": 0.027318, "PC2": -0.446833}, {"group": "Sinitic", "sample": "DCZM17IV__AD_100__Coverage_40.62%", "PC1": 0.025041, "PC2": -0.453942}, {"group": "Sinitic", "sample": "L5694__AD_1612__Coverage_24.10%", "PC1": 0.018212, "PC2": -0.447848}, {"group": "Feudal*Japanese", "sample": "JpIw31__AD_612__Coverage_75.04%", "PC1": 0.015935, "PC2": -0.447848}, {"group": "Feudal*Japanese", "sample": "JpIw33__AD_625__Coverage_78.81%", "PC1": 0.01935, "PC2": -0.437693}, {"group": "Feudal*Japanese", "sample": "NAG035__AD_1800__Coverage_34.46%", "PC1": 0.012521, "PC2": -0.426522}, {"group": "Feudal*Japanese", "sample": "NAG036__AD_1808__Coverage_30.94%", "PC1": 0.021626, "PC2": -0.421445}, {"group": "Feudal*Japanese", "sample": "NAG039__AD_1807__Coverage_80.12%", "PC1": 0.021626, "PC2": -0.425507}, {"group": "Hmong-Mien", "sample": "HuaqiaoNL26__AD_1531__Coverage_71.27%", "PC1": 0.014797, "PC2": -0.439724}, {"group": "Hmong-Mien", "sample": "HuatuyanNL02__AD_1564__Coverage_26.43%", "PC1": 0.013659, "PC2": -0.430584}, {"group": "Hmong-Mien", "sample": "HuatuyanNL21__AD_1545__Coverage_49.38%", "PC1": 0.010244, "PC2": -0.433631}, {"group": "Hmong-Mien", "sample": "HuatuyanNL06__AD_1450__Coverage_31.09%", "PC1": 0.018212, "PC2": -0.435662}, {"group": "Hmong-Mien", "sample": "HuatuyanNL18__AD_1450__Coverage_35.09%", "PC1": 0.014797, "PC2": -0.420429}, {"group": "Ancient*Siberian", "sample": "East*Siberian*(Middle*Ages)", "PC1": 0.042115, "PC2": -0.377777}, {"group": "Gandharan", "sample": "I8218__AD_1__Coverage_86.91%", "PC1": 0.076261, "PC2": -0.004062}, {"group": "Gandharan", "sample": "I8220__BC_616__Coverage_77.27%", "PC1": 0.063741, "PC2": -0.010155}, {"group": "Gandharan", "sample": "I6889__AD_1345__Coverage_76.03%", "PC1": 0.068294, "PC2": 0.005078}, {"group": "Gandharan", "sample": "I6890__AD_1097__Coverage_70.32%", "PC1": 0.072847, "PC2": 0.002031}, {"group": "Gandharan", "sample": "I7714__AD_6__Coverage_59.84%", "PC1": 0.069432, "PC2": -0.004062}, {"group": "Gandharan", "sample": "I7715__AD_1331__Coverage_77.72%", "PC1": 0.061464, "PC2": -0.013202}, {"group": "Gandharan", "sample": "I6547__BC_50__Coverage_29.11%", "PC1": 0.05805, "PC2": -0.024373}, {"group": "Gandharan", "sample": "I6549__BC_91__Coverage_48.92%", "PC1": 0.060326, "PC2": -0.016248}, {"group": "Gandharan", "sample": "I6550__AD_24__Coverage_60.86%", "PC1": 0.059188, "PC2": -0.019295}, {"group": "Gandharan", "sample": "I6551__BC_50__Coverage_55.87%", "PC1": 0.060326, "PC2": -0.025388}, {"group": "Gandharan", "sample": "I6891__BC_292__Coverage_73.94%", "PC1": 0.069432, "PC2": 0.001016}, {"group": "Gandharan", "sample": "I6893__BC_275__Coverage_52.67%", "PC1": 0.066017, "PC2": 0.005078}, {"group": "Gandharan", "sample": "I6894__BC_300__Coverage_80.92%", "PC1": 0.067156, "PC2": -0.006093}, {"group": "Gandharan", "sample": "I6896__BC_277__Coverage_68.16%", "PC1": 0.069432, "PC2": -0.011171}, {"group": "Gandharan", "sample": "I7717__BC_333__Coverage_74.74%", "PC1": 0.05805, "PC2": -0.020311}, {"group": "Gandharan", "sample": "I7718__BC_300__Coverage_66.67%", "PC1": 0.07057, "PC2": -0.002031}, {"group": "Gandharan", "sample": "I7719__BC_300__Coverage_71.61%", "PC1": 0.076261, "PC2": -0.013202}, {"group": "Gandharan", "sample": "I7720__BC_300__Coverage_69.13%", "PC1": 0.068294, "PC2": -0.019295}, {"group": "Gandharan", "sample": "I7721__BC_300__Coverage_76.40%", "PC1": 0.063741, "PC2": -0.019295}, {"group": "Gandharan", "sample": "I7723__BC_300__Coverage_75.00%", "PC1": 0.067156, "PC2": -0.024373}, {"group": "Medieval*North*Indian", "sample": "I2868__AD_939__Coverage_48.74%", "PC1": 0.033009, "PC2": -0.097491}, {"group": "Medieval*North*Indian", "sample": "I2871__AD_851__Coverage_38.37%", "PC1": 0.05805, "PC2": -0.016248}, {"group": "Medieval*North*Indian", "sample": "I2872__AD_851__Coverage_17.04%", "PC1": 0.07057, "PC2": -0.017264}, {"group": "Medieval*North*Indian", "sample": "I3342__AD_851__Coverage_34.51%", "PC1": 0.037562, "PC2": -0.094444}, {"group": "Medieval*North*Indian", "sample": "I3343__AD_841__Coverage_17.62%", "PC1": 0.039838, "PC2": -0.062963}, {"group": "Medieval*North*Indian", "sample": "I3346__AD_821__Coverage_23.23%", "PC1": 0.05122, "PC2": -0.032497}, {"group": "Medieval*North*Indian", "sample": "I3352__AD_784__Coverage_50.45%", "PC1": 0.047806, "PC2": -0.032497}, {"group": "Medieval*North*Indian", "sample": "I3406__AD_934__Coverage_21.51%", "PC1": 0.059188, "PC2": -0.02945}, {"group": "Medieval*North*Indian", "sample": "I6938__AD_798__Coverage_35.14%", "PC1": 0.067156, "PC2": -0.016248}, {"group": "Medieval*North*Indian", "sample": "I6941__AD_943__Coverage_38.59%", "PC1": 0.030732, "PC2": -0.116786}, {"group": "Medieval*North*Indian", "sample": "I6942__AD_832__Coverage_40.14%", "PC1": 0.017073, "PC2": -0.116786}, {"group": "Medieval*North*Indian", "sample": "I6944__AD_825__Coverage_27.18%", "PC1": 0.05805, "PC2": -0.063978}, {"group": "Medieval*North*Indian", "sample": "I6946__AD_841__Coverage_27.98%", "PC1": 0.015935, "PC2": -0.126941}, {"group": "Medieval*North*Indian", "sample": "I7035__AD_935__Coverage_38.78%", "PC1": 0.037562, "PC2": -0.092413}, {"group": "Medieval*North*Indian", "sample": "I7036__AD_927__Coverage_29.25%", "PC1": 0.044391, "PC2": -0.082258}, {"group": "Aboriginal", "sample": "KP1__AD_350__unknown_coverage", "PC1": -0.043253, "PC2": -0.227479}, {"group": "Aboriginal", "sample": "KP2__AD_550__unknown_coverage", "PC1": -0.036423, "PC2": -0.213261}, {"group": "Aboriginal", "sample": "PA86__AD_1500__unknown_coverage", "PC1": -0.039838, "PC2": -0.231541}, {"group": "Aboriginal", "sample": "MH6__AD_1838__unknown_coverage", "PC1": -0.053497, "PC2": -0.239665}, {"group": "Aboriginal", "sample": "MH8__AD_1838__unknown_coverage", "PC1": -0.0387, "PC2": -0.22951}, {"group": "Aboriginal", "sample": "WPAH4__AD_1838__unknown_coverage", "PC1": -0.047806, "PC2": -0.226463}, {"group": "Aboriginal", "sample": "WLH4__BC_2000__unknown_coverage", "PC1": -0.042115, "PC2": -0.224432}, {"group": "Papuan", "sample": "I4451_all__BC_310__Coverage_64.63%", "PC1": -0.039838, "PC2": -0.227479}, {"group": "Native*American", "sample": "MARC1492", "PC1": 0.052359, "PC2": -0.319892}, {"group": "Native*American", "sample": "XVII-B-939", "PC1": 0.052359, "PC2": -0.332078}, {"group": "Native*American", "sample": "19651", "PC1": 0.050082, "PC2": -0.312783}, {"group": "Native*American", "sample": "kennewick", "PC1": 0.046667, "PC2": -0.307705}, {"group": "South*Amerindian", "sample": "I11974__BC_3145__Coverage_68.83%", "PC1": 0.044391, "PC2": -0.304659}, {"group": "South*Amerindian", "sample": "LAR001__BC_4610__Coverage_38.53%", "PC1": 0.05122, "PC2": -0.31583}, {"group": "South*Amerindian", "sample": "LAR002__BC_4858__Coverage_29.30%", "PC1": 0.044391, "PC2": -0.317861}, {"group": "South*Amerindian", "sample": "A460__BC_3180__Coverage_99.81%", "PC1": 0.046667, "PC2": -0.313799}, {"group": "South*Amerindian", "sample": "I12355__AD_460__Coverage_56.42%", "PC1": 0.053497, "PC2": -0.313799}, {"group": "South*Amerindian", "sample": "IPK12__AD_1092__Coverage_99.42%", "PC1": 0.054635, "PC2": -0.314814}, {"group": "South*Amerindian", "sample": "IPK13a__AD_739__Coverage_90.11%", "PC1": 0.055773, "PC2": -0.318876}, {"group": "South*Amerindian", "sample": "I12354__AD_1500__Coverage_77.86%", "PC1": 0.052359, "PC2": -0.318876}, {"group": "South*Amerindian", "sample": "I12363__AD_1570__Coverage_57.36%", "PC1": 0.052359, "PC2": -0.317861}, {"group": "South*Amerindian", "sample": "I12364__AD_1180__Coverage_18.25%", "PC1": 0.066017, "PC2": -0.318876}, {"group": "South*Amerindian", "sample": "I12366__AD_1850__Coverage_47.74%", "PC1": 0.055773, "PC2": -0.318876}, {"group": "South*Amerindian", "sample": "I12367__AD_1250__Coverage_32.96%", "PC1": 0.056912, "PC2": -0.317861}, {"group": "Bering*Strait*Hunter", "sample": "I7331__AD_905__Coverage_74.15%", "PC1": 0.043253, "PC2": -0.361528}, {"group": "Bering*Strait*Hunter", "sample": "I7332__AD_880__Coverage_83.07%", "PC1": 0.048944, "PC2": -0.35442}, {"group": "Bering*Strait*Hunter", "sample": "I7333__AD_700__Coverage_72.96%", "PC1": 0.050082, "PC2": -0.351373}, {"group": "Bering*Strait*Hunter", "sample": "I7334__AD_1045__Coverage_81.68%", "PC1": 0.053497, "PC2": -0.351373}, {"group": "Bering*Strait*Hunter", "sample": "I7337__AD_800__Coverage_67.20%", "PC1": 0.042115, "PC2": -0.364575}, {"group": "Bering*Strait*Hunter", "sample": "I7338__AD_1340__Coverage_68.12%", "PC1": 0.047806, "PC2": -0.356451}, {"group": "Bering*Strait*Hunter", "sample": "I7339__AD_865__Coverage_74.06%", "PC1": 0.046667, "PC2": -0.35442}, {"group": "Bering*Strait*Hunter", "sample": "I7340__AD_930__Coverage_55.54%", "PC1": 0.046667, "PC2": -0.352389}, {"group": "Bering*Strait*Hunter", "sample": "I7341__AD_850__Coverage_79.64%", "PC1": 0.046667, "PC2": -0.357466}, {"group": "Bering*Strait*Hunter", "sample": "I7343__AD_1090__Coverage_68.22%", "PC1": 0.043253, "PC2": -0.349342}, {"group": "Bering*Strait*Hunter", "sample": "I7344__AD_870__Coverage_57.52%", "PC1": 0.046667, "PC2": -0.359497}, {"group": "Bering*Strait*Hunter", "sample": "I7346__AD_805__Coverage_85.04%", "PC1": 0.045529, "PC2": -0.357466}, {"group": "Bering*Strait*Hunter", "sample": "I7347__AD_1225__Coverage_73.59%", "PC1": 0.042115, "PC2": -0.358482}, {"group": "Bering*Strait*Hunter", "sample": "I7348__AD_745__Coverage_70.62%", "PC1": 0.05122, "PC2": -0.355435}, {"group": "Bering*Strait*Hunter", "sample": "I7349__AD_810__Coverage_75.87%", "PC1": 0.055773, "PC2": -0.366606}, {"group": "Bering*Strait*Hunter", "sample": "I7621__AD_595__Coverage_45.11%", "PC1": 0.047806, "PC2": -0.353404}, {"group": "Bering*Strait*Hunter", "sample": "I1524__AD_1045__Coverage_81.67%", "PC1": 0.052359, "PC2": -0.352389}, {"group": "Bering*Strait*Hunter", "sample": "I1525__AD_255__Coverage_76.61%", "PC1": 0.052359, "PC2": -0.35442}, {"group": "Bering*Strait*Hunter", "sample": "I7757__AD_1075__Coverage_77.39%", "PC1": 0.040976, "PC2": -0.347311}, {"group": "Bering*Strait*Hunter", "sample": "I8294__AD_1155__Coverage_39.32%", "PC1": 0.052359, "PC2": -0.350358}, {"group": "Cushitic", "sample": "I12533__BC_2004__Coverage_51.23%", "PC1": -0.249273, "PC2": 0.099522}, {"group": "Cushitic", "sample": "I12534__BC_1964__Coverage_43.47%", "PC1": -0.219679, "PC2": 0.1046}, {"group": "Cushitic", "sample": "HYR002__BC_320__Coverage_43.00%", "PC1": -0.284558, "PC2": 0.097491}, {"group": "Cushitic", "sample": "LUK001__BC_1549__Coverage_42.15%", "PC1": -0.309599, "PC2": 0.093429}, {"group": "Cushitic", "sample": "I8758__BC_548__Coverage_24.96%", "PC1": -0.299355, "PC2": 0.09546}, {"group": "Cushitic", "sample": "I8804__BC_543__Coverage_36.27%", "PC1": -0.286834, "PC2": 0.099522}, {"group": "Cushitic", "sample": "I8809__BC_1017__Coverage_74.97%", "PC1": -0.291387, "PC2": 0.100537}, {"group": "Cushitic", "sample": "I8814__BC_442__Coverage_72.17%", "PC1": -0.302769, "PC2": 0.08632}, {"group": "Cushitic", "sample": "I8830__BC_290__Coverage_9.28%", "PC1": -0.300493, "PC2": 0.105615}, {"group": "Cushitic", "sample": "I8874__BC_1291__Coverage_75.80%", "PC1": -0.298217, "PC2": 0.100537}, {"group": "Cushitic", "sample": "I8918__BC_279__Coverage_70.82%", "PC1": -0.301631, "PC2": 0.091398}, {"group": "Cushitic", "sample": "I8919__BC_283__Coverage_68.76%", "PC1": -0.307322, "PC2": 0.08632}, {"group": "Cushitic", "sample": "I8920__BC_286__Coverage_65.43%", "PC1": -0.311875, "PC2": 0.089367}, {"group": "Cushitic", "sample": "I12384__AD_296__Coverage_37.16%", "PC1": -0.305046, "PC2": 0.099522}, {"group": "Cushitic", "sample": "I8805__AD_174__Coverage_76.23%", "PC1": -0.301631, "PC2": 0.089367}, {"group": "Cushitic", "sample": "I8922__BC_437__Coverage_68.25%", "PC1": -0.299355, "PC2": 0.092413}, {"group": "Cushitic", "sample": "I8923__BC_502__Coverage_12.35%", "PC1": -0.266346, "PC2": 0.080227}, {"group": "Cushitic", "sample": "I10719__BC_19__Coverage_47.68%", "PC1": -0.298217, "PC2": 0.097491}, {"group": "Cushitic", "sample": "I12394__AD_524__Coverage_32.26%", "PC1": -0.280005, "PC2": 0.093429}, {"group": "Cushitic", "sample": "I12398__BC_570__Coverage_35.45%", "PC1": -0.275452, "PC2": 0.096475}, {"group": "Cushitic", "sample": "I3726__BC_1073__Coverage_68.99%", "PC1": -0.303908, "PC2": 0.087336}, {"group": "Cushitic", "sample": "I13762__BC_101__Coverage_69.17%", "PC1": -0.286834, "PC2": 0.096475}, {"group": "Cushitic", "sample": "I13977__AD_26__Coverage_23.73%", "PC1": -0.293664, "PC2": 0.101553}, {"group": "Cushitic", "sample": "I13979__BC_459__Coverage_65.44%", "PC1": -0.292525, "PC2": 0.099522}, {"group": "Cushitic", "sample": "I13980__BC_637__Coverage_67.56%", "PC1": -0.286834, "PC2": 0.098506}, {"group": "Cushitic", "sample": "I13981__BC_616__Coverage_27.92%", "PC1": -0.301631, "PC2": 0.1046}, {"group": "Nubian", "sample": "I6141___AD_780___Coverage_23.15%", "PC1": -0.209435, "PC2": 0.101553}, {"group": "Nubian", "sample": "I6255___AD_730___Coverage_50.48%", "PC1": -0.209435, "PC2": 0.111708}, {"group": "Nubian", "sample": "I6256___AD_750___Coverage_29.36%", "PC1": -0.221955, "PC2": 0.108662}, {"group": "Nubian", "sample": "I6258___AD_710___Coverage_30.40%", "PC1": -0.201467, "PC2": 0.105615}, {"group": "Nubian", "sample": "I6325___AD_680___Coverage_45.67%", "PC1": -0.212849, "PC2": 0.109677}, {"group": "Nubian", "sample": "I6326___AD_690___Coverage_62.72%", "PC1": -0.221955, "PC2": 0.107646}, {"group": "Nubian", "sample": "I6331___AD_740___Coverage_32.95%", "PC1": -0.219679, "PC2": 0.107646}, {"group": "Nubian", "sample": "I6340___AD_780___Coverage_25.83%", "PC1": -0.203743, "PC2": 0.113739}, {"group": "Nubian", "sample": "I18521___AD_825___Coverage_31.11%", "PC1": -0.213987, "PC2": 0.110693}, {"group": "Pygmy", "sample": "Mbuti", "PC1": -0.647426, "PC2": 0.0591038}, {"group": "Pygmy", "sample": "Baka", "PC1": -0.640255, "PC2": 0.0629625}, {"group": "Pygmy", "sample": "Bakola", "PC1": -0.6413935, "PC2": 0.060424}, {"group": "Pygmy", "sample": "Biaka", "PC1": -0.6421518, "PC2": 0.061947}, {"group": "Pygmy", "sample": "Bedzan", "PC1": -0.641962, "PC2": 0.062963}, {"group": "West*African*Kindgoms", "sample": "Yoruba*(Nigeria)", "PC1": -0.63006255, "PC2": 0.062501091}, {"group": "Sahelian", "sample": "Kassena*(Ghana)", "PC1": -0.62281726, "PC2": 0.06470946}, {"group": "West*African*Kindgoms", "sample": "Akan*(Ghana)", "PC1": -0.62721082, "PC2": 0.06363296}, {"group": "Sahelian", "sample": "Frafra*(Ghana)", "PC1": -0.62245302, "PC2": 0.063897}, {"group": "Sahelian", "sample": "Mossi", "PC1": -0.62065464, "PC2": 0.06440476}, {"group": "West*African*Kindgoms", "sample": "Igbo", "PC1": -0.63058, "PC2": 0.0639785}, {"group": "Sahelian", "sample": "Bambara*(Mali)", "PC1": -0.61502418, "PC2": 0.0636398}, {"group": "Sahelian", "sample": "Dogon", "PC1": -0.61217867, "PC2": 0.062285833}, {"group": "West*African*Kindgoms", "sample": "Jola*(Gambia)", "PC1": -0.62533815, "PC2": 0.063907044}, {"group": "West*African*Kindgoms", "sample": "Malinke*(Mali)", "PC1": -0.61155524, "PC2": 0.064351327}, {"group": "West*African*Kindgoms", "sample": "Manjak*(Gambia)", "PC1": -0.61231771, "PC2": 0.063504378}, {"group": "West*African*Kindgoms", "sample": "Mende*(Sierra*Leone)", "PC1": -0.62261238, "PC2": 0.064486}, {"group": "West*African*Kindgoms", "sample": "Mandinka*(Senegal)", "PC1": -0.60749928, "PC2": 0.063865444}, {"group": "West*African*Kindgoms", "sample": "Serer*(Gambia)", "PC1": -0.60392262, "PC2": 0.0633893}, {"group": "West*African*Kindgoms", "sample": "Wolof*(Gambia)", "PC1": -0.60458366, "PC2": 0.065211411}, {"group": "West*African*Kindgoms", "sample": "Mandinka*(Gambia)", "PC1": -0.6038856, "PC2": 0.063741051}, {"group": "Khoisan", "sample": "San*(Ju*Hoan)", "PC1": -0.616466, "PC2": 0.0601194}, {"group": "Khoisan", "sample": "San*(Khomani)", "PC1": -0.6220435, "PC2": 0.060424}, {"group": "Nilo-Saharan", "sample": "Dinka", "PC1": -0.57768787, "PC2": 0.052839375}, {"group": "Nilo-Saharan", "sample": "Anuak", "PC1": -0.5729729, "PC2": 0.0534846}, {"group": "Nilo-Saharan", "sample": "Shilluk", "PC1": -0.57471192, "PC2": 0.056362}, {"group": "Nilo-Saharan", "sample": "Nuer", "PC1": -0.5769205, "PC2": 0.054258429}, {"group": "Nilo-Saharan", "sample": "Bari", "PC1": -0.5859045, "PC2": 0.0528075}, {"group": "Nilo-Saharan", "sample": "Kakwa", "PC1": -0.591121, "PC2": 0.051792}, {"group": "Nilo-Saharan", "sample": "Aringa", "PC1": -0.59017275, "PC2": 0.04976075}, {"group": "Nilo-Saharan", "sample": "Mursi", "PC1": -0.525294, "PC2": 0.056362}, {"group": "Nilo-Saharan", "sample": "Zaghawa*(Sudan)", "PC1": -0.52927762, "PC2": 0.064603154}, {"group": "Bantu", "sample": "Bantu*(Kenya)", "PC1": -0.600986, "PC2": 0.062455}, {"group": "Bantu", "sample": "Luhya*(Kenya)", "PC1": -0.5978967, "PC2": 0.063688}, {"group": "Bantu", "sample": "Bantu*(South*Africa)", "PC1": -0.6293153, "PC2": 0.0637527}, {"group": "Bantu", "sample": "Herero*(Namibia)", "PC1": -0.6222873, "PC2": 0.0658643}, {"group": "Bantu", "sample": "Nyaneka", "PC1": -0.6262898, "PC2": 0.0636658}, {"group": "Bantu", "sample": "Umbundu", "PC1": -0.6262548, "PC2": 0.0632674}, {"group": "Bantu", "sample": "Changana", "PC1": -0.6280506, "PC2": 0.0644296}, {"group": "Bantu", "sample": "Bitonga", "PC1": -0.6327895, "PC2": 0.0637395}, {"group": "Bantu", "sample": "Chopi", "PC1": -0.6310178, "PC2": 0.0620254}, {"group": "Bantu", "sample": "Tswa", "PC1": -0.6309593, "PC2": 0.0633012}, {"group": "Bantu", "sample": "Nyanja", "PC1": -0.6255291, "PC2": 0.0619472}, {"group": "Bantu", "sample": "Sena", "PC1": -0.6227832, "PC2": 0.0634706}, {"group": "Bantu", "sample": "Manyika", "PC1": -0.6308075, "PC2": 0.0630981}, {"group": "Bantu", "sample": "Yao", "PC1": -0.6261978, "PC2": 0.0627596}, {"group": "Bantu", "sample": "Makhuwa", "PC1": -0.6229718, "PC2": 0.0608783}, {"group": "Bantu", "sample": "Ronga", "PC1": -0.6309593, "PC2": 0.0633013}, {"group": "Bantu", "sample": "Mwani", "PC1": -0.613962, "PC2": 0.0660092}, {"group": "Bantu", "sample": "Umbundu", "PC1": -0.6262548, "PC2": 0.0632674}, {"group": "Bantu", "sample": "Ganguela", "PC1": -0.6288727, "PC2": 0.0627935}, {"group": "Bantu", "sample": "Kongo", "PC1": -0.628304, "PC2": 0.064994}, {"group": "Germanic", "sample": "RISE174", "PC1": 0.122929, "PC2": 0.123895}, {"group": "Germanic", "sample": "VK522", "PC1": 0.130897, "PC2": 0.132019}, {"group": "Germanic", "sample": "VK523", "PC1": 0.125205, "PC2": 0.125926}, {"group": "Germanic", "sample": "VK390", "PC1": 0.121791, "PC2": 0.125926}, {"group": "Germanic", "sample": "VK418", "PC1": 0.125205, "PC2": 0.132019}, {"group": "Germanic", "sample": "VK521", "PC1": 0.12862, "PC2": 0.131003}, {"group": "Germanic", "sample": "VK532", "PC1": 0.121791, "PC2": 0.131003}, {"group": "Germanic", "sample": "I0773", "PC1": 0.141141, "PC2": 0.126941}, {"group": "Germanic", "sample": "SZ2__AD_508__Coverage_99.69%", "PC1": 0.124067, "PC2": 0.139128}, {"group": "Germanic", "sample": "SZ7__AD_508__Coverage_65.55%", "PC1": 0.130897, "PC2": 0.133034}, {"group": "Germanic", "sample": "SZ9__AD_508__Coverage_71.94%", "PC1": 0.135449, "PC2": 0.128972}, {"group": "Germanic", "sample": "SZ13__AD_488__Coverage_71.99%", "PC1": 0.134311, "PC2": 0.135065}, {"group": "Germanic", "sample": "SZ16__AD_508__Coverage_56.94%", "PC1": 0.136588, "PC2": 0.127957}, {"group": "Germanic", "sample": "R3660__AD_497__Coverage_49.88%", "PC1": 0.136588, "PC2": 0.135065}, {"group": "Germanic", "sample": "NIEcap12c", "PC1": 0.117238, "PC2": 0.133034}, {"group": "Germanic", "sample": "R10618__AD_150__Coverage_57.86%", "PC1": 0.138864, "PC2": 0.137096}, {"group": "Germanic", "sample": "R10620__AD_12__Coverage_43.14%", "PC1": 0.129758, "PC2": 0.126941}, {"group": "Germanic", "sample": "R10626__AD_85__Coverage_53.76%", "PC1": 0.134311, "PC2": 0.127957}, {"group": "Germanic", "sample": "R10631__AD_85__Coverage_47.22%", "PC1": 0.129758, "PC2": 0.131003}, {"group": "Germanic", "sample": "R10633__AD_85__Coverage_64.28%", "PC1": 0.136588, "PC2": 0.129988}, {"group": "Germanic", "sample": "R10634__AD_85__Coverage_62.64%", "PC1": 0.133173, "PC2": 0.136081}, {"group": "Germanic", "sample": "R11391__AD_85__Coverage_39.80%", "PC1": 0.127482, "PC2": 0.132019}, {"group": "Germanic", "sample": "PCA0088.SG__AD_297__Cov_28.80%", "PC1": 0.12862, "PC2": 0.13405}, {"group": "Germanic", "sample": "R2204__AD_150__Coverage_65.74%", "PC1": 0.132035, "PC2": 0.128972}, {"group": "Germanic", "sample": "I17750", "PC1": 0.133173, "PC2": 0.123895}, {"group": "Germanic", "sample": "I16113__AD_488__Coverage_58.44%", "PC1": 0.132035, "PC2": 0.132019}, {"group": "Roman*Britain", "sample": "6DT3__AD_200__Coverage_73.36%", "PC1": 0.132035, "PC2": 0.13405}, {"group": "Roman*Britain", "sample": "6DT18__AD_200__Coverage_57.86%", "PC1": 0.125205, "PC2": 0.142174}, {"group": "Roman*Britain", "sample": "6DT23__AD_200__Coverage_40.58%", "PC1": 0.126344, "PC2": 0.141159}, {"group": "Roman*Britain", "sample": "S14491__AD_226__Coverage_73.29%", "PC1": 0.130897, "PC2": 0.132019}, {"group": "Roman*Britain", "sample": "I12927__AD_125__Coverage_70.87%", "PC1": 0.126344, "PC2": 0.132019}, {"group": "Roman*Britain", "sample": "I12932__AD_125__Coverage_71.89%", "PC1": 0.134311, "PC2": 0.133034}, {"group": "Roman*Britain", "sample": "I14550__AD_100__Coverage_68.50%", "PC1": 0.134311, "PC2": 0.138112}, {"group": "Roman*Britain", "sample": "I22062__AD_20__Coverage_68.41%", "PC1": 0.134311, "PC2": 0.135065}, {"group": "Pict", "sample": "VK201__AD_490__Coverage_59.10%", "PC1": 0.126344, "PC2": 0.138112}, {"group": "Pict", "sample": "VK202__AD_950__Coverage_52.83%", "PC1": 0.121791, "PC2": 0.132019}, {"group": "Pict", "sample": "VK203__AD_361__Coverage_56.71%", "PC1": 0.124067, "PC2": 0.138112}, {"group": "Pict", "sample": "VK207__AD_1020__Coverage_38.54%", "PC1": 0.12862, "PC2": 0.135065}, {"group": "Pict", "sample": "I16504__AD_34__Coverage_57.37%", "PC1": 0.125205, "PC2": 0.139128}, {"group": "Pict", "sample": "I3568__AD_38__Coverage_68.53%", "PC1": 0.134311, "PC2": 0.133034}, {"group": "Pict", "sample": "I16413__AD_30__Coverage_15.75%", "PC1": 0.114961, "PC2": 0.137096}, {"group": "Pict", "sample": "I27384__AD_5__Coverage_59.84%", "PC1": 0.119514, "PC2": 0.131003}, {"group": "Pict", "sample": "I27385__AD_34__Coverage_72.43%", "PC1": 0.12862, "PC2": 0.139128}, {"group": "Pict", "sample": "KD001__AD_541__Coverage_57.65%", "PC1": 0.134311, "PC2": 0.126941}, {"group": "Roman*Gaul", "sample": "R2055", "PC1": 0.120652, "PC2": 0.142174}, {"group": "Roman*Gaul", "sample": "R2058", "PC1": 0.132035, "PC2": 0.138112}, {"group": "Roman*Gaul", "sample": "R11552", "PC1": 0.122929, "PC2": 0.139128}, {"group": "Roman*Gaul", "sample": "R11553", "PC1": 0.119514, "PC2": 0.148267}, {"group": "Roman*Gaul", "sample": "R11554", "PC1": 0.133173, "PC2": 0.151314}, {"group": "Roman*Gaul", "sample": "R11555", "PC1": 0.127482, "PC2": 0.146236}, {"group": "Roman*Gaul", "sample": "R11557", "PC1": 0.133173, "PC2": 0.14319}, {"group": "Slavic", "sample": "Av2", "PC1": 0.135449, "PC2": 0.128972}, {"group": "Slavic", "sample": "VK212", "PC1": 0.124067, "PC2": 0.135065}, {"group": "Baltic*Tribes", "sample": "R10840__AD_339__Coverage_52.47%", "PC1": 0.132035, "PC2": 0.131003}, {"group": "Baltic*Tribes", "sample": "R10830__AD_468__Coverage_55.19%", "PC1": 0.12862, "PC2": 0.127957}, {"group": "Baltic*Tribes", "sample": "R10832__AD_468__Coverage_47.05%", "PC1": 0.141141, "PC2": 0.125926}, {"group": "Baltic*Tribes", "sample": "R10836__AD_468__Coverage_49.21%", "PC1": 0.130897, "PC2": 0.126941}, {"group": "Baltic*Tribes", "sample": "R10838__AD_468__Coverage_56.32%", "PC1": 0.137726, "PC2": 0.121864}, {"group": "Alan", "sample": "BOL001", "PC1": 0.112685, "PC2": 0.026404}, {"group": "Alan", "sample": "BOL002", "PC1": 0.112685, "PC2": 0.014217}, {"group": "Alan", "sample": "BOL004", "PC1": 0.10927, "PC2": 0.00914}, {"group": "Alan", "sample": "BOL005", "PC1": 0.120652, "PC2": 0.036559}, {"group": "Alan", "sample": "BOL007", "PC1": 0.113823, "PC2": 0.032497}, {"group": "Alan", "sample": "BOL008", "PC1": 0.113823, "PC2": 0.019295}, {"group": "Alan", "sample": "BOL009", "PC1": 0.117238, "PC2": 0.041637}, {"group": "Saami", "sample": "DA234__AD_550__Coverage_31.42%", "PC1": 0.103579, "PC2": -0.004062}, {"group": "Saami", "sample": "DA238__AD_550__Coverage_1.55%", "PC1": 0.099026, "PC2": -0.081242}, {"group": "Saami", "sample": "JK1968__AD_550__Coverage_31.42%", "PC1": 0.111547, "PC2": -0.016248}, {"group": "Saami", "sample": "JK1970__AD_550__Coverage_29.08%", "PC1": 0.104717, "PC2": -0.041637}, {"group": "Iberian", "sample": "R10487", "PC1": 0.117238, "PC2": 0.142174}, {"group": "Iberian", "sample": "R10488", "PC1": 0.108132, "PC2": 0.152329}, {"group": "Iberian", "sample": "R10500", "PC1": 0.104717, "PC2": 0.147252}, {"group": "Iberian", "sample": "R10501", "PC1": 0.101303, "PC2": 0.13405}, {"group": "Iberian", "sample": "R10502", "PC1": 0.101303, "PC2": 0.140143}, {"group": "Iberian", "sample": "R10507", "PC1": 0.101303, "PC2": 0.145221}, {"group": "Iberian", "sample": "R10508", "PC1": 0.105855, "PC2": 0.147252}, {"group": "Iberian", "sample": "I8339__AD_173__Coverage_23.45%", "PC1": 0.129758, "PC2": 0.140143}, {"group": "Sardinian", "sample": "RMPR104", "PC1": 0.121791, "PC2": 0.159438}, {"group": "Roman", "sample": "ETR001", "PC1": 0.113823, "PC2": 0.148267}, {"group": "Roman", "sample": "MAS002", "PC1": 0.104717, "PC2": 0.152329}, {"group": "Roman", "sample": "MAS003", "PC1": 0.091058, "PC2": 0.150298}, {"group": "Roman", "sample": "TAQ021", "PC1": 0.110408, "PC2": 0.158423}, {"group": "Roman", "sample": "R1554", "PC1": 0.101303, "PC2": 0.144205}, {"group": "Roman", "sample": "R1556", "PC1": 0.108132, "PC2": 0.146236}, {"group": "Roman", "sample": "R1557", "PC1": 0.108132, "PC2": 0.151314}, {"group": "Roman", "sample": "RMPR835", "PC1": 0.102441, "PC2": 0.14319}, {"group": "Roman", "sample": "RMPR836", "PC1": 0.119514, "PC2": 0.158423}, {"group": "Roman", "sample": "RMPR114", "PC1": 0.112685, "PC2": 0.146236}, {"group": "Roman", "sample": "RMPR125", "PC1": 0.117238, "PC2": 0.152329}, {"group": "Roman", "sample": "RMPR131", "PC1": 0.111547, "PC2": 0.150298}, {"group": "Roman", "sample": "RMPR1544", "PC1": 0.111547, "PC2": 0.140143}, {"group": "Roman", "sample": "RMPR1548", "PC1": 0.112685, "PC2": 0.146236}, {"group": "Roman", "sample": "RMPR436", "PC1": 0.119514, "PC2": 0.145221}, {"group": "Roman", "sample": "RMPR47", "PC1": 0.106994, "PC2": 0.148267}, {"group": "Roman", "sample": "RMPR49", "PC1": 0.110408, "PC2": 0.156392}, {"group": "Roman", "sample": "RMPR50", "PC1": 0.100164, "PC2": 0.150298}, {"group": "Roman", "sample": "RMPR51", "PC1": 0.112685, "PC2": 0.148267}, {"group": "Roman", "sample": "RMPR32__AD_500__Coverage_53.38%", "PC1": 0.101303, "PC2": 0.155376}, {"group": "Roman", "sample": "RMPR35__AD_500__Coverage_50.76%", "PC1": 0.103579, "PC2": 0.150298}, {"group": "Roman", "sample": "RMPR122__AD_500__Coverage_78.75%", "PC1": 0.102441, "PC2": 0.153345}, {"group": "Roman", "sample": "RMPR107__AD_500__Coverage_80.22%", "PC1": 0.119514, "PC2": 0.149283}, {"group": "Roman", "sample": "RMPR121__AD_500__Coverage_49.71%", "PC1": 0.112685, "PC2": 0.151314}, {"group": "Roman", "sample": "RMPR120__AD_500__Coverage_44.44%", "PC1": 0.108132, "PC2": 0.153345}, {"group": "Roman", "sample": "RMPR118__AD_500__Coverage_51.56%", "PC1": 0.108132, "PC2": 0.145221}, {"group": "Roman", "sample": "RMPR36__AD_500__Coverage_74.85%", "PC1": 0.114961, "PC2": 0.15436}, {"group": "Roman*Illyria", "sample": "R3543", "PC1": 0.114961, "PC2": 0.151314}, {"group": "Roman*Illyria", "sample": "R3544", "PC1": 0.114961, "PC2": 0.145221}, {"group": "Roman*Illyria", "sample": "R3547", "PC1": 0.111547, "PC2": 0.148267}, {"group": "Roman*Illyria", "sample": "R2050", "PC1": 0.112685, "PC2": 0.148267}, {"group": "Roman*Illyria", "sample": "R2051", "PC1": 0.119514, "PC2": 0.153345}, {"group": "Roman*Illyria", "sample": "R2053", "PC1": 0.114961, "PC2": 0.152329}, {"group": "Roman*Illyria", "sample": "R3662", "PC1": 0.118376, "PC2": 0.149283}, {"group": "Roman*Illyria", "sample": "R3663", "PC1": 0.1161, "PC2": 0.148267}, {"group": "Roman*Illyria", "sample": "R2040", "PC1": 0.1161, "PC2": 0.150298}, {"group": "Roman*Illyria", "sample": "R2041", "PC1": 0.112685, "PC2": 0.144205}, {"group": "Roman*Illyria", "sample": "R3685", "PC1": 0.117238, "PC2": 0.146236}, {"group": "Roman*Illyria", "sample": "R3747", "PC1": 0.120652, "PC2": 0.148267}, {"group": "Roman*Illyria", "sample": "R3743", "PC1": 0.119514, "PC2": 0.162485}, {"group": "Roman*Illyria", "sample": "R3744", "PC1": 0.114961, "PC2": 0.152329}, {"group": "Roman*Illyria", "sample": "R6693", "PC1": 0.119514, "PC2": 0.149283}, {"group": "Roman*Illyria", "sample": "R6701", "PC1": 0.126344, "PC2": 0.153345}, {"group": "Roman*Illyria", "sample": "R9669", "PC1": 0.117238, "PC2": 0.144205}, {"group": "Roman*Illyria", "sample": "R3481", "PC1": 0.113823, "PC2": 0.153345}, {"group": "Byzantine", "sample": "I7833__AD_340__Coverage_80.92%", "PC1": 0.104717, "PC2": 0.146236}, {"group": "Byzantine", "sample": "I20000__AD_224__Coverage_74.50%", "PC1": 0.114961, "PC2": 0.151314}, {"group": "Byzantine", "sample": "I20001__AD_224__Coverage_70.02%", "PC1": 0.105855, "PC2": 0.153345}, {"group": "Byzantine", "sample": "I20139__AD_224__Coverage_57.34%", "PC1": 0.110408, "PC2": 0.152329}, {"group": "Byzantine", "sample": "I20259__AD_604__Coverage_74.68%", "PC1": 0.097888, "PC2": 0.148267}, {"group": "Byzantine", "sample": "I20260__AD_604__Coverage_74.22%", "PC1": 0.10927, "PC2": 0.153345}, {"group": "Byzantine", "sample": "I20261__AD_604__Coverage_24.66%", "PC1": 0.100164, "PC2": 0.147252}, {"group": "Byzantine", "sample": "I20264__AD_604__Coverage_72.31%", "PC1": 0.113823, "PC2": 0.151314}, {"group": "Byzantine", "sample": "I20265__AD_604__Coverage_72.37%", "PC1": 0.103579, "PC2": 0.155376}, {"group": "Byzantine", "sample": "I20266__AD_604__Coverage_70.09%", "PC1": 0.106994, "PC2": 0.147252}, {"group": "Byzantine", "sample": "I20320__AD_604__Coverage_23.23%", "PC1": 0.097888, "PC2": 0.152329}, {"group": "Byzantine", "sample": "I4530__AD_302__Coverage_66.20%", "PC1": 0.114961, "PC2": 0.146236}, {"group": "Byzantine", "sample": "I14845__AD_50__Coverage_45.64%", "PC1": 0.106994, "PC2": 0.152329}, {"group": "Byzantine", "sample": "I8366__AD_600__Coverage_71.10%", "PC1": 0.121791, "PC2": 0.155376}, {"group": "Byzantine", "sample": "I8367__AD_600__Coverage_45.31%", "PC1": 0.122929, "PC2": 0.15436}, {"group": "Byzantine", "sample": "I8368__AD_600__Coverage_23.03%", "PC1": 0.110408, "PC2": 0.151314}, {"group": "Byzantine", "sample": "I8370__AD_600__Coverage_47.71%", "PC1": 0.113823, "PC2": 0.160454}, {"group": "Byzantine", "sample": "I8371__AD_600__Coverage_71.98%", "PC1": 0.104717, "PC2": 0.155376}, {"group": "Byzantine", "sample": "I8373__AD_600__Coverage_56.24%", "PC1": 0.111547, "PC2": 0.153345}, {"group": "Byzantine", "sample": "I14799__AD_375__Coverage_52.66%", "PC1": 0.114961, "PC2": 0.142174}, {"group": "Byzantine", "sample": "I14833__AD_550__Coverage_41.44%", "PC1": 0.114961, "PC2": 0.144205}, {"group": "Byzantine", "sample": "I14842__AD_550__Coverage_66.01%", "PC1": 0.112685, "PC2": 0.153345}, {"group": "Byzantine", "sample": "I14843__AD_550__Coverage_66.66%", "PC1": 0.100164, "PC2": 0.149283}, {"group": "Byzantine", "sample": "I14824__AD_494__Coverage_69.25%", "PC1": 0.097888, "PC2": 0.145221}, {"group": "Byzantine", "sample": "BOG020__AD_160", "PC1": 0.106994, "PC2": 0.155376}, {"group": "Byzantine", "sample": "BOG024__AD_160", "PC1": 0.105855, "PC2": 0.150298}, {"group": "Kartvelian", "sample": "GEO38_georgian_imer", "PC1": 0.106994, "PC2": 0.126941}, {"group": "Kartvelian", "sample": "GEO51_georgian_imer", "PC1": 0.112685, "PC2": 0.138112}, {"group": "Kartvelian", "sample": "GEO71_georgian_imer", "PC1": 0.10927, "PC2": 0.139128}, {"group": "Kartvelian", "sample": "GEO73_georgian_imer", "PC1": 0.106994, "PC2": 0.131003}, {"group": "Kartvelian", "sample": "GEO75_georgia_imer", "PC1": 0.104717, "PC2": 0.131003}, {"group": "Kartvelian", "sample": "IMR1", "PC1": 0.113823, "PC2": 0.139128}, {"group": "Kartvelian", "sample": "IMR2", "PC1": 0.110408, "PC2": 0.132019}, {"group": "Kartvelian", "sample": "IMR3", "PC1": 0.112685, "PC2": 0.137096}, {"group": "Kartvelian", "sample": "IMR4", "PC1": 0.112685, "PC2": 0.135065}, {"group": "Kartvelian", "sample": "IMR5", "PC1": 0.108132, "PC2": 0.132019}, {"group": "Kartvelian", "sample": "SMG1", "PC1": 0.108132, "PC2": 0.123895}, {"group": "Kartvelian", "sample": "SMG2", "PC1": 0.111547, "PC2": 0.128972}, {"group": "Kartvelian", "sample": "SMG3", "PC1": 0.111547, "PC2": 0.133034}, {"group": "Kartvelian", "sample": "SMG4", "PC1": 0.112685, "PC2": 0.127957}, {"group": "Kartvelian", "sample": "SMG5", "PC1": 0.103579, "PC2": 0.131003}, {"group": "Kartvelian", "sample": "WG1", "PC1": 0.104717, "PC2": 0.137096}, {"group": "Kartvelian", "sample": "WG10", "PC1": 0.114961, "PC2": 0.132019}, {"group": "Kartvelian", "sample": "WG2", "PC1": 0.112685, "PC2": 0.140143}, {"group": "Kartvelian", "sample": "WG3", "PC1": 0.112685, "PC2": 0.131003}, {"group": "Kartvelian", "sample": "WG4", "PC1": 0.114961, "PC2": 0.14319}, {"group": "Kartvelian", "sample": "WG5", "PC1": 0.102441, "PC2": 0.138112}, {"group": "Kartvelian", "sample": "WG6", "PC1": 0.113823, "PC2": 0.136081}, {"group": "Kartvelian", "sample": "WG7", "PC1": 0.114961, "PC2": 0.136081}, {"group": "Kartvelian", "sample": "WG8", "PC1": 0.114961, "PC2": 0.13405}, {"group": "Kartvelian", "sample": "WG9", "PC1": 0.110408, "PC2": 0.132019}, {"group": "Caucasian*Albanian", "sample": "zrj003__AD_276__Coverage_26.27%", "PC1": 0.100164, "PC2": 0.106631}, {"group": "Armenian", "sample": "I14645__AD_1200__Coverage_59.24%", "PC1": 0.103579, "PC2": 0.140143}, {"group": "Armenian", "sample": "I14647__AD_1200__Coverage_34.78%", "PC1": 0.102441, "PC2": 0.133034}, {"group": "Armenian", "sample": "I14652__AD_1200__Coverage_18.18%", "PC1": 0.09675, "PC2": 0.145221}, {"group": "Roman*Levant", "sample": "SFI-11__BC_34__Coverage_7.81%", "PC1": 0.086506, "PC2": 0.132019}, {"group": "Roman*Levant", "sample": "SFI-15__BC_77__Coverage_63.99%", "PC1": 0.079676, "PC2": 0.136081}, {"group": "Roman*Levant", "sample": "SFI-24__AD_4__Coverage_90.45%", "PC1": 0.0774, "PC2": 0.149283}, {"group": "Roman*Levant", "sample": "SFI-33__AD_146__Coverage_89.23%", "PC1": 0.085367, "PC2": 0.144205}, {"group": "Roman*Levant", "sample": "R3473__AD_705__Coverage_54.46%", "PC1": 0.061464, "PC2": 0.147252}, {"group": "Roman*Levant", "sample": "R3476__AD_505__Coverage_62.17%", "PC1": 0.092197, "PC2": 0.145221}, {"group": "Roman*Levant", "sample": "R3477__AD_500__Coverage_49.27%", "PC1": 0.093335, "PC2": 0.147252}, {"group": "Roman*Levant", "sample": "R9823__AD_624__Coverage_67.59%", "PC1": 0.085367, "PC2": 0.148267}, {"group": "Roman*Levant", "sample": "R12229__AD_488__Coverage_78.40%", "PC1": 0.093335, "PC2": 0.145221}, {"group": "Roman*Levant", "sample": "R12233__AD_490__Coverage_33.44%", "PC1": 0.0774, "PC2": 0.156392}, {"group": "Roman*Levant", "sample": "R12245__AD_620__Coverage_34.39%", "PC1": 0.080814, "PC2": 0.147252}, {"group": "Roman*Levant", "sample": "QED-2__AD_340__Coverage_64.31%", "PC1": 0.083091, "PC2": 0.145221}, {"group": "Roman*Levant", "sample": "QED-4__AD_544__Coverage_47.85%", "PC1": 0.092197, "PC2": 0.141159}, {"group": "Roman*Levant", "sample": "QED-7__AD_323__Coverage_68.39%", "PC1": 0.092197, "PC2": 0.145221}, {"group": "Roman*Levant", "sample": "QED-12__AD_425__Coverage_23.05%", "PC1": 0.087644, "PC2": 0.147252}, {"group": "Byzantine", "sample": "I4475__AD_722__Coverage_71.08%", "PC1": 0.094473, "PC2": 0.140143}, {"group": "Byzantine", "sample": "I4534__AD_750__Coverage_72.01%", "PC1": 0.092197, "PC2": 0.135065}, {"group": "Byzantine", "sample": "I4613__AD_600__Coverage_67.91%", "PC1": 0.092197, "PC2": 0.142174}, {"group": "Iranian*Plateau", "sample": "F38__BC_883__Coverage_85.73%", "PC1": 0.09675, "PC2": 0.121864}, {"group": "Iranian*Plateau", "sample": "I4232__BC_874__Coverage_82.58%", "PC1": 0.094473, "PC2": 0.119832}, {"group": "Iranian*Plateau", "sample": "I4269__BC_803__Coverage_84.96%", "PC1": 0.095611, "PC2": 0.1046}, {"group": "Iranian*Plateau", "sample": "I4357__BC_871__Coverage_67.43%", "PC1": 0.09675, "PC2": 0.121864}, {"group": "Iranian*Plateau", "sample": "I6428__BC_1027__Coverage_77.02%", "PC1": 0.092197, "PC2": 0.110693}, {"group": "Iranian*Plateau", "sample": "I6430__BC_900__Coverage_74.99%", "PC1": 0.08992, "PC2": 0.099522}, {"group": "Iranian*Plateau", "sample": "I6431__BC_1072__Coverage_44.79%", "PC1": 0.087644, "PC2": 0.12491}, {"group": "Iranian*Plateau", "sample": "I6432__BC_1178__Coverage_74.75%", "PC1": 0.099026, "PC2": 0.101553}, {"group": "Roman*Egypt", "sample": "JK2888__BC_47__Coverage_16.65%", "PC1": 0.040976, "PC2": 0.159438}, {"group": "Roman*Egypt", "sample": "JK2134__BC_659__Coverage_10.98%", "PC1": 0.046667, "PC2": 0.152329}, {"group": "Roman*Egypt", "sample": "JK2911__BC_652__Coverage_43.86%", "PC1": 0.053497, "PC2": 0.141159}, {"group": "Roman*Egypt", "sample": "SFI-43__BC_537__Coverage_26.06%", "PC1": 0.037562, "PC2": 0.14319}, {"group": "Medieval*Arab", "sample": "syr005__AD_717__unknown_coverage", "PC1": 0.055773, "PC2": 0.151314}, {"group": "Medieval*Arab", "sample": "syr013__AD_715__unknown_coverage", "PC1": 0.078538, "PC2": 0.152329}, {"group": "Medieval*Arab", "sample": "HGDP00607", "PC1": 0.028456, "PC2": 0.141159}, {"group": "Medieval*Arab", "sample": "HGDP00608", "PC1": 0.0387, "PC2": 0.14319}, {"group": "Medieval*Arab", "sample": "HGDP00610", "PC1": 0.040976, "PC2": 0.144205}, {"group": "Medieval*Arab", "sample": "HGDP00612", "PC1": 0.042115, "PC2": 0.145221}, {"group": "Medieval*Arab", "sample": "HGDP00616", "PC1": 0.048944, "PC2": 0.142174}, {"group": "Medieval*Arab", "sample": "HGDP00618", "PC1": 0.047806, "PC2": 0.150298}, {"group": "Medieval*Arab", "sample": "HGDP00623", "PC1": 0.037562, "PC2": 0.145221}, {"group": "Medieval*Arab", "sample": "HGDP00624", "PC1": 0.027318, "PC2": 0.147252}, {"group": "Medieval*Arab", "sample": "HGDP00630", "PC1": 0.040976, "PC2": 0.140143}, {"group": "Medieval*Arab", "sample": "HGDP00631", "PC1": 0.043253, "PC2": 0.149283}, {"group": "Medieval*Arab", "sample": "HGDP00636", "PC1": 0.039838, "PC2": 0.144205}, {"group": "Medieval*Arab", "sample": "HGDP00641", "PC1": 0.039838, "PC2": 0.145221}, {"group": "Medieval*Arab", "sample": "HGDP00643", "PC1": 0.052359, "PC2": 0.145221}, {"group": "Medieval*Arab", "sample": "HGDP00648", "PC1": 0.042115, "PC2": 0.138112}, {"group": "Medieval*Arab", "sample": "HGDP00649", "PC1": 0.052359, "PC2": 0.145221}, {"group": "Medieval*Arab", "sample": "HGDP00650", "PC1": 0.048944, "PC2": 0.139128}, {"group": "Medieval*Arab", "sample": "HGDP00651", "PC1": 0.037562, "PC2": 0.144205}, {"group": "Medieval*Arab", "sample": "HGDP00653", "PC1": 0.045529, "PC2": 0.141159}, {"group": "Roman*North*Africa", "sample": "R10667__AD_171__Coverage_85.35%", "PC1": -0.022765, "PC2": 0.14319}, {"group": "Roman*North*Africa", "sample": "R11759__BC_651__Coverage_60.40%", "PC1": -0.072847, "PC2": 0.142174}, {"group": "Roman*North*Africa", "sample": "gun002__AD_1099__Coverage_13.08%", "PC1": -0.050082, "PC2": 0.122879}, {"group": "Roman*North*Africa", "sample": "gun005__AD_958__Coverage_25.55%", "PC1": -0.01935, "PC2": 0.125926}, {"group": "Roman*North*Africa", "sample": "gun008__AD_936__Coverage_18.38%", "PC1": -0.027318, "PC2": 0.139128}, {"group": "Roman*North*Africa", "sample": "gun011__AD_813__Coverage_91.59%", "PC1": -0.044391, "PC2": 0.131003}, {"group": "Roman*North*Africa", "sample": "gun012__AD_626__Coverage_27.87%", "PC1": -0.055773, "PC2": 0.138112}, {"group": "Khwarazmian", "sample": "OLN002__AD_875__Coverage_85.76%", "PC1": 0.09675, "PC2": 0.085304}, {"group": "Khwarazmian", "sample": "OLN003__AD_862__Coverage_19.30%", "PC1": 0.09675, "PC2": 0.078196}, {"group": "Khwarazmian", "sample": "L5138", "PC1": 0.08992, "PC2": 0.073118}, {"group": "Khwarazmian", "sample": "L7999", "PC1": 0.100164, "PC2": 0.093429}, {"group": "Khwarazmian", "sample": "L8002", "PC1": 0.091058, "PC2": 0.097491}, {"group": "Khwarazmian", "sample": "L8630", "PC1": 0.105855, "PC2": 0.076165}, {"group": "Khwarazmian", "sample": "L8671", "PC1": 0.101303, "PC2": 0.088351}, {"group": "Khwarazmian", "sample": "L5139", "PC1": 0.101303, "PC2": 0.087336}, {"group": "Khotanese*Saka", "sample": "C388__AD_299__Coverage_44.36%", "PC1": 0.085367, "PC2": -0.026404}, {"group": "Khotanese*Saka", "sample": "C389__AD_299__Coverage_25.44%", "PC1": 0.08992, "PC2": -0.007109}, {"group": "Khotanese*Saka", "sample": "C392__AD_299__Coverage_46.87%", "PC1": 0.073985, "PC2": -0.03859}, {"group": "Khotanese*Saka", "sample": "C3625__AD_161__Coverage_16.50%", "PC1": 0.079676, "PC2": -0.027419}, {"group": "Sarmatian", "sample": "ASZK1__AD_440__unknown_coverage", "PC1": 0.10927, "PC2": 0.034528}, {"group": "Sarmatian", "sample": "A181029__AD_450__Coverage_86.52%", "PC1": 0.112685, "PC2": 0.032497}, {"group": "Sarmatian", "sample": "DA134__BC_350__Coverage_28.13%", "PC1": 0.1161, "PC2": 0.054839}, {"group": "Sarmatian", "sample": "DA136__BC_350__Coverage_21.68%", "PC1": 0.113823, "PC2": 0.039606}, {"group": "Sarmatian", "sample": "DA141__BC_350__Coverage_25.83%", "PC1": 0.112685, "PC2": 0.039606}, {"group": "Sarmatian", "sample": "DA143__BC_350__Coverage_32.48%", "PC1": 0.112685, "PC2": 0.054839}, {"group": "Sarmatian", "sample": "DA144__BC_350__Coverage_19.59%", "PC1": 0.10927, "PC2": 0.043668}, {"group": "Hun", "sample": "KRY001__AD_398__Coverage_43.90%", "PC1": 0.056912, "PC2": -0.302628}, {"group": "Hun", "sample": "VZ12673__AD_450__unknown_coverage", "PC1": 0.048944, "PC2": -0.323954}, {"group": "Hun", "sample": "DA127__AD_334__Coverage_33.16%", "PC1": 0.052359, "PC2": -0.313799}, {"group": "Rouran", "sample": "CSPF114", "PC1": 0.039838, "PC2": -0.41332}, {"group": "Rouran", "sample": "KFP7", "PC1": 0.030732, "PC2": -0.404181}, {"group": "Rouran", "sample": "KFP31", "PC1": 0.046667, "PC2": -0.395041}, {"group": "Rouran", "sample": "MM245", "PC1": 0.037562, "PC2": -0.40215}, {"group": "Rouran", "sample": "AN376", "PC1": 0.043253, "PC2": -0.38387}, {"group": "Rouran", "sample": "FU215", "PC1": 0.039838, "PC2": -0.376761}, {"group": "Rouran", "sample": "CS465", "PC1": 0.0387, "PC2": -0.384886}, {"group": "Rouran", "sample": "KV3369", "PC1": 0.042115, "PC2": -0.376761}, {"group": "Rouran", "sample": "KFP30a", "PC1": 0.035285, "PC2": -0.381839}, {"group": "Rouran", "sample": "CSPF213__AD_725__unknown_coverage", "PC1": 0.037562, "PC2": -0.369653}, {"group": "Rouran", "sample": "FGD4", "PC1": 0.0387, "PC2": -0.377777}, {"group": "Rouran", "sample": "CSPF37__AD_690__unknown_coverage", "PC1": 0.036423, "PC2": -0.376761}, {"group": "Rouran", "sample": "I18223__AD_700__Coverage_63.20%", "PC1": 0.046667, "PC2": -0.376761}, {"group": "Rouran", "sample": "A1801___AD_650___Coverage_91.31%", "PC1": 0.039838, "PC2": -0.384886}, {"group": "Rouran", "sample": "A1818___AD_650___Coverage_85.86%", "PC1": 0.043253, "PC2": -0.382855}, {"group": "Amur", "sample": "bla001__AD_651__Coverage_28.73%", "PC1": 0.025041, "PC2": -0.451911}, {"group": "Tibetan", "sample": "C1__BC_825__Coverage_98.29%", "PC1": 0.012521, "PC2": -0.410274}, {"group": "Tibetan", "sample": "M63__BC_175__Coverage_50.14%", "PC1": 0.009106, "PC2": -0.416367}, {"group": "Tibetan", "sample": "S10__AD_450__Coverage_79.37%", "PC1": 0.020488, "PC2": -0.404181}, {"group": "Tibetan", "sample": "S35__AD_450__Coverage_88.07%", "PC1": 0.012521, "PC2": -0.407227}, {"group": "Tibetan", "sample": "S41__AD_450__Coverage_70.03%", "PC1": 0.022765, "PC2": -0.372699}, {"group": "Sinitic", "sample": "DA43__BC_150__Coverage_69.69%", "PC1": 0.022765, "PC2": -0.435662}, {"group": "Sinitic", "sample": "DA45__BC_96__Coverage_99.53%", "PC1": 0.014797, "PC2": -0.44074}, {"group": "Sinitic", "sample": "DCZ-M21II__AD_187__Coverage_50.72%", "PC1": 0.027318, "PC2": -0.446833}, {"group": "Sinitic", "sample": "DCZM17IV__AD_100__Coverage_40.62%", "PC1": 0.025041, "PC2": -0.453942}, {"group": "Sinitic", "sample": "HJTM115__BC_275__Coverage_72.65%", "PC1": 0.022765, "PC2": -0.441755}, {"group": "Sinitic", "sample": "JXNTM2__BC_1300__Coverage_71.52%", "PC1": 0.01935, "PC2": -0.448864}, {"group": "Sinitic", "sample": "JXNTM23__BC_1382__Coverage_62.75%", "PC1": 0.014797, "PC2": -0.447848}, {"group": "Sinitic", "sample": "LGM41__BC_150__Coverage_64.43%", "PC1": 0.021626, "PC2": -0.443786}, {"group": "Sinitic", "sample": "LGM79__BC_300__Coverage_67.99%", "PC1": 0.018212, "PC2": -0.451911}, {"group": "Feudal*Japanese", "sample": "JpIw31__AD_612__Coverage_75.04%", "PC1": 0.015935, "PC2": -0.447848}, {"group": "Feudal*Japanese", "sample": "JpIw33__AD_625__Coverage_78.81%", "PC1": 0.01935, "PC2": -0.437693}, {"group": "Feudal*Japanese", "sample": "NAG035__AD_1800__Coverage_34.46%", "PC1": 0.012521, "PC2": -0.426522}, {"group": "Feudal*Japanese", "sample": "NAG036__AD_1808__Coverage_30.94%", "PC1": 0.021626, "PC2": -0.421445}, {"group": "Feudal*Japanese", "sample": "NAG039__AD_1807__Coverage_80.12%", "PC1": 0.021626, "PC2": -0.425507}, {"group": "Southeast*Asian", "sample": "I0627_all__BC_1999__Coverage_9.31%", "PC1": -0.001138, "PC2": -0.390979}, {"group": "Southeast*Asian", "sample": "I1137_all__BC_1808__Coverage_11.66%", "PC1": 0.001138, "PC2": -0.382855}, {"group": "Southeast*Asian", "sample": "Vt777__BC_321__Coverage_8.50%", "PC1": 0.020488, "PC2": -0.397072}, {"group": "Southeast*Asian", "sample": "Vt778__BC_698__Coverage_10.58%", "PC1": 0.011382, "PC2": -0.388948}, {"group": "Southeast*Asian", "sample": "Vt833__BC_2218__Coverage_14.19%", "PC1": 0.017073, "PC2": -0.376761}, {"group": "Southeast*Asian", "sample": "La364__BC_1037__Coverage_79.96%", "PC1": 0.005691, "PC2": -0.40215}, {"group": "Southeast*Asian", "sample": "I1368_all__BC_920__Coverage_16.08%", "PC1": 0.007968, "PC2": -0.415352}, {"group": "Southeast*Asian", "sample": "I1369_all__BC_935__Coverage_23.53%", "PC1": 0.004553, "PC2": -0.428553}, {"group": "Southeast*Asian", "sample": "I1370_all__BC_995__Coverage_20.61%", "PC1": 0.013659, "PC2": -0.419414}, {"group": "Southeast*Asian", "sample": "I5266__BC_1000__Coverage_11.45%", "PC1": 0.022765, "PC2": -0.433631}, {"group": "Southeast*Asian", "sample": "I5951__BC_870__Coverage_10.29%", "PC1": 0.012521, "PC2": -0.42246}, {"group": "Southeast*Asian", "sample": "I13721__BC_1219__Coverage_60.68%", "PC1": 0.009106, "PC2": -0.455973}, {"group": "Southeast*Asian", "sample": "Ma912__BC_509__Coverage_70.71%", "PC1": 0.0, "PC2": -0.395041}, {"group": "Southeast*Asian", "sample": "La727__BC_378__Coverage_24.23%", "PC1": 0.002276, "PC2": -0.380824}, {"group": "Southeast*Asian", "sample": "I2497_all__AD_0__Coverage_27.17%", "PC1": 0.009106, "PC2": -0.421445}, {"group": "Southeast*Asian", "sample": "Vt779__BC_287__Coverage_7.11%", "PC1": 0.034147, "PC2": -0.391994}, {"group": "Southeast*Asian", "sample": "Vt781__BC_292__Coverage_6.89%", "PC1": 0.043253, "PC2": -0.370668}, {"group": "Southeast*Asian", "sample": "I3611__AD_235__Coverage_63.81%", "PC1": 0.015935, "PC2": -0.435662}, {"group": "Southeast*Asian", "sample": "I3612__AD_150__Coverage_62.23%", "PC1": 0.011382, "PC2": -0.441755}, {"group": "Southeast*Asian", "sample": "I3614__AD_400__Coverage_83.64%", "PC1": 0.018212, "PC2": -0.444802}, {"group": "Southeast*Asian", "sample": "I3615__AD_117__Coverage_79.92%", "PC1": 0.025041, "PC2": -0.434647}, {"group": "Southeast*Asian", "sample": "I3616__AD_309__Coverage_68.74%", "PC1": 0.018212, "PC2": -0.448864}, {"group": "Southeast*Asian", "sample": "I3617__AD_306__Coverage_81.92%", "PC1": 0.010244, "PC2": -0.446833}, {"group": "Southeast*Asian", "sample": "I3618__AD_400__Coverage_79.86%", "PC1": 0.010244, "PC2": -0.435662}, {"group": "Southeast*Asian", "sample": "I3619__AD_477__Coverage_83.80%", "PC1": 0.013659, "PC2": -0.445817}, {"group": "Southeast*Asian", "sample": "I3620__AD_93__Coverage_80.64%", "PC1": 0.006829, "PC2": -0.451911}, {"group": "Southeast*Asian", "sample": "I3621__AD_355__Coverage_83.71%", "PC1": 0.01935, "PC2": -0.441755}, {"group": "Southeast*Asian", "sample": "I3727__AD_400__Coverage_81.67%", "PC1": 0.018212, "PC2": -0.443786}, {"group": "Southeast*Asian", "sample": "I3728__AD_454__Coverage_72.02%", "PC1": 0.014797, "PC2": -0.44988}, {"group": "Southeast*Asian", "sample": "I3731__AD_400__Coverage_81.68%", "PC1": 0.009106, "PC2": -0.444802}, {"group": "Southeast*Asian", "sample": "I3732__AD_715__Coverage_77.21%", "PC1": 0.018212, "PC2": -0.439724}, {"group": "Southeast*Asian", "sample": "I3733__AD_690__Coverage_57.06%", "PC1": 0.005691, "PC2": -0.427538}, {"group": "Southeast*Asian", "sample": "I3734__AD_375__Coverage_79.83%", "PC1": 0.012521, "PC2": -0.441755}, {"group": "Southeast*Asian", "sample": "I3735__AD_418__Coverage_80.03%", "PC1": 0.013659, "PC2": -0.441755}, {"group": "Southeast*Asian", "sample": "I3736__AD_400__Coverage_71.13%", "PC1": 0.011382, "PC2": -0.44074}, {"group": "Southeast*Asian", "sample": "I8074__AD_400__Coverage_9.48%", "PC1": 0.039838, "PC2": -0.437693}, {"group": "Southeast*Asian", "sample": "I8075__AD_491__Coverage_63.82%", "PC1": 0.014797, "PC2": -0.439724}, {"group": "Southeast*Asian", "sample": "I8081__AD_541__Coverage_9.61%", "PC1": 0.018212, "PC2": -0.443786}, {"group": "Southeast*Asian", "sample": "I13692__AD_400__Coverage_49.03%", "PC1": 0.014797, "PC2": -0.447848}, {"group": "Southeast*Asian", "sample": "S15158.Y1.E1.L1__AD_400__Coverage_19.06%", "PC1": 0.017073, "PC2": -0.437693}, {"group": "Southeast*Asian", "sample": "Th519__AD_291__Coverage_17.89%", "PC1": 0.012521, "PC2": -0.395041}, {"group": "Southeast*Asian", "sample": "Th521__AD_284__Coverage_40.78%", "PC1": 0.001138, "PC2": -0.397072}, {"group": "Southeast*Asian", "sample": "Th530__AD_304__Coverage_21.93%", "PC1": 0.007968, "PC2": -0.401134}, {"group": "Southeast*Asian", "sample": "Ma554__AD_1518__Coverage_16.86%", "PC1": 0.005691, "PC2": -0.420429}, {"group": "Southeast*Asian", "sample": "Ma555__AD_1572__Coverage_46.63%", "PC1": 0.009106, "PC2": -0.425507}, {"group": "Southeast*Asian", "sample": "I6940__AD_1751__Coverage_35.78%", "PC1": 0.009106, "PC2": -0.397072}, {"group": "Southeast*Asian", "sample": "BalongKD10__AD_461__Coverage_31.29%", "PC1": 0.022765, "PC2": -0.433631}, {"group": "Southeast*Asian", "sample": "BandaKD11__AD_563__Coverage_48.69%", "PC1": 0.017073, "PC2": -0.441755}, {"group": "Southeast*Asian", "sample": "LadaKH01__AD_563__Coverage_71.28%", "PC1": 0.010244, "PC2": -0.435662}, {"group": "Southeast*Asian", "sample": "ShenxianKP09__AD_636__Coverage_56.42%", "PC1": 0.014797, "PC2": -0.426522}, {"group": "Southeast*Asian", "sample": "YiyangKP17__AD_563__Coverage_24.82%", "PC1": 0.01935, "PC2": -0.4316}, {"group": "Medieval*North*Indian", "sample": "I2868__AD_939__Coverage_48.74%", "PC1": 0.033009, "PC2": -0.097491}, {"group": "Medieval*North*Indian", "sample": "I2871__AD_851__Coverage_38.37%", "PC1": 0.05805, "PC2": -0.016248}, {"group": "Medieval*North*Indian", "sample": "I2872__AD_851__Coverage_17.04%", "PC1": 0.07057, "PC2": -0.017264}, {"group": "Medieval*North*Indian", "sample": "I3342__AD_851__Coverage_34.51%", "PC1": 0.037562, "PC2": -0.094444}, {"group": "Medieval*North*Indian", "sample": "I3343__AD_841__Coverage_17.62%", "PC1": 0.039838, "PC2": -0.062963}, {"group": "Medieval*North*Indian", "sample": "I3346__AD_821__Coverage_23.23%", "PC1": 0.05122, "PC2": -0.032497}, {"group": "Medieval*North*Indian", "sample": "I3352__AD_784__Coverage_50.45%", "PC1": 0.047806, "PC2": -0.032497}, {"group": "Medieval*North*Indian", "sample": "I3406__AD_934__Coverage_21.51%", "PC1": 0.059188, "PC2": -0.02945}, {"group": "Medieval*North*Indian", "sample": "I6938__AD_798__Coverage_35.14%", "PC1": 0.067156, "PC2": -0.016248}, {"group": "Medieval*North*Indian", "sample": "I6941__AD_943__Coverage_38.59%", "PC1": 0.030732, "PC2": -0.116786}, {"group": "Medieval*North*Indian", "sample": "I6942__AD_832__Coverage_40.14%", "PC1": 0.017073, "PC2": -0.116786}, {"group": "Medieval*North*Indian", "sample": "I6944__AD_825__Coverage_27.18%", "PC1": 0.05805, "PC2": -0.063978}, {"group": "Medieval*North*Indian", "sample": "I6946__AD_841__Coverage_27.98%", "PC1": 0.015935, "PC2": -0.126941}, {"group": "Medieval*North*Indian", "sample": "I7035__AD_935__Coverage_38.78%", "PC1": 0.037562, "PC2": -0.092413}, {"group": "Medieval*North*Indian", "sample": "I7036__AD_927__Coverage_29.25%", "PC1": 0.044391, "PC2": -0.082258}, {"group": "Gandharan", "sample": "I8218__AD_1__Coverage_86.91%", "PC1": 0.076261, "PC2": -0.004062}, {"group": "Gandharan", "sample": "I8220__BC_616__Coverage_77.27%", "PC1": 0.063741, "PC2": -0.010155}, {"group": "Gandharan", "sample": "I6889__AD_1345__Coverage_76.03%", "PC1": 0.068294, "PC2": 0.005078}, {"group": "Gandharan", "sample": "I6890__AD_1097__Coverage_70.32%", "PC1": 0.072847, "PC2": 0.002031}, {"group": "Gandharan", "sample": "I7714__AD_6__Coverage_59.84%", "PC1": 0.069432, "PC2": -0.004062}, {"group": "Gandharan", "sample": "I7715__AD_1331__Coverage_77.72%", "PC1": 0.061464, "PC2": -0.013202}, {"group": "Gandharan", "sample": "I6547__BC_50__Coverage_29.11%", "PC1": 0.05805, "PC2": -0.024373}, {"group": "Gandharan", "sample": "I6549__BC_91__Coverage_48.92%", "PC1": 0.060326, "PC2": -0.016248}, {"group": "Gandharan", "sample": "I6550__AD_24__Coverage_60.86%", "PC1": 0.059188, "PC2": -0.019295}, {"group": "Gandharan", "sample": "I6551__BC_50__Coverage_55.87%", "PC1": 0.060326, "PC2": -0.025388}, {"group": "Gandharan", "sample": "I6891__BC_292__Coverage_73.94%", "PC1": 0.069432, "PC2": 0.001016}, {"group": "Gandharan", "sample": "I6893__BC_275__Coverage_52.67%", "PC1": 0.066017, "PC2": 0.005078}, {"group": "Gandharan", "sample": "I6894__BC_300__Coverage_80.92%", "PC1": 0.067156, "PC2": -0.006093}, {"group": "Gandharan", "sample": "I6896__BC_277__Coverage_68.16%", "PC1": 0.069432, "PC2": -0.011171}, {"group": "Gandharan", "sample": "I7717__BC_333__Coverage_74.74%", "PC1": 0.05805, "PC2": -0.020311}, {"group": "Gandharan", "sample": "I7718__BC_300__Coverage_66.67%", "PC1": 0.07057, "PC2": -0.002031}, {"group": "Gandharan", "sample": "I7719__BC_300__Coverage_71.61%", "PC1": 0.076261, "PC2": -0.013202}, {"group": "Gandharan", "sample": "I7720__BC_300__Coverage_69.13%", "PC1": 0.068294, "PC2": -0.019295}, {"group": "Gandharan", "sample": "I7721__BC_300__Coverage_76.40%", "PC1": 0.063741, "PC2": -0.019295}, {"group": "Gandharan", "sample": "I7723__BC_300__Coverage_75.00%", "PC1": 0.067156, "PC2": -0.024373}, {"group": "Aboriginal", "sample": "KP1__AD_350__unknown_coverage", "PC1": -0.043253, "PC2": -0.227479}, {"group": "Aboriginal", "sample": "KP2__AD_550__unknown_coverage", "PC1": -0.036423, "PC2": -0.213261}, {"group": "Aboriginal", "sample": "PA86__AD_1500__unknown_coverage", "PC1": -0.039838, "PC2": -0.231541}, {"group": "Aboriginal", "sample": "MH6__AD_1838__unknown_coverage", "PC1": -0.053497, "PC2": -0.239665}, {"group": "Aboriginal", "sample": "MH8__AD_1838__unknown_coverage", "PC1": -0.0387, "PC2": -0.22951}, {"group": "Aboriginal", "sample": "WPAH4__AD_1838__unknown_coverage", "PC1": -0.047806, "PC2": -0.226463}, {"group": "Aboriginal", "sample": "WLH4__BC_2000__unknown_coverage", "PC1": -0.042115, "PC2": -0.224432}, {"group": "Papuan", "sample": "I4451_all__BC_310__Coverage_64.63%", "PC1": -0.039838, "PC2": -0.227479}, {"group": "Native*American", "sample": "MARC1492", "PC1": 0.052359, "PC2": -0.319892}, {"group": "Native*American", "sample": "XVII-B-939", "PC1": 0.052359, "PC2": -0.332078}, {"group": "Native*American", "sample": "19651", "PC1": 0.050082, "PC2": -0.312783}, {"group": "Native*American", "sample": "kennewick", "PC1": 0.046667, "PC2": -0.307705}, {"group": "South*Amerindian", "sample": "I11974__BC_3145__Coverage_68.83%", "PC1": 0.044391, "PC2": -0.304659}, {"group": "South*Amerindian", "sample": "LAR001__BC_4610__Coverage_38.53%", "PC1": 0.05122, "PC2": -0.31583}, {"group": "South*Amerindian", "sample": "LAR002__BC_4858__Coverage_29.30%", "PC1": 0.044391, "PC2": -0.317861}, {"group": "South*Amerindian", "sample": "A460__BC_3180__Coverage_99.81%", "PC1": 0.046667, "PC2": -0.313799}, {"group": "South*Amerindian", "sample": "I12355__AD_460__Coverage_56.42%", "PC1": 0.053497, "PC2": -0.313799}, {"group": "South*Amerindian", "sample": "IPK12__AD_1092__Coverage_99.42%", "PC1": 0.054635, "PC2": -0.314814}, {"group": "South*Amerindian", "sample": "IPK13a__AD_739__Coverage_90.11%", "PC1": 0.055773, "PC2": -0.318876}, {"group": "South*Amerindian", "sample": "I12354__AD_1500__Coverage_77.86%", "PC1": 0.052359, "PC2": -0.318876}, {"group": "South*Amerindian", "sample": "I12363__AD_1570__Coverage_57.36%", "PC1": 0.052359, "PC2": -0.317861}, {"group": "South*Amerindian", "sample": "I12364__AD_1180__Coverage_18.25%", "PC1": 0.066017, "PC2": -0.318876}, {"group": "South*Amerindian", "sample": "I12366__AD_1850__Coverage_47.74%", "PC1": 0.055773, "PC2": -0.318876}, {"group": "South*Amerindian", "sample": "I12367__AD_1250__Coverage_32.96%", "PC1": 0.056912, "PC2": -0.317861}, {"group": "Bering*Strait*Hunter", "sample": "I7331__AD_905__Coverage_74.15%", "PC1": 0.043253, "PC2": -0.361528}, {"group": "Bering*Strait*Hunter", "sample": "I7332__AD_880__Coverage_83.07%", "PC1": 0.048944, "PC2": -0.35442}, {"group": "Bering*Strait*Hunter", "sample": "I7333__AD_700__Coverage_72.96%", "PC1": 0.050082, "PC2": -0.351373}, {"group": "Bering*Strait*Hunter", "sample": "I7334__AD_1045__Coverage_81.68%", "PC1": 0.053497, "PC2": -0.351373}, {"group": "Bering*Strait*Hunter", "sample": "I7337__AD_800__Coverage_67.20%", "PC1": 0.042115, "PC2": -0.364575}, {"group": "Bering*Strait*Hunter", "sample": "I7338__AD_1340__Coverage_68.12%", "PC1": 0.047806, "PC2": -0.356451}, {"group": "Bering*Strait*Hunter", "sample": "I7339__AD_865__Coverage_74.06%", "PC1": 0.046667, "PC2": -0.35442}, {"group": "Bering*Strait*Hunter", "sample": "I7340__AD_930__Coverage_55.54%", "PC1": 0.046667, "PC2": -0.352389}, {"group": "Bering*Strait*Hunter", "sample": "I7341__AD_850__Coverage_79.64%", "PC1": 0.046667, "PC2": -0.357466}, {"group": "Bering*Strait*Hunter", "sample": "I7343__AD_1090__Coverage_68.22%", "PC1": 0.043253, "PC2": -0.349342}, {"group": "Bering*Strait*Hunter", "sample": "I7344__AD_870__Coverage_57.52%", "PC1": 0.046667, "PC2": -0.359497}, {"group": "Bering*Strait*Hunter", "sample": "I7346__AD_805__Coverage_85.04%", "PC1": 0.045529, "PC2": -0.357466}, {"group": "Bering*Strait*Hunter", "sample": "I7347__AD_1225__Coverage_73.59%", "PC1": 0.042115, "PC2": -0.358482}, {"group": "Bering*Strait*Hunter", "sample": "I7348__AD_745__Coverage_70.62%", "PC1": 0.05122, "PC2": -0.355435}, {"group": "Bering*Strait*Hunter", "sample": "I7349__AD_810__Coverage_75.87%", "PC1": 0.055773, "PC2": -0.366606}, {"group": "Bering*Strait*Hunter", "sample": "I7621__AD_595__Coverage_45.11%", "PC1": 0.047806, "PC2": -0.353404}, {"group": "Bering*Strait*Hunter", "sample": "I1524__AD_1045__Coverage_81.67%", "PC1": 0.052359, "PC2": -0.352389}, {"group": "Bering*Strait*Hunter", "sample": "I1525__AD_255__Coverage_76.61%", "PC1": 0.052359, "PC2": -0.35442}, {"group": "Bering*Strait*Hunter", "sample": "I7757__AD_1075__Coverage_77.39%", "PC1": 0.040976, "PC2": -0.347311}, {"group": "Bering*Strait*Hunter", "sample": "I8294__AD_1155__Coverage_39.32%", "PC1": 0.052359, "PC2": -0.350358}, {"group": "West*African*Kindgoms", "sample": "Yoruba*(Nigeria)", "PC1": -0.63006255, "PC2": 0.062501091}, {"group": "Sahelian", "sample": "Kassena*(Ghana)", "PC1": -0.62281726, "PC2": 0.06470946}, {"group": "West*African*Kindgoms", "sample": "Akan*(Ghana)", "PC1": -0.62721082, "PC2": 0.06363296}, {"group": "Sahelian", "sample": "Frafra*(Ghana)", "PC1": -0.62245302, "PC2": 0.063897}, {"group": "Sahelian", "sample": "Mossi", "PC1": -0.62065464, "PC2": 0.06440476}, {"group": "West*African*Kindgoms", "sample": "Igbo", "PC1": -0.63058, "PC2": 0.0639785}, {"group": "Sahelian", "sample": "Bambara*(Mali)", "PC1": -0.61502418, "PC2": 0.0636398}, {"group": "Sahelian", "sample": "Dogon", "PC1": -0.61217867, "PC2": 0.062285833}, {"group": "West*African*Kindgoms", "sample": "Jola*(Gambia)", "PC1": -0.62533815, "PC2": 0.063907044}, {"group": "West*African*Kindgoms", "sample": "Malinke*(Mali)", "PC1": -0.61155524, "PC2": 0.064351327}, {"group": "West*African*Kindgoms", "sample": "Manjak*(Gambia)", "PC1": -0.61231771, "PC2": 0.063504378}, {"group": "West*African*Kindgoms", "sample": "Mende*(Sierra*Leone)", "PC1": -0.62261238, "PC2": 0.064486}, {"group": "West*African*Kindgoms", "sample": "Mandinka*(Senegal)", "PC1": -0.60749928, "PC2": 0.063865444}, {"group": "West*African*Kindgoms", "sample": "Serer*(Gambia)", "PC1": -0.60392262, "PC2": 0.0633893}, {"group": "Sahelian", "sample": "Wolof*(Gambia)", "PC1": -0.60458366, "PC2": 0.065211411}, {"group": "West*African*Kindgoms", "sample": "Mandinka*(Gambia)", "PC1": -0.6038856, "PC2": 0.063741051}, {"group": "Cushitic", "sample": "I12533__BC_2004__Coverage_51.23%", "PC1": -0.249273, "PC2": 0.099522}, {"group": "Cushitic", "sample": "I12534__BC_1964__Coverage_43.47%", "PC1": -0.219679, "PC2": 0.1046}, {"group": "Cushitic", "sample": "HYR002__BC_320__Coverage_43.00%", "PC1": -0.284558, "PC2": 0.097491}, {"group": "Cushitic", "sample": "LUK001__BC_1549__Coverage_42.15%", "PC1": -0.309599, "PC2": 0.093429}, {"group": "Cushitic", "sample": "I8758__BC_548__Coverage_24.96%", "PC1": -0.299355, "PC2": 0.09546}, {"group": "Cushitic", "sample": "I8804__BC_543__Coverage_36.27%", "PC1": -0.286834, "PC2": 0.099522}, {"group": "Cushitic", "sample": "I8809__BC_1017__Coverage_74.97%", "PC1": -0.291387, "PC2": 0.100537}, {"group": "Cushitic", "sample": "I8814__BC_442__Coverage_72.17%", "PC1": -0.302769, "PC2": 0.08632}, {"group": "Cushitic", "sample": "I8830__BC_290__Coverage_9.28%", "PC1": -0.300493, "PC2": 0.105615}, {"group": "Cushitic", "sample": "I8874__BC_1291__Coverage_75.80%", "PC1": -0.298217, "PC2": 0.100537}, {"group": "Cushitic", "sample": "I8918__BC_279__Coverage_70.82%", "PC1": -0.301631, "PC2": 0.091398}, {"group": "Cushitic", "sample": "I8919__BC_283__Coverage_68.76%", "PC1": -0.307322, "PC2": 0.08632}, {"group": "Cushitic", "sample": "I8920__BC_286__Coverage_65.43%", "PC1": -0.311875, "PC2": 0.089367}, {"group": "Cushitic", "sample": "I12384__AD_296__Coverage_37.16%", "PC1": -0.305046, "PC2": 0.099522}, {"group": "Cushitic", "sample": "I8805__AD_174__Coverage_76.23%", "PC1": -0.301631, "PC2": 0.089367}, {"group": "Cushitic", "sample": "I8922__BC_437__Coverage_68.25%", "PC1": -0.299355, "PC2": 0.092413}, {"group": "Cushitic", "sample": "I8923__BC_502__Coverage_12.35%", "PC1": -0.266346, "PC2": 0.080227}, {"group": "Cushitic", "sample": "I10719__BC_19__Coverage_47.68%", "PC1": -0.298217, "PC2": 0.097491}, {"group": "Cushitic", "sample": "I12394__AD_524__Coverage_32.26%", "PC1": -0.280005, "PC2": 0.093429}, {"group": "Cushitic", "sample": "I12398__BC_570__Coverage_35.45%", "PC1": -0.275452, "PC2": 0.096475}, {"group": "Cushitic", "sample": "I3726__BC_1073__Coverage_68.99%", "PC1": -0.303908, "PC2": 0.087336}, {"group": "Cushitic", "sample": "I13762__BC_101__Coverage_69.17%", "PC1": -0.286834, "PC2": 0.096475}, {"group": "Cushitic", "sample": "I13977__AD_26__Coverage_23.73%", "PC1": -0.293664, "PC2": 0.101553}, {"group": "Cushitic", "sample": "I13979__BC_459__Coverage_65.44%", "PC1": -0.292525, "PC2": 0.099522}, {"group": "Cushitic", "sample": "I13980__BC_637__Coverage_67.56%", "PC1": -0.286834, "PC2": 0.098506}, {"group": "Cushitic", "sample": "I13981__BC_616__Coverage_27.92%", "PC1": -0.301631, "PC2": 0.1046}, {"group": "Germanic", "sample": "NOR_Mid_IA", "PC1": 0.125205, "PC2": 0.125926}, {"group": "Germanic", "sample": "NOR_North_IA", "PC1": 0.125205, "PC2": 0.132019}, {"group": "Germanic", "sample": "NOR_South_IA", "PC1": 0.1252055, "PC2": 0.1335425}, {"group": "Germanic", "sample": "SWE_IA", "PC1": 0.122929, "PC2": 0.123895}, {"group": "Germanic", "sample": "SWE_Oland_IA", "PC1": 0.1206525, "PC2": 0.127957}, {"group": "Germanic", "sample": "DNK_Sealand_IA", "PC1": 0.1252055, "PC2": 0.131003}, {"group": "Germanic", "sample": "HID001_merge.AG__AD_400__Cov_73.82%", "PC1": 0.129758, "PC2": 0.136081}, {"group": "Germanic", "sample": "HID002_merge.AG__AD_400__Cov_88.62%", "PC1": 0.12862, "PC2": 0.132019}, {"group": "Germanic", "sample": "HVN003__AD_300__Cov_11.83%", "PC1": 0.114961, "PC2": 0.127957}, {"group": "Germanic", "sample": "HVN004__AD_300__Cov_62.87%", "PC1": 0.112685, "PC2": 0.12491}, {"group": "Insular*Celt", "sample": "Insular*Celt*(Brigantes)", "PC1": 0.1326038, "PC2": 0.133542}, {"group": "Insular*Celt", "sample": "Insular*Celt*(Cantiaci)", "PC1": 0.1276447, "PC2": 0.1363711}, {"group": "Insular*Celt", "sample": "Insular*Celt*(Catuvellauni)", "PC1": 0.1304087, "PC2": 0.1375319}, {"group": "Insular*Celt", "sample": "Insular*Celt*(Corieltauvi)", "PC1": 0.1297584, "PC2": 0.1318158}, {"group": "Insular*Celt", "sample": "Insular*Celt*(Dobunni)", "PC1": 0.1311811, "PC2": 0.1354886}, {"group": "Insular*Celt", "sample": "Insular*Celt*(Dumnonii)", "PC1": 0.127197, "PC2": 0.140143}, {"group": "Insular*Celt", "sample": "Insular*Celt*(Durotriges)", "PC1": 0.1279696, "PC2": 0.142029}, {"group": "Insular*Celt", "sample": "Insular*Celt*(Parisi)", "PC1": 0.1301601, "PC2": 0.1337511}, {"group": "Insular*Celt", "sample": "Insular*Celt*(Votadini)", "PC1": 0.1294738, "PC2": 0.13405}, {"group": "Insular*Celt", "sample": "England_MIA_lowEEF", "PC1": 0.1303275, "PC2": 0.131511}, {"group": "Continental*Celt", "sample": "Continental*Celt*(Belgae)", "PC1": 0.1252054, "PC2": 0.1389244}, {"group": "Continental*Celt", "sample": "Continental*Celt*(Boii)", "PC1": 0.1281142, "PC2": 0.1451079}, {"group": "Continental*Celt", "sample": "Continental*Celt*(Etruria)", "PC1": 0.1263435, "PC2": 0.146744}, {"group": "Continental*Celt", "sample": "Continental*Celt*(Hallstatt*Culture)", "PC1": 0.1274818, "PC2": 0.1442054}, {"group": "Continental*Celt", "sample": "Continental*Celt*(Cotini)", "PC1": 0.128241, "PC2": 0.1489443}, {"group": "Iberian", "sample": "Iberia_East_IA", "PC1": 0.1244941, "PC2": 0.1489018}, {"group": "Iberian", "sample": "Iberia_EIA_Tartessian", "PC1": 0.121791, "PC2": 0.14319}, {"group": "Iberian", "sample": "Iberia_LIA", "PC1": 0.1257745, "PC2": 0.155376}, {"group": "Iberian", "sample": "Iberia_North_IA", "PC1": 0.125205, "PC2": 0.1431895}, {"group": "Sardinian", "sample": "Sardinian_1100_300_BC", "PC1": 0.1269125, "PC2": 0.1731478}, {"group": "Etruscan", "sample": "RMPR851__BC_650__Coverage_53.04%", "PC1": 0.133173, "PC2": 0.156392}, {"group": "Etruscan", "sample": "RMPR1021__BC_650__Coverage_46.92%", "PC1": 0.126344, "PC2": 0.152329}, {"group": "Etruscan", "sample": "RMPR1016__BC_800__Coverage_35.35%", "PC1": 0.127482, "PC2": 0.147252}, {"group": "Etruscan", "sample": "ITA_Etruscan_Campiglia", "PC1": 0.127482, "PC2": 0.155376}, {"group": "Etruscan", "sample": "ITA_Etruscan_Casenovole", "PC1": 0.1267705, "PC2": 0.148902}, {"group": "Etruscan", "sample": "ITA_Etruscan_Magliano", "PC1": 0.129758, "PC2": 0.15436}, {"group": "Etruscan", "sample": "ITA_Etruscan_PoggioRenzo", "PC1": 0.1308965, "PC2": 0.1497905}, {"group": "Etruscan", "sample": "ITA_Etruscan_Tarquinia", "PC1": 0.1255089, "PC2": 0.1563238}, {"group": "Etruscan", "sample": "ITA_Etruscan_Vetulonia", "PC1": 0.1210318, "PC2": 0.1550373}, {"group": "Etruscan", "sample": "ITA_Etruscan_Volterra", "PC1": 0.129758, "PC2": 0.156392}, {"group": "Sicani", "sample": "ITA_Sicily_IA", "PC1": 0.1260441, "PC2": 0.1701278}, {"group": "Illyrian", "sample": "HRV_EIA", "PC1": 0.1276082, "PC2": 0.1472518}, {"group": "Illyrian", "sample": "HRV_IAnew", "PC1": 0.1235794, "PC2": 0.151894}, {"group": "Illyrian", "sample": "ALB_Cinamak_Anc", "PC1": 0.1239044, "PC2": 0.1531999}, {"group": "Paeonian", "sample": "MKD_Anc", "PC1": 0.1251104, "PC2": 0.1524141}, {"group": "Thracian", "sample": "BGR_KapitanAndreevo_IA", "PC1": 0.1206523, "PC2": 0.1614692}, {"group": "Thracian", "sample": "BGR_IA", "PC1": 0.126344, "PC2": 0.157407}, {"group": "Classical*Greek", "sample": "I17962__BC_644__Coverage_41.33%", "PC1": 0.120652, "PC2": 0.160454}, {"group": "Classical*Greek", "sample": "Himera", "PC1": 0.1179206, "PC2": 0.1608598}, {"group": "Pontus", "sample": "TUR_Aegean_Mugla_Degirmendere_Anc", "PC1": 0.1122107, "PC2": 0.1585073}, {"group": "Pontus", "sample": "Gordion_IA", "PC1": 0.1110589, "PC2": 0.1502986}, {"group": "Pontus", "sample": "I4472__BC_177__Coverage_68.22%", "PC1": 0.104717, "PC2": 0.147252}, {"group": "Kartvelian", "sample": "I4473__BC_177__Coverage_68.85%", "PC1": 0.106994, "PC2": 0.131003}, {"group": "Urartian", "sample": "TUR_E_Van_Urartian", "PC1": 0.1013025, "PC2": 0.1381117}, {"group": "Mannaean", "sample": "IRN_Hasanlu_IA", "PC1": 0.0930187, "PC2": 0.1219201}, {"group": "Phoenician", "sample": "Levant_Beirut_IAII", "PC1": 0.088782, "PC2": 0.153345}, {"group": "Phoenician", "sample": "Beirut_IAIII", "PC1": 0.0853672, "PC2": 0.1492828}, {"group": "Phoenician", "sample": "SFI-20__BC_93__Coverage_46.98%", "PC1": 0.068294, "PC2": 0.146236}, {"group": "Medieval*Arab", "sample": "BedouinB", "PC1": 0.041925, "PC2": 0.1439232}, {"group": "Ancient*Egyptian", "sample": "EGY_Late_Period", "PC1": 0.050082, "PC2": 0.146744}, {"group": "Ancient*Egyptian", "sample": "SFI-43__BC_537__Coverage_26.06%", "PC1": 0.037562, "PC2": 0.14319}, {"group": "Ancient*Egyptian", "sample": "EGY_Hellenistic_contam", "PC1": 0.040976, "PC2": 0.159438}, {"group": "Berber", "sample": "R11759", "PC1": -0.072847, "PC2": 0.142174}, {"group": "Berber", "sample": "R10667__AD_171__Coverage_85.35%", "PC1": -0.022765, "PC2": 0.14319}, {"group": "Berber", "sample": "Canary_Islands_Guanche", "PC1": -0.0393828, "PC2": 0.1314096}, {"group": "Carthaginian", "sample": "TUN_Kerkouane_IA", "PC1": 0.0662449, "PC2": 0.1533449}, {"group": "East*African*Pastoralist", "sample": "KEN_Early_Pastoral_N", "PC1": -0.234476, "PC2": 0.102061}, {"group": "East*African*Pastoralist", "sample": "KEN_LuKENHill_3500BP", "PC1": -0.309599, "PC2": 0.093429}, {"group": "East*African*Pastoralist", "sample": "TZA_Luxmanda_3100BP", "PC1": -0.303908, "PC2": 0.087336}, {"group": "East*African*Pastoralist", "sample": "KEN_HyraxHill_2300BP", "PC1": -0.284558, "PC2": 0.097491}, {"group": "East*African*Pastoralist", "sample": "KEN_Pastoral_N", "PC1": -0.3004929, "PC2": 0.0954598}, {"group": "East*African*Pastoralist", "sample": "KEN_Pastoral_N_Elmenteitan", "PC1": -0.2868343, "PC2": 0.091567}, {"group": "East*African*Pastoralist", "sample": "TZA_PN", "PC1": -0.2922976, "PC2": 0.1001312}, {"group": "West*African*Kindgoms", "sample": "Yoruba*(Nigeria)", "PC1": -0.63006255, "PC2": 0.062501091}, {"group": "Sahelian", "sample": "Kassena*(Ghana)", "PC1": -0.62281726, "PC2": 0.06470946}, {"group": "West*African*Kindgoms", "sample": "Akan*(Ghana)", "PC1": -0.62721082, "PC2": 0.06363296}, {"group": "Sahelian", "sample": "Frafra*(Ghana)", "PC1": -0.62245302, "PC2": 0.063897}, {"group": "Sahelian", "sample": "Mossi", "PC1": -0.62065464, "PC2": 0.06440476}, {"group": "West*African*Kindgoms", "sample": "Igbo", "PC1": -0.63058, "PC2": 0.0639785}, {"group": "Sahelian", "sample": "Bambara*(Mali)", "PC1": -0.61502418, "PC2": 0.0636398}, {"group": "Sahelian", "sample": "Dogon", "PC1": -0.61217867, "PC2": 0.062285833}, {"group": "West*African*Kindgoms", "sample": "Jola*(Gambia)", "PC1": -0.62533815, "PC2": 0.063907044}, {"group": "West*African*Kindgoms", "sample": "Malinke*(Mali)", "PC1": -0.61155524, "PC2": 0.064351327}, {"group": "West*African*Kindgoms", "sample": "Manjak*(Gambia)", "PC1": -0.61231771, "PC2": 0.063504378}, {"group": "West*African*Kindgoms", "sample": "Mende*(Sierra*Leone)", "PC1": -0.62261238, "PC2": 0.064486}, {"group": "West*African*Kindgoms", "sample": "Mandinka*(Senegal)", "PC1": -0.60749928, "PC2": 0.063865444}, {"group": "West*African*Kindgoms", "sample": "Serer*(Gambia)", "PC1": -0.60392262, "PC2": 0.0633893}, {"group": "West*African*Kindgoms", "sample": "Wolof*(Gambia)", "PC1": -0.60458366, "PC2": 0.065211411}, {"group": "West*African*Kindgoms", "sample": "Mandinka*(Gambia)", "PC1": -0.6038856, "PC2": 0.063741051}, {"group": "Gandharan", "sample": "PAK_Aligrama_IA", "PC1": 0.0542553, "PC2": -0.0389283}, {"group": "Gandharan", "sample": "PAK_Arkotkila_IA", "PC1": 0.069432, "PC2": 0.004062}, {"group": "Gandharan", "sample": "PAK_Barikot_IA", "PC1": 0.0743643, "PC2": 0.017941}, {"group": "Gandharan", "sample": "PAK_Butkara_IA", "PC1": 0.0657327, "PC2": 0.0035543}, {"group": "Gandharan", "sample": "PAK_Gogdara_IA", "PC1": 0.070001, "PC2": -0.0071085}, {"group": "Gandharan", "sample": "PAK_Katelai_IA", "PC1": 0.0674086, "PC2": -0.0022943}, {"group": "Gandharan", "sample": "PAK_Loebanr_IA", "PC1": 0.0674127, "PC2": -0.0006552}, {"group": "Gandharan", "sample": "PAK_Udegram_IA", "PC1": 0.0690182, "PC2": 0.0048929}, {"group": "Ancestral*South*Indian", "sample": "Ancient*Ancestral*South*Indian", "PC1": -0.017354205, "PC2": -0.304894303}, {"group": "Ancestral*South*Indian", "sample": "Ancient*Ancestral*South*Indian", "PC1": 0.003619659, "PC2": -0.232207345}, {"group": "Ancestral*South*Indian", "sample": "Ancient*Ancestral*South*Indian", "PC1": -0.004810655, "PC2": -0.212137156}, {"group": "Ancestral*South*Indian", "sample": "Ancient*Ancestral*South*Indian", "PC1": -0.009525226, "PC2": -0.239836772}, {"group": "Yaz", "sample": "TKM_IA", "PC1": 0.103579, "PC2": 0.093429}, {"group": "Scythian", "sample": "Scythian_West", "PC1": 0.1075628, "PC2": 0.071087}, {"group": "Saka", "sample": "Saka_Tian_Shan", "PC1": 0.0932536, "PC2": -0.0307561}, {"group": "Tocharian", "sample": "Tarim_Basin", "PC1": 0.0866952, "PC2": -0.0575467}, {"group": "Sarmatian", "sample": "Sarmatian_IA", "PC1": 0.1105709, "PC2": 0.0470046}, {"group": "Ancient*Siberian", "sample": "RUS_Magadan_BA", "PC1": 0.0466675, "PC2": -0.347311}, {"group": "Ancient*Siberian", "sample": "kra001__BC_2220__Coverage_99.89%", "PC1": 0.037562, "PC2": -0.424491}, {"group": "Xiongnu", "sample": "RUS_Late_Xiongnu", "PC1": 0.0415971, "PC2": -0.3564047}, {"group": "Amur", "sample": "I1202__BC_900__Coverage_61.77%", "PC1": 0.021626, "PC2": -0.455973}, {"group": "Liao*River*Basin", "sample": "CHN_Western_Liao_River_BA", "PC1": 0.024472, "PC2": -0.4478485}, {"group": "Tibetan", "sample": "NPL_Chokhopani_2700BP", "PC1": 0.012521, "PC2": -0.410274}, {"group": "Tibetan", "sample": "NPL_Mebrak_2125BP", "PC1": 0.009106, "PC2": -0.416367}, {"group": "Tibetan", "sample": "NPL_Samdzong_1500BP", "PC1": 0.0185913, "PC2": -0.3947023}, {"group": "Sinitic", "sample": "DA43_DA45", "PC1": 0.018781, "PC2": -0.438201}, {"group": "Sinitic", "sample": "HJTM115__BC_275__Coverage_72.65%", "PC1": 0.022765, "PC2": -0.441755}, {"group": "Sinitic", "sample": "JXNTM2_JXNTM23", "PC1": 0.0170735, "PC2": -0.448356}, {"group": "Sinitic", "sample": "LGM41_LGM79", "PC1": 0.019919, "PC2": -0.4478485}, {"group": "Jomon", "sample": "JPN_Jomon", "PC1": 0.0069811, "PC2": -0.3414211}, {"group": "Southeast*Asian", "sample": "VNM_N", "PC1": 0.0, "PC2": -0.386917}, {"group": "Southeast*Asian", "sample": "VNM_LN", "PC1": 0.0163143, "PC2": -0.3875937}, {"group": "Southeast*Asian", "sample": "LAO_LN_BA", "PC1": 0.005691, "PC2": -0.40215}, {"group": "Southeast*Asian", "sample": "LAO_BA", "PC1": 0.002276, "PC2": -0.380824}, {"group": "Southeast*Asian", "sample": "VUT_2900BP_all", "PC1": 0.0087267, "PC2": -0.4211063}, {"group": "Southeast*Asian", "sample": "VUT_Teouma", "PC1": 0.017643, "PC2": -0.4280455}, {"group": "Southeast*Asian", "sample": "TWN_Gongguan", "PC1": 0.009106, "PC2": -0.455973}, {"group": "Southeast*Asian", "sample": "MYS_LN", "PC1": 0.0, "PC2": -0.395041}, {"group": "Southeast*Asian", "sample": "VNM_BA", "PC1": 0.009106, "PC2": -0.421445}, {"group": "Southeast*Asian", "sample": "VNM_BA_Dong_Son_Culture", "PC1": 0.0387, "PC2": -0.381331}, {"group": "Southeast*Asian", "sample": "TWN_Hanben", "PC1": 0.0155393, "PC2": -0.4419318}, {"group": "Southeast*Asian", "sample": "THA_IA", "PC1": 0.007209, "PC2": -0.397749}, {"group": "Southeast*Asian", "sample": "MYS_Historical", "PC1": 0.0073985, "PC2": -0.422968}, {"group": "Southeast*Asian", "sample": "IND_Roopkund_C", "PC1": 0.009106, "PC2": -0.397072}, {"group": "Southeast*Asian", "sample": "CHN_Balong_1500BP", "PC1": 0.0196345, "PC2": -0.437947}, {"group": "Southeast*Asian", "sample": "CHN_Banda_1400BP", "PC1": 0.0130895, "PC2": -0.42703}, {"group": "Southeast*Asian", "sample": "CHN_Lada_1300BP", "PC1": 0.010244, "PC2": -0.435662}, {"group": "Southeast*Asian", "sample": "CHN_Shenxian_1300BP", "PC1": 0.014797, "PC2": -0.426522}, {"group": "Southeast*Asian", "sample": "CHN_Yiyang_1300BP", "PC1": 0.01935, "PC2": -0.4316}, {"group": "Aboriginal", "sample": "AUS_Barham_1600BP-1400BP", "PC1": -0.039838, "PC2": -0.22037}, {"group": "Aboriginal", "sample": "AUS_Cairns_420BP", "PC1": -0.039838, "PC2": -0.231541}, {"group": "Aboriginal", "sample": "AUS_Mapoon_112BP", "PC1": -0.0460985, "PC2": -0.2345875}, {"group": "Aboriginal", "sample": "AUS_Weipa_112BP", "PC1": -0.047806, "PC2": -0.226463}, {"group": "Aboriginal", "sample": "AUS_Willandra_Lakes_4000BP", "PC1": -0.042115, "PC2": -0.224432}, {"group": "Papuan", "sample": "I4451_all__BC_310__Coverage_64.63%", "PC1": -0.039838, "PC2": -0.227479}, {"group": "Native*American", "sample": "MARC1492", "PC1": 0.052359, "PC2": -0.319892}, {"group": "Native*American", "sample": "XVII-B-939", "PC1": 0.052359, "PC2": -0.332078}, {"group": "Native*American", "sample": "19651", "PC1": 0.050082, "PC2": -0.312783}, {"group": "Native*American", "sample": "kennewick", "PC1": 0.046667, "PC2": -0.307705}, {"group": "South*Amerindian", "sample": "CHL_LosRieles_10900BP", "PC1": 0.044391, "PC2": -0.304659}, {"group": "South*Amerindian", "sample": "BRA_Laranjal_6700BP", "PC1": 0.0478055, "PC2": -0.3168455}, {"group": "South*Amerindian", "sample": "CHL_Ayayema_5100BP", "PC1": 0.046667, "PC2": -0.313799}, {"group": "South*Amerindian", "sample": "ARG_Yamana_1500BP", "PC1": 0.053497, "PC2": -0.313799}, {"group": "South*Amerindian", "sample": "CHL_Kaweskar_1000BP", "PC1": 0.055204, "PC2": -0.316845}, {"group": "South*Amerindian", "sample": "ARG_Selknam_500BP", "PC1": 0.056684, "PC2": -0.31847}, {"group": "Canaanite", "sample": "Levant_Baqah_BA", "PC1": 0.0878146, "PC2": 0.1485719}, {"group": "Canaanite", "sample": "Levant_Megiddo_MLBA", "PC1": 0.0861261, "PC2": 0.1455592}, {"group": "Canaanite", "sample": "Levant_Sidon_MBA", "PC1": 0.0812696, "PC2": 0.1468454}, {"group": "Canaanite", "sample": "Levant_Hazor_MLBA", "PC1": 0.084988, "PC2": 0.151314}];
 const YOU_POINT = {"label": "You", "PC1": 0.1341, "PC2": 0.1361};
 
 function convexHull(points){
-  if(points.length <= 2) return points.slice();
 
-  const pts = points.slice().sort((a,b)=>a[0] === b[0] ? a[1]-b[1] : a[0]-b[0]);
-  const cross = (o,a,b)=>(a[0]-o[0])*(b[1]-o[1])-(a[1]-o[1])*(b[0]-o[0]);
+  if(points.length <= 2)
+    return points.slice();
+
+  const pts = points
+    .slice()
+    .sort((a,b)=>
+      a[0] === b[0]
+        ? a[1]-b[1]
+        : a[0]-b[0]
+    );
+
+  const cross = (o,a,b)=>
+    (a[0]-o[0])*(b[1]-o[1]) -
+    (a[1]-o[1])*(b[0]-o[0]);
 
   const lower = [];
+
   for(const p of pts){
-    while(lower.length >= 2 && cross(lower[lower.length-2], lower[lower.length-1], p) <= 0){
+
+    while(
+      lower.length >= 2 &&
+      cross(
+        lower[lower.length-2],
+        lower[lower.length-1],
+        p
+      ) <= 0
+    ){
       lower.pop();
     }
+
     lower.push(p);
   }
 
   const upper = [];
+
   for(let i = pts.length - 1; i >= 0; i--){
+
     const p = pts[i];
-    while(upper.length >= 2 && cross(upper[upper.length-2], upper[upper.length-1], p) <= 0){
+
+    while(
+      upper.length >= 2 &&
+      cross(
+        upper[upper.length-2],
+        upper[upper.length-1],
+        p
+      ) <= 0
+    ){
       upper.pop();
     }
+
     upper.push(p);
   }
 
@@ -363,60 +810,151 @@ let hullIdx = [];
 let regressionIdx = null;
 
 function updateLayerVisibility(){
-  const showInd = document.getElementById("chkIndividuals").checked;
-  const showCent = document.getElementById("chkCentroids").checked;
-  const showHull = document.getElementById("chkHulls").checked;
-  const showReg = document.getElementById("chkRegression").checked;
 
-  if(individualIdx.length) Plotly.restyle('plot',{visible:showInd ? true : 'legendonly'},individualIdx);
-  if(centroidIdx.length) Plotly.restyle('plot',{visible:showCent ? true : false},centroidIdx);
-  if(hullIdx.length) Plotly.restyle('plot',{visible:showHull ? true : false},hullIdx);
-  if(regressionIdx !== null) Plotly.restyle('plot',{visible:showReg ? true : false},[regressionIdx]);
+  const showInd =
+    document.getElementById("chkIndividuals").checked;
+
+  const showCent =
+    document.getElementById("chkCentroids").checked;
+
+  const showHull =
+    document.getElementById("chkHulls").checked;
+
+  const showReg =
+    document.getElementById("chkRegression").checked;
+
+  if(individualIdx.length)
+    Plotly.restyle(
+      'plot',
+      {visible:showInd ? true : 'legendonly'},
+      individualIdx
+    );
+
+  if(centroidIdx.length)
+    Plotly.restyle(
+      'plot',
+      {visible:showCent ? true : false},
+      centroidIdx
+    );
+
+  if(hullIdx.length)
+    Plotly.restyle(
+      'plot',
+      {visible:showHull ? true : false},
+      hullIdx
+    );
+
+  if(regressionIdx !== null)
+    Plotly.restyle(
+      'plot',
+      {visible:showReg ? true : false},
+      [regressionIdx]
+    );
 }
 
-["chkIndividuals","chkCentroids","chkHulls","chkRegression"].forEach(id=>{
-  document.getElementById(id).addEventListener("change", updateLayerVisibility);
+[
+  "chkIndividuals",
+  "chkCentroids",
+  "chkHulls",
+  "chkRegression"
+].forEach(id=>{
+
+  document
+    .getElementById(id)
+    .addEventListener(
+      "change",
+      updateLayerVisibility
+    );
 });
 
+document
+  .getElementById("chkLegend")
+  .addEventListener("change", function(){
+    Plotly.relayout("plot", {
+      showlegend:this.checked
+    });
+  });
+
 function buildPlot(){
-  const statusEl = document.getElementById("status");
+
+  const statusEl =
+    document.getElementById("status");
+
   const samples = SAMPLES || [];
 
   if(!samples.length){
-    statusEl.textContent = "No usable PCA lines parsed.";
+
+    statusEl.textContent =
+      "No usable PCA lines parsed.";
+
     return;
   }
 
   const groupMap = new Map();
 
   for(const s of samples){
-    if(!groupMap.has(s.group)) groupMap.set(s.group, []);
+
+    if(!groupMap.has(s.group))
+      groupMap.set(s.group, []);
+
     groupMap.get(s.group).push(s);
   }
 
-  const groups = Array.from(groupMap.keys());
+  const groups =
+    Array.from(groupMap.keys());
 
-  statusEl.textContent = `Loaded ${samples.length} samples in ${groups.length} groups.`;
+  statusEl.textContent =
+    `Loaded ${samples.length} samples in ${groups.length} groups.`;
 
-  const palette = ['#b3d4fc','#f6c56c','#d7c0f8','#c2e9fb','#ffcad4','#c4f0c2','#ffd3a5','#a7b3ff','#9fe7f5','#f8c6ff'];
+  const palette = [
+    '#b3d4fc',
+    '#f6c56c',
+    '#d7c0f8',
+    '#c2e9fb',
+    '#ffcad4',
+    '#c4f0c2',
+    '#ffd3a5',
+    '#a7b3ff',
+    '#9fe7f5',
+    '#f8c6ff'
+  ];
+
   const traces = [];
   const centroids = [];
 
   groups.forEach((g, groupIndex)=>{
-    const arr = groupMap.get(g);
-    const color = palette[groupIndex % palette.length];
 
-    const xs = arr.map(s=>s.PC1);
-    const ys = arr.map(s=>s.PC2);
-    const labels = arr.map(s=>`${g} — ${s.sample}`);
+    const arr = groupMap.get(g);
+
+    const color =
+      palette[groupIndex % palette.length];
+
+    const xs =
+      arr.map(s=>s.PC1);
+
+    const ys =
+      arr.map(s=>s.PC2);
+
+    const labels =
+      arr.map(s=>`${g} — ${s.sample}`);
 
     const n = arr.length;
-    const meanX = xs.reduce((a,b)=>a+b,0) / n;
-    const meanY = ys.reduce((a,b)=>a+b,0) / n;
 
-    centroids.push({group:g,x:meanX,y:meanY,n});
+    const meanX =
+      xs.reduce((a,b)=>a+b,0) / n;
+
+    const meanY =
+      ys.reduce((a,b)=>a+b,0) / n;
+
+    centroids.push({
+      group:g,
+      x:meanX,
+      y:meanY,
+      n
+    });
 
     individualIdx.push(traces.length);
+
     traces.push({
       x:xs,
       y:ys,
@@ -424,127 +962,185 @@ function buildPlot(){
       type:"scattergl",
       name:g,
       legendgroup:g,
-      marker:{size:5,color,opacity:.8},
+
+      marker:{
+        size:5,
+        color,
+        opacity:.8
+      },
+
       text:labels,
-      hovertemplate:"%{text}<extra></extra>"
+
+      hovertemplate:
+        "%{text}<extra></extra>"
     });
 
     centroidIdx.push(traces.length);
+
     traces.push({
       x:[meanX],
       y:[meanY],
+
       mode:"markers+text",
       type:"scatter",
+
       name:g+" centroid",
+
       legendgroup:g,
       showlegend:false,
-      marker:{size:9,color,line:{width:1,color:"#0b0f16"}},
+
+      marker:{
+        size:9,
+        color,
+        line:{
+          width:1,
+          color:"#0b0f16"
+        }
+      },
+
       text:[g],
       textposition:"top center",
-      textfont:{size:10}
+
+      textfont:{
+        size:10
+      }
     });
 
     if(n >= 3){
-      const pts = xs.map((x,i)=>[x,ys[i]]);
-      const hull = convexHull(pts);
+
+      const pts =
+        xs.map((x,i)=>[x,ys[i]]);
+
+      const hull =
+        convexHull(pts);
 
       if(hull.length >= 3){
+
         hullIdx.push(traces.length);
+
         traces.push({
-          x:hull.map(p=>p[0]).concat([hull[0][0]]),
-          y:hull.map(p=>p[1]).concat([hull[0][1]]),
+          x:hull.map(p=>p[0])
+            .concat([hull[0][0]]),
+
+          y:hull.map(p=>p[1])
+            .concat([hull[0][1]]),
+
           mode:"lines",
           type:"scatter",
+
           name:g+" hull",
+
           legendgroup:g,
           showlegend:false,
-          line:{width:1,color},
+
+          line:{
+            width:1,
+            color
+          },
+
           fill:"toself",
           fillcolor:color+"30",
+
           opacity:.22,
+
           hoverinfo:"skip"
         });
       }
     }
   });
 
-  if(centroids.length >= 2){
-    let sumX = 0;
-    let sumY = 0;
-    let sumXY = 0;
-    let sumXX = 0;
-    let totalN = 0;
+  if(
+    YOU_POINT &&
+    typeof YOU_POINT.PC1 === "number" &&
+    typeof YOU_POINT.PC2 === "number"
+  ){
 
-    for(const c of centroids){
-      const w = c.n;
-      sumX += c.x * w;
-      sumY += c.y * w;
-      sumXY += c.x * c.y * w;
-      sumXX += c.x * c.x * w;
-      totalN += w;
-    }
-
-    const meanX = sumX / totalN;
-    const meanY = sumY / totalN;
-    const denom = sumXX - totalN * meanX * meanX;
-
-    const m = denom !== 0 ? (sumXY - totalN * meanX * meanY) / denom : 0;
-    const b = meanY - m * meanX;
-
-    const minX = Math.min(...centroids.map(c=>c.x));
-    const maxX = Math.max(...centroids.map(c=>c.x));
-    const pad = (maxX - minX) * .05;
-
-    const x1 = minX - pad;
-    const x2 = maxX + pad;
-    const y1 = m * x1 + b;
-    const y2 = m * x2 + b;
-
-    regressionIdx = traces.length;
     traces.push({
-      x:[x1,x2],
-      y:[y1,y2],
-      mode:"lines",
-      type:"scatter",
-      name:"Regression",
-      line:{color:"#9ba7c0",width:1.5,dash:"dot"},
-      hoverinfo:"skip"
-    });
-  }
 
-  if(YOU_POINT && typeof YOU_POINT.PC1 === "number" && typeof YOU_POINT.PC2 === "number"){
-    traces.push({
       x:[YOU_POINT.PC1],
       y:[YOU_POINT.PC2],
+
       mode:"markers+text",
       type:"scatter",
+
       name:"You",
-      marker:{size:12,symbol:"star",color:"#fff",line:{width:2,color:"#ff6b6b"}},
+
+      marker:{
+        size:12,
+        symbol:"star",
+        color:"#fff",
+
+        line:{
+          width:2,
+          color:"#ff6b6b"
+        }
+      },
+
       text:["You"],
       textposition:"top center",
-      hovertemplate:"You<extra></extra>"
+
+      hovertemplate:
+        "You<extra></extra>"
     });
   }
 
   const layout = {
+
+    showlegend:false,
+
     paper_bgcolor:"#0b0f16",
     plot_bgcolor:"#0b0f16",
-    font:{color:"#ecf2ff"},
+
+    font:{
+      color:"#ecf2ff"
+    },
+
     dragmode:"pan",
-    xaxis:{title:"PC1",zeroline:false},
-    yaxis:{title:"PC2",zeroline:false,scaleanchor:"x",scaleratio:1},
-    margin:{l:60,r:20,t:40,b:60},
-    legend:{bgcolor:"#0f1520",bordercolor:"#1c2333",borderwidth:1}
+
+    xaxis:{
+      title:"PC1",
+      zeroline:false
+    },
+
+    yaxis:{
+      title:"PC2",
+      zeroline:false,
+      scaleanchor:"x",
+      scaleratio:1
+    },
+
+    margin:{
+      l:60,
+      r:20,
+      t:40,
+      b:60
+    },
+
+    legend:{
+      bgcolor:"#0f1520",
+      bordercolor:"#1c2333",
+      borderwidth:1
+    }
   };
 
-  Plotly.newPlot("plot", traces, layout, {
-    responsive:true,
-    scrollZoom:true
-  }).then(updateLayerVisibility);
+  Plotly.newPlot(
+    "plot",
+    traces,
+    layout,
+    {
+      responsive:true,
+      scrollZoom:true
+    }
+  ).then(updateLayerVisibility);
 }
 
-document.addEventListener("DOMContentLoaded", buildPlot);
+document.addEventListener(
+  "DOMContentLoaded",
+  buildPlot
+);
+
 </script>
+
 
 </div>
 </body>

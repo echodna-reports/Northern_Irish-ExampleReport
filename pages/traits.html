@@ -2,40 +2,56 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>Genetic Trait Report</title>
   <script src="https://cdn.tailwindcss.com"></script>
   <link href="https://fonts.googleapis.com/css2?family=Roboto&display=swap" rel="stylesheet">
+
   <style>
     body {
       font-family: 'Roboto', sans-serif;
-      background: #ffffff;
+
+      background: linear-gradient(
+        180deg,
+        #eef6ff 0%,
+        #f7fbff 45%,
+        #ffffff 100%
+      );
+
       color: #111827;
+
       margin: 0;
       padding: 0;
+
       overflow-x: hidden;
     }
+
     .trait-card {
       transition: transform .2s ease, box-shadow .2s ease;
     }
+
     .trait-card:hover {
       transform: translateY(-4px) scale(1.02);
       box-shadow: 0 8px 20px rgba(0,0,0,0.06);
     }
+
     .fade-section {
       opacity: 0;
       transform: translateY(10px);
       transition: opacity .4s ease, transform .4s ease;
     }
+
     .fade-section.visible {
       opacity: 1;
       transform: translateY(0);
     }
+
     .bg-blob {
       position: absolute;
       z-index: 0;
       pointer-events: none;
     }
-    /* Sidebar active styling */
+
     .sidebar-btn {
       display: block;
       width: 100%;
@@ -47,9 +63,11 @@
       color: #374151;
       transition: all .2s;
     }
+
     .sidebar-btn:hover {
       background: #e5e7eb;
     }
+
     .sidebar-btn.active {
       background: #b3d4fc;
       color: #1e40af;
@@ -59,113 +77,136 @@
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap" rel="stylesheet">
 
 <style id="echo-shell-css">
+
 :root{
   --echo-bg:#0b0f16;
   --echo-panel:#101722;
-  --echo-border:rgba(255,255,255,.08);
+  --echo-border:rgba(255,255,255,.10);
   --echo-text:#e8eef8;
   --echo-muted:#8fa1b8;
-  --ancient:#ffffff;
-  --traits:#00b8c8;
-  --phenotype:#7c8cff;
-  --physique:#ff8757;
+  --accent:#b3d4fc;
 }
 
-body.echo-light-section{
-  --echo-bg:#f5f7fa;
-  --echo-text:#1a222c;
-  --echo-muted:#6b7785;
-  --echo-border:rgba(0,0,0,.08);
+*{
+  box-sizing:border-box;
 }
+
+html,body{
+  margin:0;
+  padding:0;
+  max-width:100%;
+  overflow-x:hidden;
+}
+
+/* =========================================================
+   TOPBAR
+========================================================= */
 
 .echo-shell-topbar{
   position:fixed;
   top:0;
   left:0;
   right:0;
-  height:72px;
+  height:68px;
   z-index:99990;
-  background:rgba(11,15,22,.85);
-  backdrop-filter:blur(12px);
+  background:rgba(11,15,22,.88);
+  backdrop-filter:blur(14px);
   border-bottom:1px solid var(--echo-border);
-  box-sizing:border-box;
   font-family:Inter,system-ui,sans-serif;
 }
 
-body.echo-light-section .echo-shell-topbar{
-  background:rgba(255,255,255,.85);
-}
-
 .echo-shell-toplinks{
+  height:68px;
   max-width:1300px;
-  height:72px;
   margin:0 auto;
   display:flex;
+  align-items:center;
+  justify-content:center;
 }
 
 .echo-shell-toplinks a{
   flex:1;
+  height:100%;
   display:flex;
   align-items:center;
   justify-content:center;
-  gap:10px;
+  gap:8px;
   color:var(--echo-muted);
   text-decoration:none;
-  font-size:14px;
+  font-size:13px;
   font-weight:800;
-  position:relative;
-  transition:.25s ease;
+  white-space:nowrap;
+  transition:.2s ease;
 }
 
-.echo-shell-toplinks a:hover,
-.echo-shell-toplinks a.active{
+.echo-shell-toplinks a.active,
+.echo-shell-toplinks a:hover{
   color:var(--echo-text);
 }
 
-.echo-shell-toplinks a.active::after{
-  content:"";
-  position:absolute;
-  bottom:0;
-  left:20%;
-  right:20%;
-  height:3px;
-  border-radius:999px;
+/* =========================================================
+   LIGHT MODE TOPBAR
+========================================================= */
+
+body.echo-light-section .echo-shell-topbar{
+  background:rgba(255,255,255,.95);
+  border-bottom:1px solid rgba(0,0,0,.08);
 }
 
-.echo-shell-toplinks a[data-tab="ancient"].active::after{background:var(--ancient);}
-body.echo-light-section .echo-shell-toplinks a[data-tab="ancient"].active::after{background:#0b0f16;}
-.echo-shell-toplinks a[data-tab="traits"].active::after{background:var(--traits);}
-.echo-shell-toplinks a[data-tab="phenotype"].active::after{background:var(--phenotype);}
-.echo-shell-toplinks a[data-tab="physique"].active::after{background:var(--physique);}
-
-.echo-nav-icon,
-.echo-nav-icon-stroke{
-  width:22px;
-  height:22px;
-  flex:0 0 auto;
+body.echo-light-section .echo-shell-toplinks a{
+  color:#6b7280;
 }
 
-.echo-nav-icon{fill:currentColor;}
-.echo-nav-icon-stroke{
-  fill:none;
-  stroke:currentColor;
-  stroke-width:1.8;
-  stroke-linecap:round;
-  stroke-linejoin:round;
+body.echo-light-section .echo-shell-toplinks a.active,
+body.echo-light-section .echo-shell-toplinks a:hover{
+  color:#111827;
 }
+
+/* =========================================================
+   MOBILE MENU BUTTON
+========================================================= */
+
+.echo-mobile-menu-btn{
+  display:none;
+  position:fixed;
+  top:14px;
+  left:14px;
+  z-index:100000;
+  width:42px;
+  height:42px;
+  border-radius:14px;
+  border:1px solid rgba(179,212,252,.25);
+  background:rgba(16,23,34,.96);
+  color:#e8eef8;
+  font-size:22px;
+  cursor:pointer;
+}
+
+body.echo-light-section .echo-mobile-menu-btn{
+  background:rgba(255,255,255,.96);
+  color:#111827;
+  border:1px solid rgba(0,0,0,.10);
+}
+
+/* =========================================================
+   ANCIENT SIDEBAR ONLY
+========================================================= */
 
 .echo-shell-sidebar{
   display:none;
   position:fixed;
-  top:72px;
+  top:68px;
   left:0;
   bottom:0;
   width:248px;
   z-index:99980;
-  background:linear-gradient(180deg,rgba(16,23,34,.96),rgba(9,13,20,.98));
+  background:linear-gradient(
+    180deg,
+    rgba(16,23,34,.98),
+    rgba(9,13,20,.99)
+  );
   border-right:1px solid var(--echo-border);
   padding:18px 14px;
-  box-sizing:border-box;
   font-family:Inter,system-ui,sans-serif;
 }
 
@@ -177,12 +218,12 @@ body.echo-ancient-page .echo-shell-sidebar{
   padding:15px 14px;
   border:1px solid var(--echo-border);
   border-radius:18px;
-  background:rgba(255,255,255,.035);
+  background:rgba(255,255,255,.04);
   margin-bottom:16px;
 }
 
 .echo-shell-mode .kicker{
-  color:#b3d4fc;
+  color:var(--accent);
   font-size:11px;
   font-weight:900;
   text-transform:uppercase;
@@ -220,7 +261,7 @@ body.echo-ancient-page .echo-shell-sidebar{
   border:1px solid transparent;
   transition:.18s ease;
   font-size:13px;
-  font-weight:700;
+  font-weight:800;
 }
 
 .echo-shell-nav a .ico{
@@ -229,19 +270,19 @@ body.echo-ancient-page .echo-shell-sidebar{
   border-radius:11px;
   display:grid;
   place-items:center;
-  background:rgba(179,212,252,.08);
-  color:#b3d4fc;
+  background:rgba(179,212,252,.10);
+  color:var(--accent);
 }
 
 .echo-shell-nav a:hover,
 .echo-shell-nav a.active{
   color:#e8eef8;
-  background:rgba(179,212,252,.08);
-  border-color:rgba(179,212,252,.16);
+  background:rgba(179,212,252,.10);
+  border-color:rgba(179,212,252,.20);
 }
 
 .echo-shell-nav a.active .ico{
-  background:#b3d4fc;
+  background:var(--accent);
   color:#08111d;
 }
 
@@ -249,35 +290,196 @@ body.echo-ancient-page .echo-shell-sidebar{
   margin-top:18px;
   padding:12px;
   border-radius:16px;
-  background:rgba(255,255,255,.035);
+  background:rgba(255,255,255,.04);
   color:#8fa1b8;
   font-size:11px;
   line-height:1.45;
 }
 
+/* =========================================================
+   MAIN CONTENT
+========================================================= */
+
 #echo-shell-root{
-  margin-left:0;
-  padding-top:72px;
+  padding-top:68px;
   min-height:100vh;
-  box-sizing:border-box;
 }
 
 body.echo-ancient-page #echo-shell-root{
   margin-left:248px;
 }
 
-@media(max-width:900px){
-  .echo-shell-sidebar{width:78px;padding:12px 8px;}
-  .echo-shell-mode{display:none;}
-  .echo-shell-nav a span.label{display:none;}
-  .echo-shell-nav a{justify-content:center;padding:10px;}
-  body.echo-ancient-page #echo-shell-root{margin-left:78px;}
-  .echo-shell-toplinks a{font-size:0;}
+/* remove sidebar from traits/phenotype/physique */
+body.echo-no-shell-sidebar .echo-shell-sidebar{
+  display:none !important;
 }
+
+body.echo-no-shell-sidebar #echo-shell-root{
+  margin-left:0 !important;
+}
+
+body.echo-no-shell-sidebar .echo-mobile-menu-btn,
+body.echo-no-shell-sidebar .echo-shell-backdrop{
+  display:none !important;
+}
+
+.echo-shell-backdrop{
+  display:none;
+}
+
+
+/* =========================================================
+   MOBILE
+========================================================= */
+
+@media(max-width:900px){
+
+  .echo-mobile-menu-btn{
+    display:block;
+  }
+
+  /* =====================================================
+     DEFAULT MOBILE TOPBAR
+     (ancient pages with sidebar button)
+  ===================================================== */
+
+  .echo-shell-toplinks{
+    padding-left:62px;
+    overflow-x:auto;
+    justify-content:flex-start;
+    -webkit-overflow-scrolling:touch;
+    scrollbar-width:none;
+  }
+
+  .echo-shell-toplinks::-webkit-scrollbar{
+    display:none;
+  }
+
+  .echo-shell-toplinks a{
+    flex:0 0 auto;
+    padding:0 14px;
+    font-size:12px !important;
+    white-space:nowrap;
+  }
+
+  /* =====================================================
+     LIGHT PAGES
+     traits / phenotype / physique
+  ===================================================== */
+
+  body.echo-no-shell-sidebar .echo-shell-toplinks{
+    padding-left:0 !important;
+    justify-content:flex-start !important;
+    overflow-x:auto !important;
+    width:100% !important;
+    scrollbar-width:none;
+  }
+
+  body.echo-no-shell-sidebar .echo-shell-toplinks::-webkit-scrollbar{
+    display:none;
+  }
+
+  body.echo-no-shell-sidebar .echo-shell-toplinks a{
+    flex:0 0 auto !important;
+    min-width:auto !important;
+    padding:0 18px !important;
+    font-size:12px !important;
+    text-align:center !important;
+    white-space:nowrap !important;
+  }
+
+  /* =====================================================
+     SIDEBAR
+  ===================================================== */
+
+  .echo-shell-sidebar{
+    width:280px;
+    max-width:82vw;
+    transform:translateX(-105%);
+    transition:transform .25s ease;
+    box-shadow:18px 0 45px rgba(0,0,0,.35);
+  }
+
+  body.echo-sidebar-open .echo-shell-sidebar{
+    transform:translateX(0);
+  }
+
+  body.echo-ancient-page #echo-shell-root{
+    margin-left:0;
+  }
+
+  .echo-shell-backdrop{
+    display:block;
+    position:fixed;
+    inset:0;
+    z-index:99970;
+    background:rgba(0,0,0,.48);
+    opacity:0;
+    pointer-events:none;
+    transition:.2s ease;
+  }
+
+  body.echo-sidebar-open .echo-shell-backdrop{
+    opacity:1;
+    pointer-events:auto;
+  }
+
+  /* =====================================================
+     GENERIC MEDIA SAFETY
+  ===================================================== */
+
+  img,
+  video,
+  iframe{
+    max-width:100% !important;
+    height:auto !important;
+  }
+
+  /* Do NOT globally force all SVG/canvas sizing.
+   It breaks phenotype icons, summary cards, charts, etc. */
+  svg,
+  canvas{
+    max-width:100%;
+    height:auto;
+
+  }
+
+  table{
+    display:block;
+    max-width:100%;
+    overflow-x:auto;
+    white-space:nowrap;
+  }
+
+  #plot{
+    width:100% !important;
+    height:70vh !important;
+  }
+
+  #map{
+    width:100% !important;
+  }
+
+  .echo-page,
+  .echo-pca-page,
+  .wrap,
+  main,
+  section{
+    padding-left:14px !important;
+    padding-right:14px !important;
+    max-width:100% !important;
+  }
+}
+
 </style>
 
 </head>
+
 <body>
+
+<button class="echo-mobile-menu-btn" id="echoSidebarToggle" aria-label="Open menu">☰</button>
+
+<div class="echo-shell-backdrop" id="echoSidebarBackdrop"></div>
 
 <div class="echo-shell-topbar">
   <nav class="echo-shell-toplinks">
@@ -289,26 +491,44 @@ body.echo-ancient-page #echo-shell-root{
 </div>
 
 <aside class="echo-shell-sidebar">
+
   <div class="echo-shell-mode">
     <div class="kicker">Ancient Mode</div>
     <h2>Ancient Echoes</h2>
-    <p>Explore sample matches, ancestry composition and PCA placement.</p>
+    <p>Explore sample matches, admixture and PCA placement.</p>
   </div>
 
   <nav class="echo-shell-nav">
-    <a href="top_matches.html"><span class="ico">✦</span><span class="label">Top Matches</span></a>
-    <a href="admixture.html"><span class="ico">◌</span><span class="label">Admixture</span></a>
-    <a href="pca_plot.html"><span class="ico">⌁</span><span class="label">PCA</span></a>
-    <a href="store.html"><span class="ico">🛒</span><span class="label">Store</span></a>
+    <a href="top_matches.html">
+      <span class="ico">✦</span>
+      <span class="label">Top Matches</span>
+    </a>
+
+    <a href="admixture.html">
+      <span class="ico">◌</span>
+      <span class="label">Admixture</span>
+    </a>
+
+    <a href="pca_plot.html">
+      <span class="ico">⌁</span>
+      <span class="label">PCA</span>
+    </a>
+
+    <a href="store.html">
+      <span class="ico">🛒</span>
+      <span class="label">Store</span>
+    </a>
   </nav>
 
   <div class="echo-shell-footer">
     Ancient Echoes report bundle generated locally into dist/pages.
   </div>
+
 </aside>
 
 <script id="echo-shell-js">
 (function(){
+
   const file = location.pathname.split('/').pop().toLowerCase();
 
   const ancientFiles = new Set([
@@ -329,26 +549,57 @@ body.echo-ancient-page #echo-shell-root{
 
   if(lightFiles.has(file)){
     document.body.classList.add('echo-light-section');
+    document.body.classList.add('echo-no-shell-sidebar');
   }
 
-  document.querySelectorAll('.echo-shell-nav a, .echo-shell-toplinks a').forEach(a=>{
-    const href = (a.getAttribute('href') || '').toLowerCase();
+  document.querySelectorAll(
+    '.echo-shell-nav a, .echo-shell-toplinks a'
+  ).forEach(a=>{
+
+    const href = (
+      a.getAttribute('href') || ''
+    ).toLowerCase();
 
     if(href === file){
       a.classList.add('active');
     }
 
-    if(ancientFiles.has(file) && a.dataset && a.dataset.tab === 'ancient'){
+    if(
+      ancientFiles.has(file) &&
+      a.dataset &&
+      a.dataset.tab === 'ancient'
+    ){
       a.classList.add('active');
     }
   });
+
+  const toggle = document.getElementById('echoSidebarToggle');
+  const backdrop = document.getElementById('echoSidebarBackdrop');
+
+  function closeSidebar(){
+    document.body.classList.remove('echo-sidebar-open');
+  }
+
+  if(toggle){
+    toggle.addEventListener('click',()=>{
+      document.body.classList.toggle('echo-sidebar-open');
+    });
+  }
+
+  if(backdrop){
+    backdrop.addEventListener('click', closeSidebar);
+  }
+
+  document.querySelectorAll('.echo-shell-nav a').forEach(a=>{
+    a.addEventListener('click', closeSidebar);
+  });
+
 })();
 </script>
 
 <div id="echo-shell-root">
 
 
-  <!-- Baby Blue Wave Divider -->
   <div class="absolute inset-x-0 top-0 z-0 pointer-events-none">
     <svg class="w-full h-56" xmlns="http://www.w3.org/2000/svg"
          viewBox="0 0 1440 320" preserveAspectRatio="none">
@@ -357,16 +608,13 @@ body.echo-ancient-page #echo-shell-root{
     </svg>
   </div>
 
-  <!-- Blob Background Container -->
   <div id="bg-shapes"></div>
 
-  <!-- Layout -->
   <div class="flex">
 
-    <!-- Sidebar -->
-    <aside class="w-64 h-screen sticky top-0 bg-gray-50 border-r border-gray-200 z-10 p-4 space-y-4">
+    <aside class="hidden md:block w-64 h-screen sticky top-0 bg-[#eef6ff] border-r border-gray-200 z-10 p-4 space-y-4">
       <h2 class="text-lg font-bold text-gray-700 mb-4">Categories</h2>
-      <button onclick="filterTraits('cancer', this)"   class="sidebar-btn">Cancer</button>
+      <button onclick="filterTraits('cancer', this)"   class="sidebar-btn active">Cancer</button>
       <button onclick="filterTraits('mental', this)"   class="sidebar-btn">Mental Health</button>
       <button onclick="filterTraits('general', this)"  class="sidebar-btn">General</button>
       <button onclick="filterTraits('physical', this)" class="sidebar-btn">Physical</button>
@@ -375,11 +623,29 @@ body.echo-ancient-page #echo-shell-root{
       <button onclick="filterTraits('other', this)"    class="sidebar-btn">Other</button>
     </aside>
 
-    <!-- Main Content -->
-    <main class="flex-1 p-8 relative z-10 pt-20">
+    <main class="flex-1 p-4 md:p-8 relative z-10 pt-20 w-full">
 
-      <!-- Search Bar -->
-      <form class="max-w-lg mb-8">
+      <div class="md:hidden mb-6">
+        <div class="bg-white/75 backdrop-blur-md border border-blue-100 shadow-sm rounded-2xl p-4">
+          <div class="text-center mb-3">
+            <p class="text-xs uppercase tracking-[0.18em] text-blue-400 font-bold">Trait Categories</p>
+            <h2 class="text-lg font-extrabold text-gray-900">Choose a section</h2>
+          </div>
+
+          <select id="mobile-category-select"
+                  class="w-full rounded-xl border border-gray-300 bg-[#eef6ff] px-4 py-3 text-sm font-semibold text-gray-800 focus:ring-2 focus:ring-blue-300 focus:border-blue-300">
+            <option value="cancer">Cancer</option>
+            <option value="mental">Mental Health</option>
+            <option value="general">General</option>
+            <option value="physical">Physical</option>
+            <option value="hormones">Hormones</option>
+            <option value="nutrition">Nutrition</option>
+            <option value="other">Other</option>
+          </select>
+        </div>
+      </div>
+
+      <form class="max-w-lg mb-8 mx-auto md:mx-0">
         <label for="trait-search" class="sr-only">Search</label>
         <div class="relative">
           <div class="absolute inset-y-0 start-0 flex items-center ps-3 pointer-events-none">
@@ -389,7 +655,7 @@ body.echo-ancient-page #echo-shell-root{
             </svg>
           </div>
           <input type="search" id="trait-search"
-                 class="block w-full p-4 ps-10 text-sm text-gray-900 border border-gray-300 rounded-lg bg-gray-50 focus:ring-blue-500 focus:border-blue-500"
+                 class="block w-full p-4 ps-10 text-sm text-gray-900 border border-gray-300 rounded-xl bg-gray-50 focus:ring-blue-500 focus:border-blue-500"
                  placeholder="Search traits..." autocomplete="off">
         </div>
       </form>
@@ -440,10 +706,10 @@ body.echo-ancient-page #echo-shell-root{
     <div class="trait-card relative bg-white rounded-xl shadow-sm p-5 flex flex-col justify-between border border-gray-200 min-h-[200px] overflow-hidden">
       <div class="flex-grow">
         <h3 class="text-md font-semibold text-gray-800 mb-2">Testicular Cancer</h3>
-        <p class="text-sm text-gray-400 leading-relaxed max-w-[70%]">Your genotype suggests a moderately increased risk for Testicular Cancer.</p>
+        <p class="text-sm text-gray-400 leading-relaxed max-w-[70%]">Your genotype suggests typical or reduced risk for Testicular Cancer.</p>
       </div>
       <div class="flex justify-between items-end mt-4 z-10 relative">
-        <span class="text-sm font-medium text-yellow-600">Moderate Risk</span>
+        <span class="text-sm font-medium text-green-600">Lower Risk</span>
       </div>
       <img src="../Images/Testicular.png" 
            class="absolute top-[20px] right-[-40px] w-36 h-36 z-0 pointer-events-none" 
@@ -551,10 +817,10 @@ body.echo-ancient-page #echo-shell-root{
     <div class="trait-card relative bg-white rounded-xl shadow-sm p-5 flex flex-col justify-between border border-gray-200 min-h-[200px] overflow-hidden">
       <div class="flex-grow">
         <h3 class="text-md font-semibold text-gray-800 mb-2">Genetic Intelligence Potential</h3>
-        <p class="text-sm text-gray-400 leading-relaxed max-w-[70%]">Your genotype suggests a mild boost in cognitive traits associated with intelligence.</p>
+        <p class="text-sm text-gray-400 leading-relaxed max-w-[70%]">Your genotype does not show any SNPs strongly linked to increased cognitive ability — but this doesn’t mean low intelligence.</p>
       </div>
       <div class="flex justify-between items-end mt-4 z-10 relative">
-        <span class="text-sm font-medium text-yellow-600">Slightly Above Average</span>
+        <span class="text-sm font-medium text-green-600">Typical Range</span>
       </div>
       <img src="../Images/Intelligence.png" 
            class="absolute top-[20px] right-[-40px] w-36 h-36 z-0 pointer-events-none" 
@@ -564,10 +830,10 @@ body.echo-ancient-page #echo-shell-root{
     <div class="trait-card relative bg-white rounded-xl shadow-sm p-5 flex flex-col justify-between border border-gray-200 min-h-[200px] overflow-hidden">
       <div class="flex-grow">
         <h3 class="text-md font-semibold text-gray-800 mb-2">Schizophrenia</h3>
-        <p class="text-sm text-gray-400 leading-relaxed max-w-[70%]">You carry one or more variants slightly associated with schizophrenia.</p>
+        <p class="text-sm text-gray-400 leading-relaxed max-w-[70%]">Your genotype suggests a moderately increased risk of schizophrenia.</p>
       </div>
       <div class="flex justify-between items-end mt-4 z-10 relative">
-        <span class="text-sm font-medium text-yellow-600">Slightly Elevated Risk</span>
+        <span class="text-sm font-medium text-yellow-600">Moderate Risk</span>
       </div>
       <img src="../Images/Schizophrenia.png" 
            class="absolute top-[20px] right-[-40px] w-36 h-36 z-0 pointer-events-none" 
@@ -624,45 +890,6 @@ body.echo-ancient-page #echo-shell-root{
       <img src="../Images/Alzheimer.png" 
            class="absolute top-[20px] right-[-40px] w-36 h-36 z-0 pointer-events-none" 
            alt="Alzheimer's Disease icon"/>
-    </div>
-    
-    <div class="trait-card relative bg-white rounded-xl shadow-sm p-5 flex flex-col justify-between border border-gray-200 min-h-[200px] overflow-hidden">
-      <div class="flex-grow">
-        <h3 class="text-md font-semibold text-gray-800 mb-2">Fragile X Syndrome</h3>
-        <p class="text-sm text-gray-400 leading-relaxed max-w-[70%]">No increased genetic risk for Fragile X Syndrome detected.</p>
-      </div>
-      <div class="flex justify-between items-end mt-4 z-10 relative">
-        <span class="text-sm font-medium text-green-600">Normal</span>
-      </div>
-      <img src="../Images/FragileX.png" 
-           class="absolute top-[20px] right-[-40px] w-36 h-36 z-0 pointer-events-none" 
-           alt="Fragile X Syndrome icon"/>
-    </div>
-    
-    <div class="trait-card relative bg-white rounded-xl shadow-sm p-5 flex flex-col justify-between border border-gray-200 min-h-[200px] overflow-hidden">
-      <div class="flex-grow">
-        <h3 class="text-md font-semibold text-gray-800 mb-2">Sanfilippo Syndrome</h3>
-        <p class="text-sm text-gray-400 leading-relaxed max-w-[70%]">You are unlikely to carry or be affected by Sanfilippo Syndrome.</p>
-      </div>
-      <div class="flex justify-between items-end mt-4 z-10 relative">
-        <span class="text-sm font-medium text-green-600">Low Risk</span>
-      </div>
-      <img src="../Images/Sanfilippo.png" 
-           class="absolute top-[20px] right-[-40px] w-36 h-36 z-0 pointer-events-none" 
-           alt="Sanfilippo Syndrome icon"/>
-    </div>
-    
-    <div class="trait-card relative bg-white rounded-xl shadow-sm p-5 flex flex-col justify-between border border-gray-200 min-h-[200px] overflow-hidden">
-      <div class="flex-grow">
-        <h3 class="text-md font-semibold text-gray-800 mb-2">Canavan Syndrome</h3>
-        <p class="text-sm text-gray-400 leading-relaxed max-w-[70%]">You are not genetically predisposed to Canavan Syndrome (G/G).</p>
-      </div>
-      <div class="flex justify-between items-end mt-4 z-10 relative">
-        <span class="text-sm font-medium text-green-600">Low Risk</span>
-      </div>
-      <img src="../Images/Canavan.png" 
-           class="absolute top-[20px] right-[-40px] w-36 h-36 z-0 pointer-events-none" 
-           alt="Canavan Syndrome icon"/>
     </div>
     
     <div class="trait-card relative bg-white rounded-xl shadow-sm p-5 flex flex-col justify-between border border-gray-200 min-h-[200px] overflow-hidden">
@@ -766,10 +993,10 @@ body.echo-ancient-page #echo-shell-root{
     <div class="trait-card relative bg-white rounded-xl shadow-sm p-5 flex flex-col justify-between border border-gray-200 min-h-[200px] overflow-hidden">
       <div class="flex-grow">
         <h3 class="text-md font-semibold text-gray-800 mb-2">Type 2 Diabetes Risk</h3>
-        <p class="text-sm text-gray-400 leading-relaxed max-w-[70%]">Your genotype includes minor variants associated with Type 2 Diabetes.</p>
+        <p class="text-sm text-gray-400 leading-relaxed max-w-[70%]">Your genotype is not associated with increased Type 2 Diabetes risk.</p>
       </div>
       <div class="flex justify-between items-end mt-4 z-10 relative">
-        <span class="text-sm font-medium text-yellow-600">Slightly Elevated Risk</span>
+        <span class="text-sm font-medium text-green-600">Lower Risk</span>
       </div>
       <img src="../Images/T2D.png" 
            class="absolute top-[20px] right-[-40px] w-36 h-36 z-0 pointer-events-none" 
@@ -839,19 +1066,6 @@ body.echo-ancient-page #echo-shell-root{
       <img src="../Images/MS.png" 
            class="absolute top-[20px] right-[-40px] w-36 h-36 z-0 pointer-events-none" 
            alt="Multiple Sclerosis icon"/>
-    </div>
-    
-    <div class="trait-card relative bg-white rounded-xl shadow-sm p-5 flex flex-col justify-between border border-gray-200 min-h-[200px] overflow-hidden">
-      <div class="flex-grow">
-        <h3 class="text-md font-semibold text-gray-800 mb-2">Heart Attack Risk</h3>
-        <p class="text-sm text-gray-400 leading-relaxed max-w-[70%]">Your genotype (A/A) is associated with reduced odds of heart attack.</p>
-      </div>
-      <div class="flex justify-between items-end mt-4 z-10 relative">
-        <span class="text-sm font-medium text-green-600">Lower Risk</span>
-      </div>
-      <img src="../Images/HeartAttack.png" 
-           class="absolute top-[20px] right-[-40px] w-36 h-36 z-0 pointer-events-none" 
-           alt="Heart Attack Risk icon"/>
     </div>
     
     <div class="trait-card relative bg-white rounded-xl shadow-sm p-5 flex flex-col justify-between border border-gray-200 min-h-[200px] overflow-hidden">
@@ -934,32 +1148,6 @@ body.echo-ancient-page #echo-shell-root{
     
     <div class="trait-card relative bg-white rounded-xl shadow-sm p-5 flex flex-col justify-between border border-gray-200 min-h-[200px] overflow-hidden">
       <div class="flex-grow">
-        <h3 class="text-md font-semibold text-gray-800 mb-2">Hemophilia B</h3>
-        <p class="text-sm text-gray-400 leading-relaxed max-w-[70%]">No risk variants detected for Hemophilia B.</p>
-      </div>
-      <div class="flex justify-between items-end mt-4 z-10 relative">
-        <span class="text-sm font-medium text-green-600">Low Risk</span>
-      </div>
-      <img src="../Images/Hemophilia.png" 
-           class="absolute top-[20px] right-[-40px] w-36 h-36 z-0 pointer-events-none" 
-           alt="Hemophilia B icon"/>
-    </div>
-    
-    <div class="trait-card relative bg-white rounded-xl shadow-sm p-5 flex flex-col justify-between border border-gray-200 min-h-[200px] overflow-hidden">
-      <div class="flex-grow">
-        <h3 class="text-md font-semibold text-gray-800 mb-2">Atrial Fibrillation</h3>
-        <p class="text-sm text-gray-400 leading-relaxed max-w-[70%]">Your genotype suggests a slightly decreased risk of Atrial Fibrillation.</p>
-      </div>
-      <div class="flex justify-between items-end mt-4 z-10 relative">
-        <span class="text-sm font-medium text-green-600">Low Risk</span>
-      </div>
-      <img src="../Images/Atrial.png" 
-           class="absolute top-[20px] right-[-40px] w-36 h-36 z-0 pointer-events-none" 
-           alt="Atrial Fibrillation icon"/>
-    </div>
-    
-    <div class="trait-card relative bg-white rounded-xl shadow-sm p-5 flex flex-col justify-between border border-gray-200 min-h-[200px] overflow-hidden">
-      <div class="flex-grow">
         <h3 class="text-md font-semibold text-gray-800 mb-2">Leprosy</h3>
         <p class="text-sm text-gray-400 leading-relaxed max-w-[70%]">Your genotype suggests a lower genetic predisposition to Leprosy.</p>
       </div>
@@ -973,32 +1161,6 @@ body.echo-ancient-page #echo-shell-root{
     
     <div class="trait-card relative bg-white rounded-xl shadow-sm p-5 flex flex-col justify-between border border-gray-200 min-h-[200px] overflow-hidden">
       <div class="flex-grow">
-        <h3 class="text-md font-semibold text-gray-800 mb-2">Ankylosing Spondylitis</h3>
-        <p class="text-sm text-gray-400 leading-relaxed max-w-[70%]">Your genotype suggests typical or reduced risk of Ankylosing Spondylitis.</p>
-      </div>
-      <div class="flex justify-between items-end mt-4 z-10 relative">
-        <span class="text-sm font-medium text-green-600">Low Risk</span>
-      </div>
-      <img src="../Images/Ankylosing.png" 
-           class="absolute top-[20px] right-[-40px] w-36 h-36 z-0 pointer-events-none" 
-           alt="Ankylosing Spondylitis icon"/>
-    </div>
-    
-    <div class="trait-card relative bg-white rounded-xl shadow-sm p-5 flex flex-col justify-between border border-gray-200 min-h-[200px] overflow-hidden">
-      <div class="flex-grow">
-        <h3 class="text-md font-semibold text-gray-800 mb-2">Tuberculosis Susceptibility</h3>
-        <p class="text-sm text-gray-400 leading-relaxed max-w-[70%]">Your genotype suggests a typical or lower susceptibility to Tuberculosis (G/G).</p>
-      </div>
-      <div class="flex justify-between items-end mt-4 z-10 relative">
-        <span class="text-sm font-medium text-green-600">Low Risk</span>
-      </div>
-      <img src="../Images/Tuberculosis.png" 
-           class="absolute top-[20px] right-[-40px] w-36 h-36 z-0 pointer-events-none" 
-           alt="Tuberculosis Susceptibility icon"/>
-    </div>
-    
-    <div class="trait-card relative bg-white rounded-xl shadow-sm p-5 flex flex-col justify-between border border-gray-200 min-h-[200px] overflow-hidden">
-      <div class="flex-grow">
         <h3 class="text-md font-semibold text-gray-800 mb-2">Biotinidase Deficiency</h3>
         <p class="text-sm text-gray-400 leading-relaxed max-w-[70%]">You are unlikely to be affected or a carrier for Biotinidase Deficiency (G/G).</p>
       </div>
@@ -1008,19 +1170,6 @@ body.echo-ancient-page #echo-shell-root{
       <img src="../Images/Biotinidase.png" 
            class="absolute top-[20px] right-[-40px] w-36 h-36 z-0 pointer-events-none" 
            alt="Biotinidase Deficiency icon"/>
-    </div>
-    
-    <div class="trait-card relative bg-white rounded-xl shadow-sm p-5 flex flex-col justify-between border border-gray-200 min-h-[200px] overflow-hidden">
-      <div class="flex-grow">
-        <h3 class="text-md font-semibold text-gray-800 mb-2">Crohn's Disease</h3>
-        <p class="text-sm text-gray-400 leading-relaxed max-w-[70%]">You carry one risk allele for Crohn’s Disease, associated with about 2x increased risk.</p>
-      </div>
-      <div class="flex justify-between items-end mt-4 z-10 relative">
-        <span class="text-sm font-medium text-yellow-600">Moderate Risk</span>
-      </div>
-      <img src="../Images/Chrohns.png" 
-           class="absolute top-[20px] right-[-40px] w-36 h-36 z-0 pointer-events-none" 
-           alt="Crohn's Disease icon"/>
     </div>
     
     <div class="trait-card relative bg-white rounded-xl shadow-sm p-5 flex flex-col justify-between border border-gray-200 min-h-[200px] overflow-hidden">
@@ -1062,45 +1211,6 @@ body.echo-ancient-page #echo-shell-root{
            alt="Delayed Sleep Phase Syndrome icon"/>
     </div>
     
-    <div class="trait-card relative bg-white rounded-xl shadow-sm p-5 flex flex-col justify-between border border-gray-200 min-h-[200px] overflow-hidden">
-      <div class="flex-grow">
-        <h3 class="text-md font-semibold text-gray-800 mb-2">Deep Sleep Trait</h3>
-        <p class="text-sm text-gray-400 leading-relaxed max-w-[70%]">You are not strongly genetically predisposed to deep sleep, though many other factors also play a role.</p>
-      </div>
-      <div class="flex justify-between items-end mt-4 z-10 relative">
-        <span class="text-sm font-medium text-yellow-600">Typical Sleep Depth</span>
-      </div>
-      <img src="../Images/DeepSleeper.png" 
-           class="absolute top-[20px] right-[-40px] w-36 h-36 z-0 pointer-events-none" 
-           alt="Deep Sleep Trait icon"/>
-    </div>
-    
-    <div class="trait-card relative bg-white rounded-xl shadow-sm p-5 flex flex-col justify-between border border-gray-200 min-h-[200px] overflow-hidden">
-      <div class="flex-grow">
-        <h3 class="text-md font-semibold text-gray-800 mb-2">Insomnia</h3>
-        <p class="text-sm text-gray-400 leading-relaxed max-w-[70%]">You do not carry the insomnia-linked variant at this SNP.</p>
-      </div>
-      <div class="flex justify-between items-end mt-4 z-10 relative">
-        <span class="text-sm font-medium text-green-600">Typical Insomnia Risk</span>
-      </div>
-      <img src="../Images/Insomnia.png" 
-           class="absolute top-[20px] right-[-40px] w-36 h-36 z-0 pointer-events-none" 
-           alt="Insomnia icon"/>
-    </div>
-    
-    <div class="trait-card relative bg-white rounded-xl shadow-sm p-5 flex flex-col justify-between border border-gray-200 min-h-[200px] overflow-hidden">
-      <div class="flex-grow">
-        <h3 class="text-md font-semibold text-gray-800 mb-2">Parkinson's Disease</h3>
-        <p class="text-sm text-gray-400 leading-relaxed max-w-[70%]">You carry two G alleles associated with a 1.6x increased risk of developing Parkinson's disease.</p>
-      </div>
-      <div class="flex justify-between items-end mt-4 z-10 relative">
-        <span class="text-sm font-medium text-red-600">Increased Risk</span>
-      </div>
-      <img src="../Images/Parkinsons.png" 
-           class="absolute top-[20px] right-[-40px] w-36 h-36 z-0 pointer-events-none" 
-           alt="Parkinson's Disease icon"/>
-    </div>
-    
     </div>
   </div>
 
@@ -1108,32 +1218,6 @@ body.echo-ancient-page #echo-shell-root{
   <div id="physical" class="trait-section fade-section pt-6 mb-12 hidden">
     <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
       
-    <div class="trait-card relative bg-white rounded-xl shadow-sm p-5 flex flex-col justify-between border border-gray-200 min-h-[200px] overflow-hidden">
-      <div class="flex-grow">
-        <h3 class="text-md font-semibold text-gray-800 mb-2">Micropenis Risk</h3>
-        <p class="text-sm text-gray-400 leading-relaxed max-w-[70%]">Your genotype suggests typical development with no elevated risk.</p>
-      </div>
-      <div class="flex justify-between items-end mt-4 z-10 relative">
-        <span class="text-sm font-medium text-green-600">Normal</span>
-      </div>
-      <img src="../Images/Micropenis.png" 
-           class="absolute top-[20px] right-[-40px] w-36 h-36 z-0 pointer-events-none" 
-           alt="Micropenis Risk icon"/>
-    </div>
-    
-    <div class="trait-card relative bg-white rounded-xl shadow-sm p-5 flex flex-col justify-between border border-gray-200 min-h-[200px] overflow-hidden">
-      <div class="flex-grow">
-        <h3 class="text-md font-semibold text-gray-800 mb-2">Pain Sensitivity</h3>
-        <p class="text-sm text-gray-400 leading-relaxed max-w-[70%]">You are likely to have normal or reduced sensitivity to pain.</p>
-      </div>
-      <div class="flex justify-between items-end mt-4 z-10 relative">
-        <span class="text-sm font-medium text-green-600">Typical Sensitivity</span>
-      </div>
-      <img src="../Images/Pain.png" 
-           class="absolute top-[20px] right-[-40px] w-36 h-36 z-0 pointer-events-none" 
-           alt="Pain Sensitivity icon"/>
-    </div>
-    
     <div class="trait-card relative bg-white rounded-xl shadow-sm p-5 flex flex-col justify-between border border-gray-200 min-h-[200px] overflow-hidden">
       <div class="flex-grow">
         <h3 class="text-md font-semibold text-gray-800 mb-2">Cleft Lip & Palate</h3>
@@ -1149,32 +1233,6 @@ body.echo-ancient-page #echo-shell-root{
     
     <div class="trait-card relative bg-white rounded-xl shadow-sm p-5 flex flex-col justify-between border border-gray-200 min-h-[200px] overflow-hidden">
       <div class="flex-grow">
-        <h3 class="text-md font-semibold text-gray-800 mb-2">Ichthyosis Vulgaris</h3>
-        <p class="text-sm text-gray-400 leading-relaxed max-w-[70%]">No elevated genetic risk for Ichthyosis Vulgaris detected.</p>
-      </div>
-      <div class="flex justify-between items-end mt-4 z-10 relative">
-        <span class="text-sm font-medium text-green-600">Low Risk</span>
-      </div>
-      <img src="../Images/Ichthyosis.png" 
-           class="absolute top-[20px] right-[-40px] w-36 h-36 z-0 pointer-events-none" 
-           alt="Ichthyosis Vulgaris icon"/>
-    </div>
-    
-    <div class="trait-card relative bg-white rounded-xl shadow-sm p-5 flex flex-col justify-between border border-gray-200 min-h-[200px] overflow-hidden">
-      <div class="flex-grow">
-        <h3 class="text-md font-semibold text-gray-800 mb-2">Obesity Risk</h3>
-        <p class="text-sm text-gray-400 leading-relaxed max-w-[70%]">You carry one obesity-associated allele (A), which may slightly increase risk of weight gain.</p>
-      </div>
-      <div class="flex justify-between items-end mt-4 z-10 relative">
-        <span class="text-sm font-medium text-yellow-600">Moderate Risk</span>
-      </div>
-      <img src="../Images/Obesity.png" 
-           class="absolute top-[20px] right-[-40px] w-36 h-36 z-0 pointer-events-none" 
-           alt="Obesity Risk icon"/>
-    </div>
-    
-    <div class="trait-card relative bg-white rounded-xl shadow-sm p-5 flex flex-col justify-between border border-gray-200 min-h-[200px] overflow-hidden">
-      <div class="flex-grow">
         <h3 class="text-md font-semibold text-gray-800 mb-2">Muscle Performance</h3>
         <p class="text-sm text-gray-400 leading-relaxed max-w-[70%]">You have the CC genotype associated with fast-twitch muscle fiber efficiency. Common in sprinters.</p>
       </div>
@@ -1184,19 +1242,6 @@ body.echo-ancient-page #echo-shell-root{
       <img src="../Images/Muscle.png" 
            class="absolute top-[20px] right-[-40px] w-36 h-36 z-0 pointer-events-none" 
            alt="Muscle Performance icon"/>
-    </div>
-    
-    <div class="trait-card relative bg-white rounded-xl shadow-sm p-5 flex flex-col justify-between border border-gray-200 min-h-[200px] overflow-hidden">
-      <div class="flex-grow">
-        <h3 class="text-md font-semibold text-gray-800 mb-2">Myostatin Deficiency</h3>
-        <p class="text-sm text-gray-400 leading-relaxed max-w-[70%]">You do not carry any variants associated with myostatin-related muscle enhancement.</p>
-      </div>
-      <div class="flex justify-between items-end mt-4 z-10 relative">
-        <span class="text-sm font-medium text-green-600">Typical</span>
-      </div>
-      <img src="../Images/Myostatin.png" 
-           class="absolute top-[20px] right-[-40px] w-36 h-36 z-0 pointer-events-none" 
-           alt="Myostatin Deficiency icon"/>
     </div>
     
     <div class="trait-card relative bg-white rounded-xl shadow-sm p-5 flex flex-col justify-between border border-gray-200 min-h-[200px] overflow-hidden">
@@ -1227,19 +1272,6 @@ body.echo-ancient-page #echo-shell-root{
     
     <div class="trait-card relative bg-white rounded-xl shadow-sm p-5 flex flex-col justify-between border border-gray-200 min-h-[200px] overflow-hidden">
       <div class="flex-grow">
-        <h3 class="text-md font-semibold text-gray-800 mb-2">Ticklishness</h3>
-        <p class="text-sm text-gray-400 leading-relaxed max-w-[70%]">You're genetically wired to be more ticklish. Good luck surviving surprise pokes!</p>
-      </div>
-      <div class="flex justify-between items-end mt-4 z-10 relative">
-        <span class="text-sm font-medium text-red-600">Highly Ticklish</span>
-      </div>
-      <img src="../Images/Tickles.png" 
-           class="absolute top-[20px] right-[-40px] w-36 h-36 z-0 pointer-events-none" 
-           alt="Ticklishness icon"/>
-    </div>
-    
-    <div class="trait-card relative bg-white rounded-xl shadow-sm p-5 flex flex-col justify-between border border-gray-200 min-h-[200px] overflow-hidden">
-      <div class="flex-grow">
         <h3 class="text-md font-semibold text-gray-800 mb-2">Vitiligo</h3>
         <p class="text-sm text-gray-400 leading-relaxed max-w-[70%]">You may carry a slightly increased risk for vitiligo.</p>
       </div>
@@ -1254,10 +1286,10 @@ body.echo-ancient-page #echo-shell-root{
     <div class="trait-card relative bg-white rounded-xl shadow-sm p-5 flex flex-col justify-between border border-gray-200 min-h-[200px] overflow-hidden">
       <div class="flex-grow">
         <h3 class="text-md font-semibold text-gray-800 mb-2">Nearsightedness</h3>
-        <p class="text-sm text-gray-400 leading-relaxed max-w-[70%]">You carry some markers associated with nearsightedness.</p>
+        <p class="text-sm text-gray-400 leading-relaxed max-w-[70%]">You do not carry known risk variants for nearsightedness at these SNPs.</p>
       </div>
       <div class="flex justify-between items-end mt-4 z-10 relative">
-        <span class="text-sm font-medium text-yellow-600">Slight Risk</span>
+        <span class="text-sm font-medium text-green-600">Low Risk</span>
       </div>
       <img src="../Images/Nearsightedness.png" 
            class="absolute top-[20px] right-[-40px] w-36 h-36 z-0 pointer-events-none" 
@@ -1293,10 +1325,10 @@ body.echo-ancient-page #echo-shell-root{
     <div class="trait-card relative bg-white rounded-xl shadow-sm p-5 flex flex-col justify-between border border-gray-200 min-h-[200px] overflow-hidden">
       <div class="flex-grow">
         <h3 class="text-md font-semibold text-gray-800 mb-2">Macular Degeneration (AMD)</h3>
-        <p class="text-sm text-gray-400 leading-relaxed max-w-[70%]">Your genetic profile indicates a slightly elevated risk of macular degeneration.</p>
+        <p class="text-sm text-gray-400 leading-relaxed max-w-[70%]">You carry protective variants that may reduce your risk of age-related macular degeneration.</p>
       </div>
       <div class="flex justify-between items-end mt-4 z-10 relative">
-        <span class="text-sm font-medium text-yellow-600">Moderate Risk</span>
+        <span class="text-sm font-medium text-green-600">Low Risk</span>
       </div>
       <img src="../Images/AMD.png" 
            class="absolute top-[20px] right-[-40px] w-36 h-36 z-0 pointer-events-none" 
@@ -1326,10 +1358,10 @@ body.echo-ancient-page #echo-shell-root{
     <div class="trait-card relative bg-white rounded-xl shadow-sm p-5 flex flex-col justify-between border border-gray-200 min-h-[200px] overflow-hidden">
       <div class="flex-grow">
         <h3 class="text-md font-semibold text-gray-800 mb-2">Estradiol (Estrogen) Levels</h3>
-        <p class="text-sm text-gray-400 leading-relaxed max-w-[70%]">Your genotype suggests elevated estradiol (estrogen) levels.</p>
+        <p class="text-sm text-gray-400 leading-relaxed max-w-[70%]">Your genotype suggests slightly above-average estradiol levels.</p>
       </div>
       <div class="flex justify-between items-end mt-4 z-10 relative">
-        <span class="text-sm font-medium text-red-600">Higher Levels</span>
+        <span class="text-sm font-medium text-yellow-600">Moderate Levels</span>
       </div>
       <img src="../Images/Estrogen.png" 
            class="absolute top-[20px] right-[-40px] w-36 h-36 z-0 pointer-events-none" 
@@ -1347,32 +1379,6 @@ body.echo-ancient-page #echo-shell-root{
       <img src="../Images/DHT.png" 
            class="absolute top-[20px] right-[-40px] w-36 h-36 z-0 pointer-events-none" 
            alt="DHT (Dihydrotestosterone) Levels icon"/>
-    </div>
-    
-    <div class="trait-card relative bg-white rounded-xl shadow-sm p-5 flex flex-col justify-between border border-gray-200 min-h-[200px] overflow-hidden">
-      <div class="flex-grow">
-        <h3 class="text-md font-semibold text-gray-800 mb-2">Reifenstein Syndrome</h3>
-        <p class="text-sm text-gray-400 leading-relaxed max-w-[70%]">You have a typical genotype associated with normal androgen sensitivity.</p>
-      </div>
-      <div class="flex justify-between items-end mt-4 z-10 relative">
-        <span class="text-sm font-medium text-green-600">Low Risk</span>
-      </div>
-      <img src="../Images/Reifenstein.png" 
-           class="absolute top-[20px] right-[-40px] w-36 h-36 z-0 pointer-events-none" 
-           alt="Reifenstein Syndrome icon"/>
-    </div>
-    
-    <div class="trait-card relative bg-white rounded-xl shadow-sm p-5 flex flex-col justify-between border border-gray-200 min-h-[200px] overflow-hidden">
-      <div class="flex-grow">
-        <h3 class="text-md font-semibold text-gray-800 mb-2">Omega-3 Fatty Acid Levels</h3>
-        <p class="text-sm text-gray-400 leading-relaxed max-w-[70%]">You are genetically predisposed to higher blood levels of omega-3 fatty acids — a heart- and brain-beneficial fat group.</p>
-      </div>
-      <div class="flex justify-between items-end mt-4 z-10 relative">
-        <span class="text-sm font-medium text-green-600">Higher Omega-3 Levels</span>
-      </div>
-      <img src="../Images/Omega3.png" 
-           class="absolute top-[20px] right-[-40px] w-36 h-36 z-0 pointer-events-none" 
-           alt="Omega-3 Fatty Acid Levels icon"/>
     </div>
     
     <div class="trait-card relative bg-white rounded-xl shadow-sm p-5 flex flex-col justify-between border border-gray-200 min-h-[200px] overflow-hidden">
@@ -1398,66 +1404,14 @@ body.echo-ancient-page #echo-shell-root{
     <div class="trait-card relative bg-white rounded-xl shadow-sm p-5 flex flex-col justify-between border border-gray-200 min-h-[200px] overflow-hidden">
       <div class="flex-grow">
         <h3 class="text-md font-semibold text-gray-800 mb-2">Vitamin D Levels</h3>
-        <p class="text-sm text-gray-400 leading-relaxed max-w-[70%]">Your genotype may predispose you to slightly reduced Vitamin D levels.</p>
+        <p class="text-sm text-gray-400 leading-relaxed max-w-[70%]">Your genetic profile is consistent with typical or elevated Vitamin D levels.</p>
       </div>
       <div class="flex justify-between items-end mt-4 z-10 relative">
-        <span class="text-sm font-medium text-yellow-600">Slightly Low Vitamin D</span>
+        <span class="text-sm font-medium text-green-600">Typical or Higher Vitamin D</span>
       </div>
       <img src="../Images/VitD.png" 
            class="absolute top-[20px] right-[-40px] w-36 h-36 z-0 pointer-events-none" 
            alt="Vitamin D Levels icon"/>
-    </div>
-    
-    <div class="trait-card relative bg-white rounded-xl shadow-sm p-5 flex flex-col justify-between border border-gray-200 min-h-[200px] overflow-hidden">
-      <div class="flex-grow">
-        <h3 class="text-md font-semibold text-gray-800 mb-2">Vitamin B12 Levels</h3>
-        <p class="text-sm text-gray-400 leading-relaxed max-w-[70%]">You are genetically predisposed to higher B12 levels.</p>
-      </div>
-      <div class="flex justify-between items-end mt-4 z-10 relative">
-        <span class="text-sm font-medium text-green-600">High B12 Levels</span>
-      </div>
-      <img src="../Images/VitB12.png" 
-           class="absolute top-[20px] right-[-40px] w-36 h-36 z-0 pointer-events-none" 
-           alt="Vitamin B12 Levels icon"/>
-    </div>
-    
-    <div class="trait-card relative bg-white rounded-xl shadow-sm p-5 flex flex-col justify-between border border-gray-200 min-h-[200px] overflow-hidden">
-      <div class="flex-grow">
-        <h3 class="text-md font-semibold text-gray-800 mb-2">Vitamin B6 Levels</h3>
-        <p class="text-sm text-gray-400 leading-relaxed max-w-[70%]">You may have slightly reduced Vitamin B6 levels.</p>
-      </div>
-      <div class="flex justify-between items-end mt-4 z-10 relative">
-        <span class="text-sm font-medium text-yellow-600">Slightly Lower B6 Levels</span>
-      </div>
-      <img src="../Images/VitB6.png" 
-           class="absolute top-[20px] right-[-40px] w-36 h-36 z-0 pointer-events-none" 
-           alt="Vitamin B6 Levels icon"/>
-    </div>
-    
-    <div class="trait-card relative bg-white rounded-xl shadow-sm p-5 flex flex-col justify-between border border-gray-200 min-h-[200px] overflow-hidden">
-      <div class="flex-grow">
-        <h3 class="text-md font-semibold text-gray-800 mb-2">Vitamin C Levels</h3>
-        <p class="text-sm text-gray-400 leading-relaxed max-w-[70%]">You are genetically predisposed to higher Vitamin C levels.</p>
-      </div>
-      <div class="flex justify-between items-end mt-4 z-10 relative">
-        <span class="text-sm font-medium text-green-600">Higher Vitamin C</span>
-      </div>
-      <img src="../Images/VitC.png" 
-           class="absolute top-[20px] right-[-40px] w-36 h-36 z-0 pointer-events-none" 
-           alt="Vitamin C Levels icon"/>
-    </div>
-    
-    <div class="trait-card relative bg-white rounded-xl shadow-sm p-5 flex flex-col justify-between border border-gray-200 min-h-[200px] overflow-hidden">
-      <div class="flex-grow">
-        <h3 class="text-md font-semibold text-gray-800 mb-2">Vitamin A Levels</h3>
-        <p class="text-sm text-gray-400 leading-relaxed max-w-[70%]">Your Vitamin A levels are likely within the typical range.</p>
-      </div>
-      <div class="flex justify-between items-end mt-4 z-10 relative">
-        <span class="text-sm font-medium text-yellow-600">Typical Vitamin A</span>
-      </div>
-      <img src="../Images/VitA.png" 
-           class="absolute top-[20px] right-[-40px] w-36 h-36 z-0 pointer-events-none" 
-           alt="Vitamin A Levels icon"/>
     </div>
     
     <div class="trait-card relative bg-white rounded-xl shadow-sm p-5 flex flex-col justify-between border border-gray-200 min-h-[200px] overflow-hidden">
@@ -1512,19 +1466,6 @@ body.echo-ancient-page #echo-shell-root{
            alt="Intracellular Cobalamin Metabolism icon"/>
     </div>
     
-    <div class="trait-card relative bg-white rounded-xl shadow-sm p-5 flex flex-col justify-between border border-gray-200 min-h-[200px] overflow-hidden">
-      <div class="flex-grow">
-        <h3 class="text-md font-semibold text-gray-800 mb-2">Anaemia</h3>
-        <p class="text-sm text-gray-400 leading-relaxed max-w-[70%]">You are not genetically predisposed to anaemia at this SNP.</p>
-      </div>
-      <div class="flex justify-between items-end mt-4 z-10 relative">
-        <span class="text-sm font-medium text-green-600">Low Risk of Anaemia</span>
-      </div>
-      <img src="../Images/Anaemia.png" 
-           class="absolute top-[20px] right-[-40px] w-36 h-36 z-0 pointer-events-none" 
-           alt="Anaemia icon"/>
-    </div>
-    
     </div>
   </div>
 
@@ -1532,6 +1473,26 @@ body.echo-ancient-page #echo-shell-root{
   <div id="other" class="trait-section fade-section pt-6 mb-12 hidden">
     <div class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
       
+        <div class="trait-card relative bg-white border border-dashed border-gray-400 rounded-xl shadow-sm p-5 flex flex-col justify-between min-h-[200px] overflow-hidden opacity-60">
+          <div class="flex-grow">
+            <h3 class="text-md font-semibold text-gray-500 mb-2">Heart Attack</h3>
+            <p class="text-sm text-gray-400 leading-relaxed max-w-[70%]">No matching genotype found in your file for this trait.</p>
+          </div>
+          <img src="../Images/Missing.png" 
+               class="absolute top-[20px] right-[-40px] w-36 h-36 z-0 pointer-events-none" 
+               alt="Heart Attack icon"/>
+        </div>
+        
+        <div class="trait-card relative bg-white border border-dashed border-gray-400 rounded-xl shadow-sm p-5 flex flex-col justify-between min-h-[200px] overflow-hidden opacity-60">
+          <div class="flex-grow">
+            <h3 class="text-md font-semibold text-gray-500 mb-2">Micropenis</h3>
+            <p class="text-sm text-gray-400 leading-relaxed max-w-[70%]">No matching genotype found in your file for this trait.</p>
+          </div>
+          <img src="../Images/Missing.png" 
+               class="absolute top-[20px] right-[-40px] w-36 h-36 z-0 pointer-events-none" 
+               alt="Micropenis icon"/>
+        </div>
+        
     <div class="trait-card relative bg-white rounded-xl shadow-sm p-5 flex flex-col justify-between border border-gray-200 min-h-[200px] overflow-hidden">
       <div class="flex-grow">
         <h3 class="text-md font-semibold text-gray-800 mb-2">Photic Sneeze Reflex</h3>
@@ -1545,19 +1506,26 @@ body.echo-ancient-page #echo-shell-root{
            alt="Photic Sneeze Reflex icon"/>
     </div>
     
-    <div class="trait-card relative bg-white rounded-xl shadow-sm p-5 flex flex-col justify-between border border-gray-200 min-h-[200px] overflow-hidden">
-      <div class="flex-grow">
-        <h3 class="text-md font-semibold text-gray-800 mb-2">Caffeine-Induced Anxiety</h3>
-        <p class="text-sm text-gray-400 leading-relaxed max-w-[70%]">You may be slightly more sensitive to caffeine-induced anxiety.</p>
-      </div>
-      <div class="flex justify-between items-end mt-4 z-10 relative">
-        <span class="text-sm font-medium text-yellow-600">Slightly Increased Risk</span>
-      </div>
-      <img src="../Images/Caffeine.png" 
-           class="absolute top-[20px] right-[-40px] w-36 h-36 z-0 pointer-events-none" 
-           alt="Caffeine-Induced Anxiety icon"/>
-    </div>
-    
+        <div class="trait-card relative bg-white border border-dashed border-gray-400 rounded-xl shadow-sm p-5 flex flex-col justify-between min-h-[200px] overflow-hidden opacity-60">
+          <div class="flex-grow">
+            <h3 class="text-md font-semibold text-gray-500 mb-2">Pain Sensitivity</h3>
+            <p class="text-sm text-gray-400 leading-relaxed max-w-[70%]">No matching genotype found in your file for this trait.</p>
+          </div>
+          <img src="../Images/Missing.png" 
+               class="absolute top-[20px] right-[-40px] w-36 h-36 z-0 pointer-events-none" 
+               alt="Pain Sensitivity icon"/>
+        </div>
+        
+        <div class="trait-card relative bg-white border border-dashed border-gray-400 rounded-xl shadow-sm p-5 flex flex-col justify-between min-h-[200px] overflow-hidden opacity-60">
+          <div class="flex-grow">
+            <h3 class="text-md font-semibold text-gray-500 mb-2">Caffeine Anxiety</h3>
+            <p class="text-sm text-gray-400 leading-relaxed max-w-[70%]">No matching genotype found in your file for this trait.</p>
+          </div>
+          <img src="../Images/Missing.png" 
+               class="absolute top-[20px] right-[-40px] w-36 h-36 z-0 pointer-events-none" 
+               alt="Caffeine Anxiety icon"/>
+        </div>
+        
     <div class="trait-card relative bg-white rounded-xl shadow-sm p-5 flex flex-col justify-between border border-gray-200 min-h-[200px] overflow-hidden">
       <div class="flex-grow">
         <h3 class="text-md font-semibold text-gray-800 mb-2">Albinism</h3>
@@ -1571,6 +1539,76 @@ body.echo-ancient-page #echo-shell-root{
            alt="Albinism icon"/>
     </div>
     
+        <div class="trait-card relative bg-white border border-dashed border-gray-400 rounded-xl shadow-sm p-5 flex flex-col justify-between min-h-[200px] overflow-hidden opacity-60">
+          <div class="flex-grow">
+            <h3 class="text-md font-semibold text-gray-500 mb-2">Hemophilia B</h3>
+            <p class="text-sm text-gray-400 leading-relaxed max-w-[70%]">No matching genotype found in your file for this trait.</p>
+          </div>
+          <img src="../Images/Missing.png" 
+               class="absolute top-[20px] right-[-40px] w-36 h-36 z-0 pointer-events-none" 
+               alt="Hemophilia B icon"/>
+        </div>
+        
+        <div class="trait-card relative bg-white border border-dashed border-gray-400 rounded-xl shadow-sm p-5 flex flex-col justify-between min-h-[200px] overflow-hidden opacity-60">
+          <div class="flex-grow">
+            <h3 class="text-md font-semibold text-gray-500 mb-2">Fragile X</h3>
+            <p class="text-sm text-gray-400 leading-relaxed max-w-[70%]">No matching genotype found in your file for this trait.</p>
+          </div>
+          <img src="../Images/Missing.png" 
+               class="absolute top-[20px] right-[-40px] w-36 h-36 z-0 pointer-events-none" 
+               alt="Fragile X icon"/>
+        </div>
+        
+        <div class="trait-card relative bg-white border border-dashed border-gray-400 rounded-xl shadow-sm p-5 flex flex-col justify-between min-h-[200px] overflow-hidden opacity-60">
+          <div class="flex-grow">
+            <h3 class="text-md font-semibold text-gray-500 mb-2">Ichthyosis</h3>
+            <p class="text-sm text-gray-400 leading-relaxed max-w-[70%]">No matching genotype found in your file for this trait.</p>
+          </div>
+          <img src="../Images/Missing.png" 
+               class="absolute top-[20px] right-[-40px] w-36 h-36 z-0 pointer-events-none" 
+               alt="Ichthyosis icon"/>
+        </div>
+        
+        <div class="trait-card relative bg-white border border-dashed border-gray-400 rounded-xl shadow-sm p-5 flex flex-col justify-between min-h-[200px] overflow-hidden opacity-60">
+          <div class="flex-grow">
+            <h3 class="text-md font-semibold text-gray-500 mb-2">Atrial Fibrillation</h3>
+            <p class="text-sm text-gray-400 leading-relaxed max-w-[70%]">No matching genotype found in your file for this trait.</p>
+          </div>
+          <img src="../Images/Missing.png" 
+               class="absolute top-[20px] right-[-40px] w-36 h-36 z-0 pointer-events-none" 
+               alt="Atrial Fibrillation icon"/>
+        </div>
+        
+        <div class="trait-card relative bg-white border border-dashed border-gray-400 rounded-xl shadow-sm p-5 flex flex-col justify-between min-h-[200px] overflow-hidden opacity-60">
+          <div class="flex-grow">
+            <h3 class="text-md font-semibold text-gray-500 mb-2">Sanfilippo Syndrome</h3>
+            <p class="text-sm text-gray-400 leading-relaxed max-w-[70%]">No matching genotype found in your file for this trait.</p>
+          </div>
+          <img src="../Images/Missing.png" 
+               class="absolute top-[20px] right-[-40px] w-36 h-36 z-0 pointer-events-none" 
+               alt="Sanfilippo Syndrome icon"/>
+        </div>
+        
+        <div class="trait-card relative bg-white border border-dashed border-gray-400 rounded-xl shadow-sm p-5 flex flex-col justify-between min-h-[200px] overflow-hidden opacity-60">
+          <div class="flex-grow">
+            <h3 class="text-md font-semibold text-gray-500 mb-2">Ankylosing Spondylitis</h3>
+            <p class="text-sm text-gray-400 leading-relaxed max-w-[70%]">No matching genotype found in your file for this trait.</p>
+          </div>
+          <img src="../Images/Missing.png" 
+               class="absolute top-[20px] right-[-40px] w-36 h-36 z-0 pointer-events-none" 
+               alt="Ankylosing Spondylitis icon"/>
+        </div>
+        
+        <div class="trait-card relative bg-white border border-dashed border-gray-400 rounded-xl shadow-sm p-5 flex flex-col justify-between min-h-[200px] overflow-hidden opacity-60">
+          <div class="flex-grow">
+            <h3 class="text-md font-semibold text-gray-500 mb-2">Tuberculosis Susceptibility</h3>
+            <p class="text-sm text-gray-400 leading-relaxed max-w-[70%]">No matching genotype found in your file for this trait.</p>
+          </div>
+          <img src="../Images/Missing.png" 
+               class="absolute top-[20px] right-[-40px] w-36 h-36 z-0 pointer-events-none" 
+               alt="Tuberculosis Susceptibility icon"/>
+        </div>
+        
     <div class="trait-card relative bg-white rounded-xl shadow-sm p-5 flex flex-col justify-between border border-gray-200 min-h-[200px] overflow-hidden">
       <div class="flex-grow">
         <h3 class="text-md font-semibold text-gray-800 mb-2">Peanut Allergy</h3>
@@ -1584,19 +1622,66 @@ body.echo-ancient-page #echo-shell-root{
            alt="Peanut Allergy icon"/>
     </div>
     
-    <div class="trait-card relative bg-white rounded-xl shadow-sm p-5 flex flex-col justify-between border border-gray-200 min-h-[200px] overflow-hidden">
-      <div class="flex-grow">
-        <h3 class="text-md font-semibold text-gray-800 mb-2">Extraordinary Tasting Ability</h3>
-        <p class="text-sm text-gray-400 leading-relaxed max-w-[70%]">You likely have normal taste sensitivity based on your genotype.</p>
-      </div>
-      <div class="flex justify-between items-end mt-4 z-10 relative">
-        <span class="text-sm font-medium text-green-600">Typical</span>
-      </div>
-      <img src="../Images/Taste.png" 
-           class="absolute top-[20px] right-[-40px] w-36 h-36 z-0 pointer-events-none" 
-           alt="Extraordinary Tasting Ability icon"/>
-    </div>
-    
+        <div class="trait-card relative bg-white border border-dashed border-gray-400 rounded-xl shadow-sm p-5 flex flex-col justify-between min-h-[200px] overflow-hidden opacity-60">
+          <div class="flex-grow">
+            <h3 class="text-md font-semibold text-gray-500 mb-2">Reifenstein Syndrome</h3>
+            <p class="text-sm text-gray-400 leading-relaxed max-w-[70%]">No matching genotype found in your file for this trait.</p>
+          </div>
+          <img src="../Images/Missing.png" 
+               class="absolute top-[20px] right-[-40px] w-36 h-36 z-0 pointer-events-none" 
+               alt="Reifenstein Syndrome icon"/>
+        </div>
+        
+        <div class="trait-card relative bg-white border border-dashed border-gray-400 rounded-xl shadow-sm p-5 flex flex-col justify-between min-h-[200px] overflow-hidden opacity-60">
+          <div class="flex-grow">
+            <h3 class="text-md font-semibold text-gray-500 mb-2">Crohns Disease</h3>
+            <p class="text-sm text-gray-400 leading-relaxed max-w-[70%]">No matching genotype found in your file for this trait.</p>
+          </div>
+          <img src="../Images/Missing.png" 
+               class="absolute top-[20px] right-[-40px] w-36 h-36 z-0 pointer-events-none" 
+               alt="Crohns Disease icon"/>
+        </div>
+        
+        <div class="trait-card relative bg-white border border-dashed border-gray-400 rounded-xl shadow-sm p-5 flex flex-col justify-between min-h-[200px] overflow-hidden opacity-60">
+          <div class="flex-grow">
+            <h3 class="text-md font-semibold text-gray-500 mb-2">Canavan Syndrome</h3>
+            <p class="text-sm text-gray-400 leading-relaxed max-w-[70%]">No matching genotype found in your file for this trait.</p>
+          </div>
+          <img src="../Images/Missing.png" 
+               class="absolute top-[20px] right-[-40px] w-36 h-36 z-0 pointer-events-none" 
+               alt="Canavan Syndrome icon"/>
+        </div>
+        
+        <div class="trait-card relative bg-white border border-dashed border-gray-400 rounded-xl shadow-sm p-5 flex flex-col justify-between min-h-[200px] overflow-hidden opacity-60">
+          <div class="flex-grow">
+            <h3 class="text-md font-semibold text-gray-500 mb-2">Obesity</h3>
+            <p class="text-sm text-gray-400 leading-relaxed max-w-[70%]">No matching genotype found in your file for this trait.</p>
+          </div>
+          <img src="../Images/Missing.png" 
+               class="absolute top-[20px] right-[-40px] w-36 h-36 z-0 pointer-events-none" 
+               alt="Obesity icon"/>
+        </div>
+        
+        <div class="trait-card relative bg-white border border-dashed border-gray-400 rounded-xl shadow-sm p-5 flex flex-col justify-between min-h-[200px] overflow-hidden opacity-60">
+          <div class="flex-grow">
+            <h3 class="text-md font-semibold text-gray-500 mb-2">Myostatin Deficiency</h3>
+            <p class="text-sm text-gray-400 leading-relaxed max-w-[70%]">No matching genotype found in your file for this trait.</p>
+          </div>
+          <img src="../Images/Missing.png" 
+               class="absolute top-[20px] right-[-40px] w-36 h-36 z-0 pointer-events-none" 
+               alt="Myostatin Deficiency icon"/>
+        </div>
+        
+        <div class="trait-card relative bg-white border border-dashed border-gray-400 rounded-xl shadow-sm p-5 flex flex-col justify-between min-h-[200px] overflow-hidden opacity-60">
+          <div class="flex-grow">
+            <h3 class="text-md font-semibold text-gray-500 mb-2">Tasting Ability</h3>
+            <p class="text-sm text-gray-400 leading-relaxed max-w-[70%]">No matching genotype found in your file for this trait.</p>
+          </div>
+          <img src="../Images/Missing.png" 
+               class="absolute top-[20px] right-[-40px] w-36 h-36 z-0 pointer-events-none" 
+               alt="Tasting Ability icon"/>
+        </div>
+        
     <div class="trait-card relative bg-white rounded-xl shadow-sm p-5 flex flex-col justify-between border border-gray-200 min-h-[200px] overflow-hidden">
       <div class="flex-grow">
         <h3 class="text-md font-semibold text-gray-800 mb-2">Earwax Type</h3>
@@ -1622,6 +1707,46 @@ body.echo-ancient-page #echo-shell-root{
         
         <div class="trait-card relative bg-white border border-dashed border-gray-400 rounded-xl shadow-sm p-5 flex flex-col justify-between min-h-[200px] overflow-hidden opacity-60">
           <div class="flex-grow">
+            <h3 class="text-md font-semibold text-gray-500 mb-2">Vitamin B12</h3>
+            <p class="text-sm text-gray-400 leading-relaxed max-w-[70%]">No matching genotype found in your file for this trait.</p>
+          </div>
+          <img src="../Images/Missing.png" 
+               class="absolute top-[20px] right-[-40px] w-36 h-36 z-0 pointer-events-none" 
+               alt="Vitamin B12 icon"/>
+        </div>
+        
+        <div class="trait-card relative bg-white border border-dashed border-gray-400 rounded-xl shadow-sm p-5 flex flex-col justify-between min-h-[200px] overflow-hidden opacity-60">
+          <div class="flex-grow">
+            <h3 class="text-md font-semibold text-gray-500 mb-2">Vitamin B6</h3>
+            <p class="text-sm text-gray-400 leading-relaxed max-w-[70%]">No matching genotype found in your file for this trait.</p>
+          </div>
+          <img src="../Images/Missing.png" 
+               class="absolute top-[20px] right-[-40px] w-36 h-36 z-0 pointer-events-none" 
+               alt="Vitamin B6 icon"/>
+        </div>
+        
+        <div class="trait-card relative bg-white border border-dashed border-gray-400 rounded-xl shadow-sm p-5 flex flex-col justify-between min-h-[200px] overflow-hidden opacity-60">
+          <div class="flex-grow">
+            <h3 class="text-md font-semibold text-gray-500 mb-2">Vitamin C</h3>
+            <p class="text-sm text-gray-400 leading-relaxed max-w-[70%]">No matching genotype found in your file for this trait.</p>
+          </div>
+          <img src="../Images/Missing.png" 
+               class="absolute top-[20px] right-[-40px] w-36 h-36 z-0 pointer-events-none" 
+               alt="Vitamin C icon"/>
+        </div>
+        
+        <div class="trait-card relative bg-white border border-dashed border-gray-400 rounded-xl shadow-sm p-5 flex flex-col justify-between min-h-[200px] overflow-hidden opacity-60">
+          <div class="flex-grow">
+            <h3 class="text-md font-semibold text-gray-500 mb-2">Vitamin A</h3>
+            <p class="text-sm text-gray-400 leading-relaxed max-w-[70%]">No matching genotype found in your file for this trait.</p>
+          </div>
+          <img src="../Images/Missing.png" 
+               class="absolute top-[20px] right-[-40px] w-36 h-36 z-0 pointer-events-none" 
+               alt="Vitamin A icon"/>
+        </div>
+        
+        <div class="trait-card relative bg-white border border-dashed border-gray-400 rounded-xl shadow-sm p-5 flex flex-col justify-between min-h-[200px] overflow-hidden opacity-60">
+          <div class="flex-grow">
             <h3 class="text-md font-semibold text-gray-500 mb-2">Cilantro Taste</h3>
             <p class="text-sm text-gray-400 leading-relaxed max-w-[70%]">No matching genotype found in your file for this trait.</p>
           </div>
@@ -1643,19 +1768,16 @@ body.echo-ancient-page #echo-shell-root{
            alt="Bitter Taste Perception icon"/>
     </div>
     
-    <div class="trait-card relative bg-white rounded-xl shadow-sm p-5 flex flex-col justify-between border border-gray-200 min-h-[200px] overflow-hidden">
-      <div class="flex-grow">
-        <h3 class="text-md font-semibold text-gray-800 mb-2">Sweet vs Salty Preference</h3>
-        <p class="text-sm text-gray-400 leading-relaxed max-w-[70%]">You are more likely to prefer salty or savoury foods over sweet.</p>
-      </div>
-      <div class="flex justify-between items-end mt-4 z-10 relative">
-        <span class="text-sm font-medium text-green-600">Salty Preference</span>
-      </div>
-      <img src="../Images/SweetSalt.png" 
-           class="absolute top-[20px] right-[-40px] w-36 h-36 z-0 pointer-events-none" 
-           alt="Sweet vs Salty Preference icon"/>
-    </div>
-    
+        <div class="trait-card relative bg-white border border-dashed border-gray-400 rounded-xl shadow-sm p-5 flex flex-col justify-between min-h-[200px] overflow-hidden opacity-60">
+          <div class="flex-grow">
+            <h3 class="text-md font-semibold text-gray-500 mb-2">Salty Vs Sweet</h3>
+            <p class="text-sm text-gray-400 leading-relaxed max-w-[70%]">No matching genotype found in your file for this trait.</p>
+          </div>
+          <img src="../Images/Missing.png" 
+               class="absolute top-[20px] right-[-40px] w-36 h-36 z-0 pointer-events-none" 
+               alt="Salty Vs Sweet icon"/>
+        </div>
+        
         <div class="trait-card relative bg-white border border-dashed border-gray-400 rounded-xl shadow-sm p-5 flex flex-col justify-between min-h-[200px] overflow-hidden opacity-60">
           <div class="flex-grow">
             <h3 class="text-md font-semibold text-gray-500 mb-2">Thrill Seeking</h3>
@@ -1666,58 +1788,46 @@ body.echo-ancient-page #echo-shell-root{
                alt="Thrill Seeking icon"/>
         </div>
         
-    <div class="trait-card relative bg-white rounded-xl shadow-sm p-5 flex flex-col justify-between border border-gray-200 min-h-[200px] overflow-hidden">
-      <div class="flex-grow">
-        <h3 class="text-md font-semibold text-gray-800 mb-2">Caffeine Metabolism</h3>
-        <p class="text-sm text-gray-400 leading-relaxed max-w-[70%]">You metabolize caffeine quickly. You may tolerate coffee well and feel less impact from caffeine.</p>
-      </div>
-      <div class="flex justify-between items-end mt-4 z-10 relative">
-        <span class="text-sm font-medium text-green-600">Fast Metabolizer</span>
-      </div>
-      <img src="../Images/CaffeineMetabolism.png" 
-           class="absolute top-[20px] right-[-40px] w-36 h-36 z-0 pointer-events-none" 
-           alt="Caffeine Metabolism icon"/>
-    </div>
-    
-    <div class="trait-card relative bg-white rounded-xl shadow-sm p-5 flex flex-col justify-between border border-gray-200 min-h-[200px] overflow-hidden">
-      <div class="flex-grow">
-        <h3 class="text-md font-semibold text-gray-800 mb-2">Alcohol Tolerance</h3>
-        <p class="text-sm text-gray-400 leading-relaxed max-w-[70%]">You likely break down alcohol efficiently and experience fewer negative reactions when drinking.</p>
-      </div>
-      <div class="flex justify-between items-end mt-4 z-10 relative">
-        <span class="text-sm font-medium text-green-600">High Tolerance</span>
-      </div>
-      <img src="../Images/Alcohol.png" 
-           class="absolute top-[20px] right-[-40px] w-36 h-36 z-0 pointer-events-none" 
-           alt="Alcohol Tolerance icon"/>
-    </div>
-    
-    <div class="trait-card relative bg-white rounded-xl shadow-sm p-5 flex flex-col justify-between border border-gray-200 min-h-[200px] overflow-hidden">
-      <div class="flex-grow">
-        <h3 class="text-md font-semibold text-gray-800 mb-2">Marmite Preference</h3>
-        <p class="text-sm text-gray-400 leading-relaxed max-w-[70%]">Your DNA says you’re one of the rare few who truly enjoy the taste of Marmite.</p>
-      </div>
-      <div class="flex justify-between items-end mt-4 z-10 relative">
-        <span class="text-sm font-medium text-green-600">Loves Marmite</span>
-      </div>
-      <img src="../Images/Marmite.png" 
-           class="absolute top-[20px] right-[-40px] w-36 h-36 z-0 pointer-events-none" 
-           alt="Marmite Preference icon"/>
-    </div>
-    
-    <div class="trait-card relative bg-white rounded-xl shadow-sm p-5 flex flex-col justify-between border border-gray-200 min-h-[200px] overflow-hidden">
-      <div class="flex-grow">
-        <h3 class="text-md font-semibold text-gray-800 mb-2">Dream Recall</h3>
-        <p class="text-sm text-gray-400 leading-relaxed max-w-[70%]">You may struggle to remember dreams — a trait linked to variants near the noradrenaline receptor gene.</p>
-      </div>
-      <div class="flex justify-between items-end mt-4 z-10 relative">
-        <span class="text-sm font-medium text-red-600">Weaker Dream Recall</span>
-      </div>
-      <img src="../Images/Dream.png" 
-           class="absolute top-[20px] right-[-40px] w-36 h-36 z-0 pointer-events-none" 
-           alt="Dream Recall icon"/>
-    </div>
-    
+        <div class="trait-card relative bg-white border border-dashed border-gray-400 rounded-xl shadow-sm p-5 flex flex-col justify-between min-h-[200px] overflow-hidden opacity-60">
+          <div class="flex-grow">
+            <h3 class="text-md font-semibold text-gray-500 mb-2">Caffeine Metabolism</h3>
+            <p class="text-sm text-gray-400 leading-relaxed max-w-[70%]">No matching genotype found in your file for this trait.</p>
+          </div>
+          <img src="../Images/Missing.png" 
+               class="absolute top-[20px] right-[-40px] w-36 h-36 z-0 pointer-events-none" 
+               alt="Caffeine Metabolism icon"/>
+        </div>
+        
+        <div class="trait-card relative bg-white border border-dashed border-gray-400 rounded-xl shadow-sm p-5 flex flex-col justify-between min-h-[200px] overflow-hidden opacity-60">
+          <div class="flex-grow">
+            <h3 class="text-md font-semibold text-gray-500 mb-2">Alcohol Tolerance</h3>
+            <p class="text-sm text-gray-400 leading-relaxed max-w-[70%]">No matching genotype found in your file for this trait.</p>
+          </div>
+          <img src="../Images/Missing.png" 
+               class="absolute top-[20px] right-[-40px] w-36 h-36 z-0 pointer-events-none" 
+               alt="Alcohol Tolerance icon"/>
+        </div>
+        
+        <div class="trait-card relative bg-white border border-dashed border-gray-400 rounded-xl shadow-sm p-5 flex flex-col justify-between min-h-[200px] overflow-hidden opacity-60">
+          <div class="flex-grow">
+            <h3 class="text-md font-semibold text-gray-500 mb-2">Marmite Preference</h3>
+            <p class="text-sm text-gray-400 leading-relaxed max-w-[70%]">No matching genotype found in your file for this trait.</p>
+          </div>
+          <img src="../Images/Missing.png" 
+               class="absolute top-[20px] right-[-40px] w-36 h-36 z-0 pointer-events-none" 
+               alt="Marmite Preference icon"/>
+        </div>
+        
+        <div class="trait-card relative bg-white border border-dashed border-gray-400 rounded-xl shadow-sm p-5 flex flex-col justify-between min-h-[200px] overflow-hidden opacity-60">
+          <div class="flex-grow">
+            <h3 class="text-md font-semibold text-gray-500 mb-2">Dream Recall</h3>
+            <p class="text-sm text-gray-400 leading-relaxed max-w-[70%]">No matching genotype found in your file for this trait.</p>
+          </div>
+          <img src="../Images/Missing.png" 
+               class="absolute top-[20px] right-[-40px] w-36 h-36 z-0 pointer-events-none" 
+               alt="Dream Recall icon"/>
+        </div>
+        
     <div class="trait-card relative bg-white rounded-xl shadow-sm p-5 flex flex-col justify-between border border-gray-200 min-h-[200px] overflow-hidden">
       <div class="flex-grow">
         <h3 class="text-md font-semibold text-gray-800 mb-2">Cheese Smell Sensitivity</h3>
@@ -1731,6 +1841,66 @@ body.echo-ancient-page #echo-shell-root{
            alt="Cheese Smell Sensitivity icon"/>
     </div>
     
+        <div class="trait-card relative bg-white border border-dashed border-gray-400 rounded-xl shadow-sm p-5 flex flex-col justify-between min-h-[200px] overflow-hidden opacity-60">
+          <div class="flex-grow">
+            <h3 class="text-md font-semibold text-gray-500 mb-2">Ticklishness</h3>
+            <p class="text-sm text-gray-400 leading-relaxed max-w-[70%]">No matching genotype found in your file for this trait.</p>
+          </div>
+          <img src="../Images/Missing.png" 
+               class="absolute top-[20px] right-[-40px] w-36 h-36 z-0 pointer-events-none" 
+               alt="Ticklishness icon"/>
+        </div>
+        
+        <div class="trait-card relative bg-white border border-dashed border-gray-400 rounded-xl shadow-sm p-5 flex flex-col justify-between min-h-[200px] overflow-hidden opacity-60">
+          <div class="flex-grow">
+            <h3 class="text-md font-semibold text-gray-500 mb-2">Deep Sleep</h3>
+            <p class="text-sm text-gray-400 leading-relaxed max-w-[70%]">No matching genotype found in your file for this trait.</p>
+          </div>
+          <img src="../Images/Missing.png" 
+               class="absolute top-[20px] right-[-40px] w-36 h-36 z-0 pointer-events-none" 
+               alt="Deep Sleep icon"/>
+        </div>
+        
+        <div class="trait-card relative bg-white border border-dashed border-gray-400 rounded-xl shadow-sm p-5 flex flex-col justify-between min-h-[200px] overflow-hidden opacity-60">
+          <div class="flex-grow">
+            <h3 class="text-md font-semibold text-gray-500 mb-2">Insomnia</h3>
+            <p class="text-sm text-gray-400 leading-relaxed max-w-[70%]">No matching genotype found in your file for this trait.</p>
+          </div>
+          <img src="../Images/Missing.png" 
+               class="absolute top-[20px] right-[-40px] w-36 h-36 z-0 pointer-events-none" 
+               alt="Insomnia icon"/>
+        </div>
+        
+        <div class="trait-card relative bg-white border border-dashed border-gray-400 rounded-xl shadow-sm p-5 flex flex-col justify-between min-h-[200px] overflow-hidden opacity-60">
+          <div class="flex-grow">
+            <h3 class="text-md font-semibold text-gray-500 mb-2">Parkinsons</h3>
+            <p class="text-sm text-gray-400 leading-relaxed max-w-[70%]">No matching genotype found in your file for this trait.</p>
+          </div>
+          <img src="../Images/Missing.png" 
+               class="absolute top-[20px] right-[-40px] w-36 h-36 z-0 pointer-events-none" 
+               alt="Parkinsons icon"/>
+        </div>
+        
+        <div class="trait-card relative bg-white border border-dashed border-gray-400 rounded-xl shadow-sm p-5 flex flex-col justify-between min-h-[200px] overflow-hidden opacity-60">
+          <div class="flex-grow">
+            <h3 class="text-md font-semibold text-gray-500 mb-2">Omega3</h3>
+            <p class="text-sm text-gray-400 leading-relaxed max-w-[70%]">No matching genotype found in your file for this trait.</p>
+          </div>
+          <img src="../Images/Missing.png" 
+               class="absolute top-[20px] right-[-40px] w-36 h-36 z-0 pointer-events-none" 
+               alt="Omega3 icon"/>
+        </div>
+        
+        <div class="trait-card relative bg-white border border-dashed border-gray-400 rounded-xl shadow-sm p-5 flex flex-col justify-between min-h-[200px] overflow-hidden opacity-60">
+          <div class="flex-grow">
+            <h3 class="text-md font-semibold text-gray-500 mb-2">Anaemia</h3>
+            <p class="text-sm text-gray-400 leading-relaxed max-w-[70%]">No matching genotype found in your file for this trait.</p>
+          </div>
+          <img src="../Images/Missing.png" 
+               class="absolute top-[20px] right-[-40px] w-36 h-36 z-0 pointer-events-none" 
+               alt="Anaemia icon"/>
+        </div>
+        
     <div class="trait-card relative bg-white rounded-xl shadow-sm p-5 flex flex-col justify-between border border-gray-200 min-h-[200px] overflow-hidden">
       <div class="flex-grow">
         <h3 class="text-md font-semibold text-gray-800 mb-2">Smoking Tendency</h3>
@@ -1747,56 +1917,89 @@ body.echo-ancient-page #echo-shell-root{
     </div>
   </div>
 
+
     </main>
   </div>
 
   <script>
-    // Sidebar filter
     function filterTraits(sectionId, btn) {
       const sections = document.querySelectorAll('.trait-section');
-      sections.forEach(s => { s.classList.add('hidden'); s.classList.remove('visible'); });
+
+      sections.forEach(s => {
+        s.classList.add('hidden');
+        s.classList.remove('visible');
+      });
+
       const target = document.getElementById(sectionId);
-      if (target) { target.classList.remove('hidden'); void target.offsetWidth; target.classList.add('visible'); }
+
+      if (target) {
+        target.classList.remove('hidden');
+        void target.offsetWidth;
+        target.classList.add('visible');
+      }
+
       document.querySelectorAll('.sidebar-btn').forEach(b => b.classList.remove('active'));
-      if (btn) btn.classList.add('active');
+
+      if (btn) {
+        btn.classList.add('active');
+      }
+
+      const mobileSelect = document.getElementById("mobile-category-select");
+
+      if (mobileSelect && mobileSelect.value !== sectionId) {
+        mobileSelect.value = sectionId;
+      }
     }
+
     window.addEventListener('DOMContentLoaded', () => {
       const firstVisible = document.querySelector('.trait-section:not(.hidden)');
       if (firstVisible) firstVisible.classList.add('visible');
+
+      const mobileSelect = document.getElementById("mobile-category-select");
+
+      if (mobileSelect) {
+        mobileSelect.addEventListener("change", function () {
+          filterTraits(this.value, null);
+        });
+      }
     });
 
-    // Live Search
     document.getElementById("trait-search").addEventListener("input", function() {
       const query = this.value.toLowerCase();
       const cards = document.querySelectorAll(".trait-card");
+
       cards.forEach(card => {
         const text = card.innerText.toLowerCase();
         card.style.display = text.includes(query) ? "" : "none";
       });
     });
 
-    // Blob Generator
     const shapesContainer = document.getElementById("bg-shapes");
     const blobPaths = [
       "M421.5,294.5Q387,339,354.5,383Q322,427,261,440Q200,453,153,418Q106,383,77.5,333Q49,283,56,221.5Q63,160,100,112.5Q137,65,192.5,49Q248,33,293,70.5Q338,108,390,137.5Q442,167,448,220Q454,273,421.5,294.5Z",
       "M419,298.5Q390,347,349.5,385Q309,423,252.5,412Q196,401,152.5,367Q109,333,83,284.5Q57,236,74.5,178Q92,120,144.5,85.5Q197,51,256.5,52Q316,53,358,96Q400,139,423.5,194.5Q447,250,419,298.5Z",
       "M421.5,298.5Q392,347,344,372.5Q296,398,239,408Q182,418,132.5,384Q83,350,60,295Q37,240,56.5,182Q76,124,126,86.5Q176,49,237,47Q298,45,344,85Q390,125,418.5,187.5Q447,250,421.5,298.5Z"
     ];
+
     for (let i = 0; i < 3; i++) {
       const el = document.createElementNS("http://www.w3.org/2000/svg", "svg");
       el.setAttribute("viewBox", "0 0 500 500");
       el.setAttribute("class", "bg-blob");
+
       const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
       path.setAttribute("d", blobPaths[Math.floor(Math.random() * blobPaths.length)]);
       path.setAttribute("fill", "#b3d4fc");
       path.setAttribute("opacity", 0.2);
+
       el.appendChild(path);
+
       const size = Math.floor(Math.random() * 200) + 160;
       el.style.width = size + "px";
       el.style.height = size + "px";
       el.style.position = "absolute";
-      el.style.top = (200 + Math.random() * 600) + "px"; // ensure not at very top
+      el.style.top = (200 + Math.random() * 600) + "px";
       el.style.left = Math.floor(Math.random() * window.innerWidth) + "px";
+
       shapesContainer.appendChild(el);
     }
   </script>
